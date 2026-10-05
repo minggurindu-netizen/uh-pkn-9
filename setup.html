@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suntik Data Ujian Ar-Ridho</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen p-4">
+
+    <div class="bg-white p-8 rounded-2xl shadow-xl max-w-lg text-center border border-gray-200">
+        <div class="text-5xl mb-4">🚀</div>
+        <h1 class="text-2xl font-bold text-gray-800 mb-2">Pemulih Database Instan</h1>
+        <p class="text-gray-500 mb-6 text-sm">Sistem ini sudah berisi <b>173 Siswa Kelas 9</b> dan <b>50 Soal PKN</b> milik Pak Jayadi. Klik tombol di bawah ini 1 kali saja untuk memindahkannya ke Database.</p>
+        
+        <button id="btnSuntik" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-6 rounded-xl w-full transition shadow-lg">
+            Suntik Data Sekarang!
+        </button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
+        import { getFirestore, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDExMRbUfrN-R8mKVznYCVpng4K6F8iaSg",
+            authDomain: "uh-pkn-kelas-9.firebaseapp.com",
+            projectId: "uh-pkn-kelas-9",
+            storageBucket: "uh-pkn-kelas-9.firebasestorage.app",
+            messagingSenderId: "468330303384",
+            appId: "1:468330303384:web:c5ed6f5b821ca1d58ae5ed"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // DATA 173 SISWA KELAS 9.1 - 9.4
+        const rawSiswa = `
+ABIDZAR AL GHIFARI LUBIS|242507001|L|9.1
+AISHA RIZKYA ZHAFIRA|242507185|P|9.1
+ALDIAN FAIZ ABIMANYU|242507049|L|9.1
+AN NISA AULIA RAHMAH|242507051|P|9.1
+ASSYIPA ALDAWIYAH|242507140|P|9.1
+ATARA NAWAWINA ALAYA|242507006|P|9.1
+DANISH ALDRIC KANDELA|242507053|L|9.1
+ELVINA RAMADHANI|242507011|P|9.1
+FAKHRI AL YASIN|242507144|L|9.1
+HAIKAL YUSUF MUTAQIN|242507146|L|9.1
+HELMAWATI NISPI|242507148|P|9.1
+KALILA AZZAHRA AGSYA|242507150|P|9.1
+KARIN PUTRI RAHMANIAR|242507151|P|9.1
+MEDINA RAYANI PUTRI|242507154|P|9.1
+MUHAMAD FIKRI HAIKAL|242507067|L|9.1
+MUHAMAD KURNIAWAN|242507110|L|9.1
+MUHAMAD RISKI|242507163|L|9.1
+MUHAMAD RIZKY ALFARIZI|242507156|L|9.1
+MUHAMAD YAHYA SEPTIAN|242507023|L|9.1
+MUHAMMAD AMMAR AZZIKRA|242507026|L|9.1
+MUHAMMAD AZZAM ZAIDDAN|242507113|L|9.1
+MUHAMMAD FADIL ALFARIZKY|242507066|L|9.1
+MUHAMMAD IMAM RIYADHUSSOLIHIN|242507029|L|9.1
+MUHAMMAD NICKY PRATAMA|242507074|L|9.1
+MULYANA BADAR MUHTAR|242507167|L|9.1
+NAJLAA KIRANA PUTRI|242507116|P|9.1
+NARENDRA DARVESH PRADITYA|242507117|L|9.1
+NAZWA ZAKIYAH|242507031|P|9.1
+NOVITA DWI LESTARI|242507032|P|9.1
+RAFA FAEYZA ADITYA|242507123|L|9.1
+RAFI IMADUL BILAD|242507081|L|9.1
+RIDHONINO SETIAWAN|242507174|L|9.1
+RIYAN AZZARI DALIMUNTE|242507126|L|9.1
+SIFA RAMADANI|242507129|P|9.1
+SILVIA HIDAYAT|242507130|P|9.1
+SITI SILVIAWATI|242507086|P|9.1
+SITI WINDI AZAHIRA|242507087|P|9.1
+SITI ZAHIRA|242507088|P|9.1
+SYLA RAHMANIA|242507186|P|9.1
+VIOLA ZULFIANI|242507089|P|9.1
+VISKA ARIANI|242507090|P|9.1
+WILDAN NURULLOH|242507046|L|9.1
+ZIDAN ALGIFARI SURYAMAN|242507179|L|9.1
+AFRINA RAFANIA RHAMDANI|242507093|P|9.2
+AL ZAHIRA SRI WIJAYA|242507094|P|9.2
+ALFAN ANDRIAN|242507050|L|9.2
+ARSYAVIN WIDAN SAPUTRA|242507005|L|9.2
+ARYA NAILUL KHALIL|242507139|L|9.2
+AURORA MIKHAYLA RAMADANTI|242507052|P|9.2
+AZZAHRA WIDYASIH PUTRI|242507141|P|9.2
+BUNGA KEYSHA DARMAWAN|242507008|P|9.2
+DENDY ALFAREZ PUTRA WIDODO|242507054|L|9.2
+EGI|242507010|L|9.2
+FAHMI PUTRA RIFA'I|242507056|L|9.2
+FAIRUZ FUADI SAPUTRA|242507101|L|9.2
+FAJAR ADHITAMA|242507102|L|9.2
+FARASKA SURYA FADILAH|242507145|L|9.2
+FARSHA FAIZI SAPUTRA|242507057|L|9.2
+HASBI ALGANI|242507147|L|9.2
+IBRAHIM DZAKI CHANDRA|242507104|L|9.2
+INTAN SYIFA MUFADHILAH|242507149|P|9.2
+IRVAN MAULANA|242507060|L|9.2
+JERRY AHMAD AL-FARIZZI|242507016|L|9.2
+KALILA RIFDA|242507017|P|9.2
+KHANZA CHAERUNNISA|242507063|P|9.2
+MUHAMAD ALVIN MULYADI|242507073|L|9.2
+MUHAMAD DHARIN DIMYATI|242507021|L|9.2
+MUHAMAD RAFI FAHRUROHMAN|242507111|L|9.2
+MUHAMMAD AZZMI KHAIRAN|242507114|L|9.2
+MUHAMMAD ENO KURNIAWAN|242507159|L|9.2
+MUHAMMAD FAHRY FIQRIANI|242507161|L|9.2
+MUHAMMAD IBNU SABIL|242507028|L|9.2
+MUHAMMAD RENALDY SYAHRILLAH|242507076|L|9.2
+MUHAMMAD RIFYAN|242507162|L|9.2
+NAJWATUL LATIFAH|242507187|P|9.2
+NAWA AURA WAHYUDI|242507119|P|9.2
+NUGIH PRATAMA|242507078|L|9.2
+NUR SHAFA KAMILA|242507080|P|9.2
+PUTRI CAHYA YULIA|242507169|P|9.2
+RAFIF NAUFAL FADHILAH|242507170|L|9.2
+ROFI ALKHAYIS PUTRA YOLANDA|242507127|L|9.2
+SHEREN AZKIA CALISTA|242507085|P|9.2
+SITI QISWAH|242507041|P|9.2
+ULFAH HAKIMAH AKBAR|242507044|P|9.2
+YASMIN ADZKIA|242507131|P|9.2
+YUNITA PERMATA SARI|242507133|P|9.2
+ZAHRAH ZAAFARANI|242507092|P|9.2
+ACHDAN YUSUF KRISTIANTO|242507002|L|9.3
+ADELIA ALYA PUTRI|242507003|P|9.3
+AFRAM MAHAWIRA|242507047|L|9.3
+ALFIAN SYAHPUTRA|242507095|L|9.3
+ALIKA KHOIRUNNISA|242507138|P|9.3
+BALQIS UFAIRAH|242507007|P|9.3
+CALLISTA NEYSA SAFARI|242507009|P|9.3
+DHENA ZAHRA RAMADHANI|242507098|P|9.3
+FAHRI NURHAKIM|242507100|L|9.3
+FATIMAH RAHMA|242507013|P|9.3
+FIKRI SURYA PRATAMA RAMADHAN|242507014|L|9.3
+GEMA ARVI RAMADHAN|242507015|L|9.3
+HILMA AYUNINDIA PUTRI|242507103|P|9.3
+KENZA ALGIYASA RAMADHAN|252608188|L|9.3
+LAURA KIRANA SYIFAN|242507064|P|9.3
+M. RAMLAN|242507107|L|9.3
+MAURA SILVIANA DEVI|242507153|P|9.3
+MUHAMAD HASBI AL-HADORI|242507069|L|9.3
+MUHAMAD RAMA HAIKAL ANDRIAN|242507155|L|9.3
+MUHAMAD SYAGHILUL KHAIR|242507157|L|9.3
+MUHAMMAD AGHA ALDZAKWAN|242507071|L|9.3
+MUHAMMAD ALIF AHDAN|242507072|L|9.3
+MUHAMMAD GALEN HAMIZAN FAIQ|242507027|L|9.3
+MUHAMMAD MAHAMERU|242507030|L|9.3
+MUHAMMAD RAFI AL ZAKI|242507075|L|9.3
+MUHAMMAD SALMAN ALPARIZZI|242507164|L|9.3
+NUR AKBAR|242507079|L|9.3
+PRADIPTA DAMAR ATMAJA|242507121|L|9.3
+RAFA ALDIAN SIREGAR|242507034|L|9.3
+RAHMA FITRIANI|242507035|P|9.3
+RAISSA RAWNIE RIANTA|242507082|P|9.3
+RAVAEL ARIFIAN|242507083|L|9.3
+REYHANI KURNIA RAMADHANI|242507172|P|9.3
+SABRINA SOFIA FIRDAUS|242507128|P|9.3
+SASKIA SHAFARANI|242507040|P|9.3
+SHAFA RIZKIKA RAMADHANI|242507084|P|9.3
+TSANI LATIFA|242507043|P|9.3
+WAHYU RIFTIANSYAH CAHYO PRAYOG|242507091|L|9.3
+YASMIN NABILA RAMADHANI|242507132|P|9.3
+ZAIN GIBRAN|242507134|L|9.3
+ZARA ALIFAH NOVIANTI|242507135|P|9.3
+ZASKIA OKTAVIANI|242507136|P|9.3
+ZEIN ABDULLAH SOPYAN|242507178|L|9.3
+ADISTYA SAHIRA NASUTION|242507137|P|9.4
+AHTAR MAULANA SANJAYA|242507048|L|9.4
+ANANDA CHIARA CHANA LUCITA HAR|242507004|P|9.4
+ANDHIKA MAULANA RIZKY|242507096|L|9.4
+ANNALISA PUTRI ANGGRAENI|242507184|P|9.4
+DESHINTA MAHARANI|242507055|P|9.4
+DHIA AYU SYARAFANA|242507142|P|9.4
+DINDA RIZKY LESTARI|242507099|P|9.4
+FAHMI NURUL DZIHNI|242507012|L|9.4
+FAJAR RAMADHAN|242507143|L|9.4
+IKRIMA AZZAHRA|242507058|P|9.4
+INDRIYANA|242507059|P|9.4
+JOE HANDY VICKY ATMAJA|242507061|L|9.4
+KENZIE EKO SADUBI|242507018|L|9.4
+KHADIZAH PUTRI FAUZIAH|242507062|P|9.4
+MAULANA ABDUL HADI|242507152|L|9.4
+MUHAMAD ARYA PRATAMA|242507019|L|9.4
+MUHAMAD DANU PERMANA|242507020|L|9.4
+MUHAMAD GISMA APRIATNA|242507068|L|9.4
+MUHAMAD ILHAM FIQRIANSYAH|242507070|L|9.4
+MUHAMAD RIFAT SULAEMAN|242507077|L|9.4
+MUHAMAD YUSUF GHAZALI SUTISNA|242507024|L|9.4
+MUHAMMAD ABIAN PRATAMA PUTRA|242507025|L|9.4
+MUHAMMAD ANWARUDIN|242507112|L|9.4
+MUHAMMAD ARKA SAPUTRA|242507065|L|9.4
+MUHAMMAD AZKA ADYARIZKY|242507158|L|9.4
+MUHAMMAD FACHRI TIRTAYASA|242507160|L|9.4
+MUHAMMAD SYATHIR|242507182|L|9.4
+MUHAMMAD TIBRIZIK MUKODAM|242507165|L|9.4
+MUHAMMAD VICKY AKBAR|242507166|L|9.4
+NUFFAH JASMINE HAURA KHANSA|242507033|P|9.4
+NURHILMA NAFILA|242507168|P|9.4
+OCTA NUR'AENI|242507120|P|9.4
+PUTRI AYUDIA INKAN|242507122|P|9.4
+RAIF AL YASIR|242507036|L|9.4
+RAISA ALKAUTSAR|242507037|P|9.4
+RAYHAN HERMANSYAH|242507124|L|9.4
+REZKY AJI SAPUTRA|242507173|L|9.4
+SAEPUDIN|242507038|L|9.4
+SALWA ALFINA HUSNIYAH|242507039|P|9.4
+SITI AYRA|242507176|P|9.4
+SITI AZZAHRA BATUBARA|242507177|P|9.4
+SITI SALWA KHAMALIYAH|242507042|P|9.4
+`;
+
+        // DATA 50 SOAL PKN
+        const rawSoal = `
+1|Analisis hubungan antara Pancasila dan Pembukaan UUD NRI Tahun 1945: (1) Pancasila berkedudukan di atas konstitusi sebagai norma dasar. (2) Pembukaan UUD 1945 dapat diubah sewaktu-waktu. (3) Pembukaan UUD 1945 memuat rumusan Pancasila.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b
+2|Karakteristik hubungan Pancasila dengan Bhinneka Tunggal Ika: (1) Sila ketiga meletakkan dasar kebangsaan. (2) Keberagaman harus diseragamkan. (3) Pancasila menjamin hak yang setara bagi setiap warga.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b
+3|Implementasi semangat Pancasila dalam kehidupan bernegara: (1) Mengutamakan musyawarah mufakat. (2) Memperlakukan orang lain secara adil. (3) Memaksakan kehendak kelompok mayoritas.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
+4|Analisis pandangan para ahli mengenai konsep hak dan kewajiban: (1) Notonegoro menyatakan hak adalah kekuasaan menerima. (2) John Salmond mengelompokkan hak kekebalan. (3) Kewajiban warga negara bersifat opsional.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
+5|Pengaturan hak dan kewajiban warga negara dalam UUD 1945: (1) Hak atas pekerjaan diatur Pasal 27 ayat 2. (2) Hak berserikat diatur Pasal 28E. (3) Warga negara dibebaskan dari kewajiban hukum.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
+6|Peran lembaga penegak hukum dalam sistem peradilan di Indonesia: (1) Polri memelihara keamanan. (2) Kejaksaan melaksanakan penuntutan perkara pidana. (3) Hakim bertindak sebagai penasihat hukum terdakwa.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
+7|Hakikat kemerdekaan berpendapat sebagai hak asasi manusia: (1) Tolok ukur negara demokrasi. (2) Dapat dilaksanakan sebebas-bebasnya tanpa batas. (3) Harus diimbangi kewajiban menghormati hak orang lain.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b
+8|Ketentuan hukum penyampaian pendapat di muka umum (UU No 9/1998): (1) Dilarang di istana kepresidenan dan tempat ibadah. (2) Diwujudkan melalui unjuk rasa atau pawai. (3) Diizinkan malam hari tanpa batasan waktu.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
+9|Prinsip keterbukaan informasi publik (UU No 14/2008): (1) Menjamin hak warga mengetahui kebijakan publik. (2) Mendorong partisipasi aktif masyarakat. (3) Menutupi dokumen negara dari pengawasan.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
+10|Karakteristik tradisi dan kearifan lokal di Indonesia: (1) Tradisi diwariskan turun-temurun. (2) Kearifan lokal memuat budi pekerti luhur. (3) Tradisi bersifat statis mutlak dan tidak beradaptasi.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
+11|Analisis nilai filosofis kearifan lokal nusantara: (1) Tri Hita Karana mengajarkan keharmonisan. (2) Ajining diri saka lathi menekankan pentingnya etika. (3) Lojor teu meunang dipotong mendorong eksploitasi hutan.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
+12|Ruang lingkup objek pemajuan kebudayaan (UU No 5/2017): (1) Tradisi lisan dan upacara adat. (2) Permainan rakyat dan olahraga tradisional. (3) Industri manufaktur mesin berat.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
+13|Analisis tantangan demografi Indonesia (Sensus 2020): (1) Bonus demografi ditandai dominasi usia produktif. (2) Sebaran penduduk merata di pulau terluar. (3) Peningkatan kualitas SDM sangat krusial.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b
+14|Wujud cita-cita bangsa dan sistem pertahanan NKRI: (1) Membentuk masyarakat adil makmur. (2) Menerapkan Sishankamrata. (3) Mengisolasi diri dari kerja sama internasional.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
+15|Peran aktif peserta didik menjaga keutuhan wilayah NKRI: (1) Belajar tekun. (2) Menjaga kerukunan dan menghindari intoleransi. (3) Melakukan tindakan anarkis di ruang publik.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
+16|Pendapat yang menyatakan hubungan Pancasila dan UUD 1945 ibarat roh dan jasad dikemukakan oleh...|Prof. Dr. Notonegoro|Jimly Asshiddiqie|Yudi Latif|Moh. Hatta|a
+17|Alasan utama Pembukaan UUD 1945 tidak boleh diubah oleh MPR adalah karena memuat...|Aturan peralihan sistem|Rumusan dasar negara dan tujuan NKRI|Rincian pasal penyelenggaraan negara|Jadwal pelaksanaan pemilu|b
+18|Menurut Prof. Dr. Notonegoro, hak diartikan sebagai...|Kepentingan yang dilindungi hukum|Beban memberikan sesuatu|Kekuasaan menerima sesuatu yang semestinya|Izin mutlak dari penguasa|c
+19|Pasal UUD 1945 yang tegas menjamin kebebasan memeluk agama dan beribadat adalah...|Pasal 27 ayat (1)|Pasal 28D ayat (1)|Pasal 29 ayat (2)|Pasal 31 ayat (1)|c
+20|Perilaku keseimbangan antara hak dan kewajiban di sekolah adalah...|Menuntut fasilitas tanpa merawat|Mendapat pelajaran & menaati tata tertib|Meminta guru mengulang tanpa perhatikan|Mengabaikan kebersihan demi nilai|b
+21|Lembaga peradilan di bawah MA untuk mengadili perkara perdata dan pidana umum adalah...|Peradilan TUN|Peradilan Agama|Peradilan Militer|Peradilan Umum|d
+22|Berdasarkan UU No 2 Tahun 2002, tugas utama Polri adalah...|Menguji UU terhadap UUD|Memelihara keamanan & ketertiban hukum|Menjatuhkan vonis persidangan|Melaksanakan penuntutan perkara|b
+23|Undang-undang yang khusus mengatur kemerdekaan menyampaikan pendapat di muka umum adalah...|UU No 9 Tahun 1998|UU No 39 Tahun 1999|UU No 14 Tahun 2008|UU No 5 Tahun 2017|a
+24|Lokasi yang dilarang mutlak untuk dijadikan tempat unjuk rasa adalah...|Alun-alun dan jalan protokol|Istana kepresidenan dan tempat ibadah|Depan gedung DPRD|Lapangan terbuka umum|b
+25|Aplikasi resmi pemerintah untuk layanan pengaduan online masyarakat adalah...|PeduliLindungi|JKN Mobile|LAPOR!|JDIH Nasional|c
+26|Abercrombie mendefinisikan tradisi sebagai...|Keputusan politik parlemen|Kebiasaan diwariskan antargenerasi|Aturan tertulis bersanksi|Perilaku adopsi budaya asing|b
+27|Kearifan lokal Bali tentang keharmonisan manusia, Tuhan, dan alam disebut...|Tri Hita Karana|Sad Rasa|Tat Twam Asi|Tri Kaya Parisudha|a
+28|Pesan utama filosofi Baduy 'Gunung teu meunang dilebur' adalah...|Membangun kawasan industri pegunungan|Kewajiban menjaga kelestarian alam|Larangan mukim di dataran rendah|Memanfaatkan hutan sebebasnya|b
+29|Undang-undang tentang Pemajuan Kebudayaan adalah...|UU No 11 Tahun 2008|UU No 9 Tahun 1998|UU No 5 Tahun 2017|UU No 14 Tahun 2008|c
+30|Kondisi struktur penduduk didominasi kelompok usia produktif disebut...|Urbanisasi penduduk|Bonus demografi|Transisi demografi|Kepadatan agraris|b
+31|Wujud cita-cita nasional dalam Pembukaan UUD 1945 tercantum pada...|Alinea pertama|Alinea kedua|Alinea ketiga|Alinea keempat|b
+32|Sistem pertahanan keamanan yang bersifat semesta dikenal dengan...|Hansip|Sishankamrata|Wajib militer|Bela negara aktif|b
+33|Pasal 28F UUD 1945 memberikan jaminan perlindungan untuk...|Memilih pekerjaan layak|Berkomunikasi & memperoleh informasi|Memeluk agama|Mendapat pengajaran dasar|b
+34|Peran pers nasional di Indonesia diatur dalam...|UU No 40 Tahun 1999 tentang Pers|UU No 39 Tahun 1999 tentang HAM|UU No 14 Tahun 2008 tentang KIP|UU No 9 Tahun 1998|a
+35|Komitmen pelajar dalam menjaga NKRI diwujudkan melalui sikap...|Membentuk kelompok eksklusif|Menaati tata tertib & toleransi|Aksi protes anarkis|Mengabaikan upacara bendera|b
+36|Hubungan Pancasila dan UUD 1945 ibarat roh dan jasad yang tak terpisahkan.|Benar|Salah|-|-|a
+37|Pembukaan UUD 1945 dapat diamendemen sewaktu-waktu oleh MPR.|Benar|Salah|-|-|b
+38|Menurut Notonegoro, kewajiban adalah beban memberikan sesuatu secara mutlak.|Benar|Salah|-|-|a
+39|HAM di Indonesia bersifat mutlak tanpa batas dan bebas tanpa peduli hak orang lain.|Benar|Salah|-|-|b
+40|Peradilan militer mengadili tindak pidana yang dilakukan oleh militer.|Benar|Salah|-|-|a
+41|Demonstrasi diperbolehkan di lingkungan istana kepresidenan pada malam hari.|Benar|Salah|-|-|b
+42|Keterbukaan informasi publik diatur melalui UU No 14 Tahun 2008.|Benar|Salah|-|-|a
+43|Tradisi budaya lokal bersifat statis dan tidak berguna bagi masyarakat modern.|Benar|Salah|-|-|b
+44|Satu Tungku Tiga Batu adalah wujud kearifan lokal kerukunan di Fakfak.|Benar|Salah|-|-|a
+45|Sensus 2020: sebagian besar penduduk Indonesia terkonsentrasi di luar Pulau Jawa.|Benar|Salah|-|-|b
+46|Bonus demografi memberi keuntungan jika SDM didukung pendidikan dan kesehatan.|Benar|Salah|-|-|a
+47|Pasal 33 UUD 1945: bumi, air, kekayaan alam dikuasai negara untuk kemakmuran rakyat.|Benar|Salah|-|-|a
+48|Bullying di sekolah adalah bentuk pelanggaran hak asasi manusia.|Benar|Salah|-|-|a
+49|Kebebasan pendapat tidak memerlukan batasan moral karena dijamin undang-undang.|Benar|Salah|-|-|b
+50|Peran menjaga NKRI bagi siswa dimulai dari disiplin dan menghormati teman.|Benar|Salah|-|-|a
+`;
+
+        document.getElementById('btnSuntik').addEventListener('click', async () => {
+            const btn = document.getElementById('btnSuntik');
+            btn.disabled = true;
+            btn.innerText = "Memasukkan Data... Mohon Tunggu Sebentar";
+            btn.classList.replace('bg-blue-600', 'bg-gray-400');
+            
+            Swal.fire({ title: 'Mengeksekusi Data...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            try {
+                // 1. Eksekusi Siswa
+                const linesSiswa = rawSiswa.trim().split('\n');
+                for(let line of linesSiswa) {
+                    const p = line.split('|');
+                    const idSiswa = 'siswa_' + p[1].trim(); 
+                    await setDoc(doc(db, "users", idSiswa), {
+                        nama: p[0].trim(),
+                        nis: p[1].trim(),
+                        jk: p[2].trim(),
+                        kelas: p[3].trim(),
+                        status: 'belum',
+                        nilai: 0,
+                        jawaban: {}
+                    });
+                }
+
+                // 2. Eksekusi Soal
+                const linesSoal = rawSoal.trim().split('\n');
+                for(let i=0; i<linesSoal.length; i++) {
+                    const p = linesSoal[i].split('|');
+                    const idSoal = 'soal_pkn_' + (i+1);
+                    await setDoc(doc(db, "questions", idSoal), {
+                        soal: p[1].trim(),
+                        a: p[2].trim(),
+                        b: p[3].trim(),
+                        c: p[4].trim(),
+                        d: p[5].trim(),
+                        jawaban: p[6].trim()
+                    });
+                }
+
+                Swal.fire('BERHASIL TOTAL!', '173 Data Siswa dan 50 Soal telah masuk ke Database Bapak.', 'success');
+                btn.innerText = "Selesai! Silakan buka Web Ujian Utama";
+                btn.classList.replace('bg-gray-400', 'bg-green-500');
+
+            } catch(e) {
+                console.error(e);
+                Swal.fire('Gagal!', 'Pastikan koneksi internet Bapak stabil.', 'error');
+                btn.disabled = false;
+                btn.innerText = "Gagal. Klik untuk Coba Lagi";
+                btn.classList.replace('bg-gray-400', 'bg-blue-600');
+            }
+        });
+    </script>
+</body>
+</html>
