@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ujian PKN - SMP Islam Ar-Ridho</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiVWppYW4gUEtOIEFyLVJpZGhvIiwic2hvcnRfbmFtZSI6IlVqaWFuIFBLTiIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjZmZmZmZmIiwidGhlbWVfY29sb3IiOiIjMjU2M2ViIiwiaWNvbnMiOlt7InNyYyI6Imh0dHBzOi8vcGxhY2Vob2xkLmNvLzE5MngxOTIvMjU2M2ViL2ZmZmZmZj90ZXh0PVVqaWFuIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 24px 24px;
+            color: #0f172a;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        }
+        .hide { display: none !important; }
+        
+        /* Custom Radio Button Style untuk Opsi Jawaban */
+        .radio-custom:checked + div {
+            background-color: #eff6ff;
+            border-color: #3b82f6;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);
+        }
+        .radio-custom:checked + div .radio-circle {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+        .radio-custom:checked + div .radio-circle::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: white;
+        }
+        
+        /* Animasi Loader */
+        .loader { 
+            border: 3px solid #e2e8f0; 
+            border-top: 3px solid #3b82f6; 
+            border-radius: 50%; 
+            width: 32px; height: 32px; 
+            animation: spin 1s linear infinite; 
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Layout Admin Responsif */
+        @media (min-width: 768px) {
+            .admin-layout { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
+            .bottom-nav { display: none; }
+        }
+        @media (max-width: 767px) {
+            .admin-layout { display: block; padding-bottom: 70px; }
+            .sidebar { display: none; }
+            .bottom-nav { display: flex; }
+        }
+        
+        /* Hide scrollbar for cleaner look in exam area */
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="antialiased min-h-screen relative selection:bg-blue-200">
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm transition-opacity duration-300">
+        <div class="loader mb-4"></div>
+        <p id="loadingText" class="text-slate-600 font-medium animate-pulse">Memuat sistem ujian...</p>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div id="app" class="w-full h-full min-h-screen"></div>
+
+    <!-- Firebase SDK (Modular) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, query, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ==========================================
+        // 1. KONFIGURASI FIREBASE & MODE DEMO
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDExMRbUfrN-R8mKVznYCVpng4K6F8iaSg",
+            authDomain: "uh-pkn-kelas-9.firebaseapp.com",
+            projectId: "uh-pkn-kelas-9",
+            storageBucket: "uh-pkn-kelas-9.firebasestorage.app",
+            messagingSenderId: "468330303384",
+            appId: "1:468330303384:web:c5ed6f5b821ca1d58ae5ed",
+            measurementId: "G-5B951533XB"
+        };
+
+        // Otomatis jalankan Mode Demo jika API Key belum diisi (Untuk fitur Pratinjau / Preview)
+        const isDemoMode = firebaseConfig.apiKey === "API_KEY_BAPAK";
+        
+        let app, db, auth, studentsRef, questionsRef;
+        
+        if (!isDemoMode) {
+            app = initializeApp(firebaseConfig);
+            db = getFirestore(app);
+            auth = getAuth(app);
+            studentsRef = collection(db, 'students');
+            questionsRef = collection(db, 'questions');
+        }
+
+        // ==========================================
+        // 2. STATE APLIKASI (Penyimpanan Memori Sementara)
+        // ==========================================
+        const state = {
+            userType: null, // 'student' atau 'admin'
+            studentData: null, // Data profil siswa yg sedang ujian
+            allStudents: [], // List seluruh siswa untuk dropdown login / tabel admin
+            examQuestions: [], // Soal yang sudah diacak urutannya
+            currentQuestionIndex: 0, 
+            answers: {}, // Jawaban yang dipilih siswa { questionId: indexPilihan }
+            isAdmin: false,
+            isExamFinished: false,
+            isConfirmed: false, // Menandakan siswa sudah konfirmasi data diri
+            unsubscribeAdmin: null,
+            currentAdminData: [] // Menyimpan data rekap saat ini untuk didownload
+        };
+
+        // ==========================================
+        // 3. DATABASE DUMMY: 173 SISWA KELAS 9
+        // ==========================================
+        const RAW_STUDENTS = [
+            // Kelas 9.1
+            ["242507001","0112250701","ABIDZAR AL GHIFARI LUBIS","L","9.1"],["242507185","0118468729","AISHA RIZKYA ZHAFIRA","P","9.1"],["242507049","0115521932","ALDIAN FAIZ ABIMANYU","L","9.1"],["242507051","03113035206","AN NISA AULIA RAHMAH","P","9.1"],["242507140","3126598859","ASSYIPA ALDAWIYAH","P","9.1"],["242507006","3115132886","ATARA NAWAWINA ALAYA","P","9.1"],["242507053","0129682086","DANISH ALDRIC KANDELA","L","9.1"],["242507011","0128031712","ELVINA RAMADHANI","P","9.1"],["242507144","0125950149","FAKHRI AL YASIN","L","9.1"],["242507146","0126738383","HAIKAL YUSUF MUTAQIN","L","9.1"],["242507148","0127732474","HELMAWATI NISPI","P","9.1"],["242507150","0123215234","KALILA AZZAHRA AGSYA","P","9.1"],["242507151","0123810952","KARIN PUTRI RAHMANIAR","P","9.1"],["242507154","0111262830","MEDINA RAYANI PUTRI","P","9.1"],["242507067","3115858704","MUHAMAD FIKRI HAIKAL","L","9.1"],["242507110","3128561717","MUHAMAD KURNIAWAN","L","9.1"],["242507163","0119272535","MUHAMAD RISKI","L","9.1"],["242507156","0114707555","MUHAMAD RIZKY ALFARIZI","L","9.1"],["242507023","3114407011","MUHAMAD YAHYA SEPTIAN","L","9.1"],["242507026","0121453887","MUHAMMAD AMMAR AZZIKRA","L","9.1"],["242507113","0127804343","MUHAMMAD AZZAM ZAIDDAN","L","9.1"],["242507066","0125048100","MUHAMMAD FADIL ALFARIZKY","L","9.1"],["242507029","0121991684","MUHAMMAD IMAM RIYADHUSSOLIHIN","L","9.1"],["242507074","0112208538","MUHAMMAD NICKY PRATAMA","L","9.1"],["242507167","0126632131","MULYANA BADAR MUHTAR","L","9.1"],["242507116","0126757694","NAJLAA KIRANA PUTRI","P","9.1"],["242507117","0129767780","NARENDRA DARVESH PRADITYA","L","9.1"],["242507031","3122953563","NAZWA ZAKIYAH","P","9.1"],["242507032","3128551310","NOVITA DWI LESTARI","P","9.1"],["242507123","0124575918","RAFA FAEYZA ADITYA","L","9.1"],["242507081","0118347648","RAFI IMADUL BILAD","L","9.1"],["242507174","0115176085","RIDHONINO SETIAWAN","L","9.1"],["242507126","0124959392","RIYAN AZZARI DALIMUNTE","L","9.1"],["242507129","0114585043","SIFA RAMADANI","P","9.1"],["242507130","0115912357","SILVIA HIDAYAT","P","9.1"],["242507086","3120214186","SITI SILVIAWATI","P","9.1"],["242507087","0116017127","SITI WINDI AZAHIRA","P","9.1"],["242507088","0129243631","SITI ZAHIRA","P","9.1"],["242507186","0122849032","SYLA RAHMANIA","P","9.1"],["242507089","0117682754","VIOLA ZULFIANI","P","9.1"],["242507090","3125102794","VISKA ARIANI","P","9.1"],["242507046","3112799899","WILDAN NURULLOH","L","9.1"],["242507179","0112922469","ZIDAN ALGIFARI SURYAMAN","L","9.1"],
+            // Kelas 9.2
+            ["242507093","0123145389","AFRINA RAFANIA RHAMDANI","P","9.2"],["242507094","0112458312","AL ZAHIRA SRI WIJAYA","P","9.2"],["242507050","3110372642","ALFAN ANDRIAN","L","9.2"],["242507005","3114044196","ARSYAVIN WIDAN SAPUTRA","L","9.2"],["242507139","0119108501","ARYA NAILUL KHALIL","L","9.2"],["242507052","3126814449","AURORA MIKHAYLA RAMADANTI","P","9.2"],["242507141","0121057775","AZZAHRA WIDYASIH PUTRI","P","9.2"],["242507008","3128932716","BUNGA KEYSHA DARMAWAN","P","9.2"],["242507054","0124462929","DENDY ALFAREZ PUTRA WIDODO","L","9.2"],["242507010","3114633046","EGI","L","9.2"],["242507056","3111616100","FAHMI PUTRA RIFA'I","L","9.2"],["242507101","3114479502","FAIRUZ FUADI SAPUTRA","L","9.2"],["242507102","3125296816","FAJAR ADHITAMA","L","9.2"],["242507145","0127713764","FARASKA SURYA FADILAH","L","9.2"],["242507057","0113281236","FARSHA FAIZI SAPUTRA","L","9.2"],["242507147","0117447040","HASBI ALGANI","L","9.2"],["242507104","0111135296","IBRAHIM DZAKI CHANDRA","L","9.2"],["242507149","0129554291","INTAN SYIFA MUFADHILAH","P","9.2"],["242507060","0116127084","IRVAN MAULANA","L","9.2"],["242507016","0121692888","JERRY AHMAD AL-FARIZZI","L","9.2"],["242507017","0126563139","KALILA RIFDA","P","9.2"],["242507063","3122278981","KHANZA CHAERUNNISA","P","9.2"],["242507073","0127635435","MUHAMAD ALVIN MULYADI","L","9.2"],["242507021","0117756964","MUHAMAD DHARIN DIMYATI","L","9.2"],["242507111","3115697782","MUHAMAD RAFI FAHRUROHMAN","L","9.2"],["242507114","0114059284","MUHAMMAD AZZMI KHAIRAN","L","9.2"],["242507159","3127311018","MUHAMMAD ENO KURNIAWAN","L","9.2"],["242507161","0122039029","MUHAMMAD FAHRY FIQRIANI","L","9.2"],["242507028","3129677731","MUHAMMAD IBNU SABIL","L","9.2"],["242507076","0121473107","MUHAMMAD RENALDY SYAHRILLAH","L","9.2"],["242507162","0119702922","MUHAMMAD RIFYAN","L","9.2"],["242507187","0102357258","NAJWATUL LATIFAH","P","9.2"],["242507119","3117784761","NAWA AURA WAHYUDI","P","9.2"],["242507078","0118972393","NUGIH PRATAMA","L","9.2"],["242507080","0115974381","NUR SHAFA KAMILA","P","9.2"],["242507169","0116845427","PUTRI CAHYA YULIA","P","9.2"],["242507170","0127658437","RAFIF NAUFAL FADHILAH","L","9.2"],["242507127","3125609025","ROFI ALKHAYIS PUTRA YOLANDA","L","9.2"],["242507085","0127368315","SHEREN AZKIA CALISTA","P","9.2"],["242507041","0113065360","SITI QISWAH","P","9.2"],["242507044","0129472451","ULFAH HAKIMAH AKBAR","P","9.2"],["242507131","3115175343","YASMIN ADZKIA","P","9.2"],["242507133","0113300370","YUNITA PERMATA SARI","P","9.2"],["242507092","0127178677","ZAHRAH ZAAFARANI","P","9.2"],
+            // Kelas 9.3
+            ["242507002","3118256582","ACHDAN YUSUF KRISTIANTO","L","9.3"],["242507003","0128183889","ADELIA ALYA PUTRI","P","9.3"],["242507047","0128502377","AFRAM MAHAWIRA","L","9.3"],["242507095","3120024158","ALFIAN SYAHPUTRA","L","9.3"],["242507138","0116206407","ALIKA KHOIRUNNISA","P","9.3"],["242507007","0123010248","BALQIS UFAIRAH","P","9.3"],["242507009","0121170697","CALLISTA NEYSA SAFARI","P","9.3"],["242507098","0128640046","DHENA ZAHRA RAMADHANI","P","9.3"],["242507100","0116919283","FAHRI NURHAKIM","L","9.3"],["242507013","0129629537","FATIMAH RAHMA","P","9.3"],["242507014","0117318247","FIKRI SURYA PRATAMA RAMADHAN","L","9.3"],["242507015","0111856130","GEMA ARVI RAMADHAN","L","9.3"],["242507103","0125846934","HILMA AYUNINDIA PUTRI","P","9.3"],["252608188","0114001833","KENZA ALGIYASA RAMADHAN","L","9.3"],["242507064","0114668414","LAURA KIRANA SYIFAN","P","9.3"],["242507107","0107534944","M. RAMLAN","L","9.3"],["242507153","0129560342","MAURA SILVIANA DEVI","P","9.3"],["242507069","3118528446","MUHAMAD HASBI AL-HADORI","L","9.3"],["242507155","3122869484","MUHAMAD RAMA HAIKAL ANDRIAN","L","9.3"],["242507157","3128263561","MUHAMAD SYAGHILUL KHAIR","L","9.3"],["242507071","3127683602","MUHAMMAD AGHA ALDZAKWAN","L","9.3"],["242507072","0118702008","MUHAMMAD ALIF AHDAN","L","9.3"],["242507027","3120581901","MUHAMMAD GALEN HAMIZAN FAIQ","L","9.3"],["242507030","0115155912","MUHAMMAD MAHAMERU","L","9.3"],["242507075","0125695290","MUHAMMAD RAFI AL ZAKI","L","9.3"],["242507164","0113012488","MUHAMMAD SALMAN ALPARIZZI","L","9.3"],["242507079","0114829364","NUR AKBAR","L","9.3"],["242507121","0124241649","PRADIPTA DAMAR ATMAJA","L","9.3"],["242507034","0125010329","RAFA ALDIAN SIREGAR","L","9.3"],["242507035","0128054159","RAHMA FITRIANI","P","9.3"],["242507082","0125692386","RAISSA RAWNIE RIANTA","P","9.3"],["242507083","3127004840","RAVAEL ARIFIAN","L","9.3"],["242507172","0127614774","REYHANI KURNIA RAMADHANI","P","9.3"],["242507128","3123791401","SABRINA SOFIA FIRDAUS","P","9.3"],["242507040","31108930891","SASKIA SHAFARANI","P","9.3"],["242507084","3118689729","SHAFA RIZKIKA RAMADHANI","P","9.3"],["242507043","3119726769","TSANI LATIFA","P","9.3"],["242507091","0121650332","WAHYU RIFTIANSYAH CAHYO PRAYOG","L","9.3"],["242507132","0116646191","YASMIN NABILA RAMADHANI","P","9.3"],["242507134","0122321920","ZAIN GIBRAN","L","9.3"],["242507135","0115864404","ZARA ALIFAH NOVIANTI","P","9.3"],["242507136","0117852452","ZASKIA OKTAVIANI","P","9.3"],["242507178","3120378578","ZEIN ABDULLAH SOPYAN","L","9.3"],
+            // Kelas 9.4
+            ["242507137","0114272306","ADISTYA SAHIRA NASUTION","P","9.4"],["242507048","3113568980","AHTAR MAULANA SANJAYA","L","9.4"],["242507004","3113858725","ANANDA CHIARA CHANA LUCITA HAR","P","9.4"],["242507096","3129608907","ANDHIKA MAULANA RIZKY","L","9.4"],["242507184","0118448564","ANNALISA PUTRI ANGGRAENI","P","9.4"],["242507055","0119756570","DESHINTA MAHARANI","P","9.4"],["242507142","0128579453","DHIA AYU SYARAFANA","P","9.4"],["242507099","0114364305","DINDA RIZKY LESTARI","P","9.4"],["242507012","0111449123","FAHMI NURUL DZIHNI","L","9.4"],["242507143","0107745175","FAJAR RAMADHAN","L","9.4"],["242507058","3122354991","IKRIMA AZZAHRA","P","9.4"],["242507059","0126291785","INDRIYANA","P","9.4"],["242507061","0144020622","JOE HANDY VICKY ATMAJA","L","9.4"],["242507018","0116692650","KENZIE EKO SADUBI","L","9.4"],["242507062","0114934071","KHADIZAH PUTRI FAUZIAH","P","9.4"],["242507152","0111138804","MAULANA ABDUL HADI","L","9.4"],["242507019","0126737439","MUHAMAD ARYA PRATAMA","L","9.4"],["242507020","0124559999","MUHAMAD DANU PERMANA","L","9.4"],["242507068","0128155135","MUHAMAD GISMA APRIATNA","L","9.4"],["242507070","3122395422","MUHAMAD ILHAM FIQRIANSYAH","L","9.4"],["242507077","0126156847","MUHAMAD RIFAT SULAEMAN","L","9.4"],["242507024","0118598035","MUHAMAD YUSUF GHAZALI SUTISNA","L","9.4"],["242507025","0129777548","MUHAMMAD ABIAN PRATAMA PUTRA","L","9.4"],["242507112","3129727489","MUHAMMAD ANWARUDIN","L","9.4"],["242507065","0123775509","MUHAMMAD ARKA SAPUTRA","L","9.4"],["242507158","3114586617","MUHAMMAD AZKA ADYARIZKY","L","9.4"],["242507160","3128358398","MUHAMMAD FACHRI TIRTAYASA","L","9.4"],["242507182","0121665902","MUHAMMAD SYATHIR","L","9.4"],["242507165","0127611686","MUHAMMAD TIBRIZIK MUKODAM","L","9.4"],["242507166","0123762074","MUHAMMAD VICKY AKBAR","L","9.4"],["242507033","3118668179","NUFFAH JASMINE HAURA KHANSA","P","9.4"],["242507168","3125724996","NURHILMA NAFILA","P","9.4"],["242507120","0112620301","OCTA NUR'AENI","P","9.4"],["242507122","0128792685","PUTRI AYUDIA INKAN","P","9.4"],["242507036","0128822909","RAIF AL YASIR","L","9.4"],["242507037","3124118938","RAISA ALKAUTSAR","P","9.4"],["242507124","0114866515","RAYHAN HERMANSYAH","L","9.4"],["242507173","0116362683","REZKY AJI SAPUTRA","L","9.4"],["242507038","3125354904","SAEPUDIN","L","9.4"],["242507039","0121847853","SALWA ALFINA HUSNIYAH","P","9.4"],["242507176","3127820485","SITI AYRA","P","9.4"],["242507177","0115727627","SITI AZZAHRA BATUBARA","P","9.4"],["242507042","3121489131","SITI SALWA KHAMALIYAH","P","9.4"]
+        ];
+
+        // ==========================================
+        // 4. DATABASE DUMMY: 50 SOAL PKN
+        // ==========================================
+        const RAW_QUESTIONS = [
+            // TIPE 1 (1-15)
+            { id: 1, text: "Analisis hubungan antara Pancasila dan Pembukaan UUD NRI Tahun 1945:\n(1) Pancasila berkedudukan di atas konstitusi sebagai norma dasar.\n(2) Pembukaan UUD 1945 dapat diubah sewaktu-waktu oleh MPR.\n(3) Pembukaan UUD 1945 memuat rumusan Pancasila sebagai dasar negara yang sah dan tidak boleh diubah.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 1 },
+            { id: 2, text: "Karakteristik hubungan Pancasila dengan Bhinneka Tunggal Ika:\n(1) Sila ketiga Pancasila meletakkan dasar kebangsaan sebagai simpul persatuan.\n(2) Keberagaman suku dan agama di Indonesia harus diseragamkan.\n(3) Pancasila menjamin hak yang setara bagi setiap warga tanpa membedakan SARA.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 1 },
+            { id: 3, text: "Implementasi semangat Pancasila dalam kehidupan bernegara:\n(1) Mengutamakan musyawarah mufakat dalam pengambilan keputusan.\n(2) Memperlakukan orang lain secara adil tanpa memandang status sosial.\n(3) Memaksakan kehendak kelompok mayoritas terhadap minoritas.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
+            { id: 4, text: "Analisis pandangan para ahli mengenai konsep hak dan kewajiban:\n(1) Prof. Dr. Notonegoro menyatakan hak adalah kekuasaan untuk menerima sesuatu yang semestinya diterima.\n(2) John Salmond mengelompokkan hak ke dalam bentuk seperti hak kemerdekaan dan kekebalan.\n(3) Kewajiban warga negara bersifat opsional.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
+            { id: 5, text: "Pengaturan hak dan kewajiban warga negara dalam UUD NRI Tahun 1945:\n(1) Hak atas pekerjaan dan penghidupan yang layak diatur dalam Pasal 27 ayat (2).\n(2) Hak kemerdekaan berserikat dan mengeluarkan pendapat diatur dalam Pasal 28E.\n(3) Warga negara dibebaskan dari segala bentuk kewajiban hukum.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
+            { id: 6, text: "Peran lembaga penegak hukum dalam sistem peradilan di Indonesia:\n(1) Kepolisian bertugas memelihara keamanan dan menegakkan hukum.\n(2) Kejaksaan memiliki wewenang utama dalam melaksanakan penuntutan perkara pidana.\n(3) Hakim bertindak sebagai penasihat hukum bagi terdakwa.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
+            { id: 7, text: "Hakikat kemerdekaan berpendapat sebagai bagian dari hak asasi manusia:\n(1) Merupakan salah satu tolok ukur utama dalam negara demokrasi.\n(2) Dapat dilaksanakan secara sebebas-bebasnya tanpa batas aturan.\n(3) Harus diimbangi dengan kewajiban menghormati hak orang lain.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 1 },
+            { id: 8, text: "Ketentuan hukum penyampaian pendapat di muka umum (UU No. 9 Tahun 1998):\n(1) Dilarang keras dilaksanakan di lingkungan istana kepresidenan dan tempat ibadah.\n(2) Dapat diwujudkan melalui bentuk unjuk rasa, pawai, rapat umum.\n(3) Pelaksanaannya diizinkan pada malam hari tanpa batasan waktu.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
+            { id: 9, text: "Prinsip keterbukaan informasi publik (UU No. 14 Tahun 2008):\n(1) Menjamin hak warga negara untuk mengetahui rencana kebijakan publik.\n(2) Mendorong partisipasi aktif masyarakat dalam negara transparan.\n(3) Menutupi seluruh dokumen penyelenggaraan negara.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
+            { id: 10, text: "Karakteristik tradisi dan kearifan lokal di Indonesia:\n(1) Tradisi merupakan produk keputusan manusia yang diwariskan turun-temurun.\n(2) Kearifan lokal memuat nilai budi pekerti luhur selaras dengan alam.\n(3) Tradisi bersifat statis mutlak sehingga tidak boleh beradaptasi.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
+            { id: 11, text: "Analisis nilai filosofis kearifan lokal nusantara:\n(1) Tri Hita Karana di Bali mengajarkan keharmonisan hubungan manusia dengan Tuhan, sesama, dan alam.\n(2) Filosofi \"Ajining diri saka lathi\" menekankan etika perkataan.\n(3) Filosofi masyarakat Baduy mendorong eksploitasi kawasan hutan.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
+            { id: 12, text: "Ruang lingkup objek pemajuan kebudayaan (UU No. 5 Tahun 2017):\n(1) Tradisi lisan, bahasa, manuskrip kuno, serta upacara adat.\n(2) Permainan rakyat dan olahraga tradisional.\n(3) Industri manufaktur mesin berat.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
+            { id: 13, text: "Analisis tantangan demografi dan kependudukan Indonesia:\n(1) Bonus demografi ditandai oleh dominasi penduduk usia produktif.\n(2) Sebaran penduduk Indonesia terkonsentrasi merata di pulau kecil.\n(3) Peningkatan kualitas SDM sangat krusial menghadapi bonus demografi.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 1 },
+            { id: 14, text: "Wujud cita-cita bangsa dan sistem pertahanan NKRI:\n(1) Membentuk masyarakat yang adil dan makmur materiel maupun spiritual.\n(2) Menerapkan sistem pertahanan keamanan rakyat semesta (Sishankamrata).\n(3) Mengisolasi diri sepenuhnya dari pergaulan diplomasi internasional.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
+            { id: 15, text: "Peran aktif peserta didik dalam menjaga keutuhan wilayah NKRI:\n(1) Belajar dengan tekun dan meningkatkan kapasitas diri.\n(2) Menjaga kerukunan serta menghindari tindakan intoleransi.\n(3) Melakukan tindakan anarkis di ruang publik.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
+            // TIPE 2 (16-35)
+            { id: 16, text: "Pendapat yang menyatakan bahwa hubungan antara Pancasila dan UUD NRI Tahun 1945 ibarat hubungan antara roh dan jasad yang tidak dapat dipisahkan dikemukakan oleh...", options: ["Prof. Dr. Notonegoro", "Jimly Asshiddiqie", "Yudi Latif", "Moh. Hatta"], ans: 0 },
+            { id: 17, text: "Alasan utama Pembukaan UUD NRI Tahun 1945 tidak boleh diubah (diamendemen) oleh MPR adalah karena di dalamnya memuat...", options: ["Aturan peralihan sistem pemerintahan", "Rumusan dasar negara Pancasila dan tujuan berdirinya NKRI", "Rincian pasal-pasal teknis penyelenggaraan negara", "Jadwal pelaksanaan pemilihan umum"], ans: 1 },
+            { id: 18, text: "Menurut Prof. Dr. Notonegoro, hak diartikan sebagai...", options: ["Kepentingan yang dilindungi oleh hukum positif", "Beban untuk memberikan sesuatu yang semestinya diberikan", "Kekuasaan untuk menerima atau melakukan sesuatu yang semestinya diterima oleh pihak tertentu", "Izin atau kekuasaan yang diberikan secara mutlak oleh penguasa"], ans: 2 },
+            { id: 19, text: "Pasal dalam UUD NRI Tahun 1945 yang secara tegas menjamin kebebasan penduduk untuk memeluk agamanya masing-masing dan beribadat menurut agama dan kepercayaannya adalah...", options: ["Pasal 27 ayat (1)", "Pasal 28D ayat (1)", "Pasal 29 ayat (2)", "Pasal 31 ayat (1)"], ans: 2 },
+            { id: 20, text: "Perilaku berikut yang mencerminkan keseimbangan antara pelaksanaan hak dan kewajiban di lingkungan sekolah adalah...", options: ["Menuntut fasilitas belajar yang lengkap tanpa mau merawat dan menjaga inventaris kelas", "Mendapatkan pelajaran dengan tenang serta melaksanakan kewajiban menaati tata tertib sekolah", "Meminta guru mengulang penjelasan tanpa mau memperhatikan materi pelajaran", "Mengabaikan tugas piket kebersihan kelas demi mendapatkan nilai rapor yang tinggi"], ans: 1 },
+            { id: 21, text: "Lembaga peradilan di bawah Mahkamah Agung yang bertugas mengadili perkara perdata dan pidana umum bagi masyarakat pencari keadilan adalah...", options: ["Peradilan Tata Usaha Negara", "Peradilan Agama", "Peradilan Militer", "Peradilan Umum"], ans: 3 },
+            { id: 22, text: "Berdasarkan Undang-Undang Nomor 2 Tahun 2002, tugas utama Kepolisian Negara Republik Indonesia (Polri) adalah...", options: ["Menguji undang-undang terhadap UUD 1945", "Memelihara keamanan dan ketertiban masyarakat serta menegakkan hukum", "Menjatuhkan putusan vonis bersalah kepada terdakwa di persidangan", "Melaksanakan penuntutan perkara ke hadapan sidang pengadilan"], ans: 1 },
+            { id: 23, text: "Undang-undang yang secara khusus mengatur tentang kemerdekaan menyampaikan pendapat di muka umum adalah...", options: ["UU Nomor 9 Tahun 1998", "UU Nomor 39 Tahun 1999", "UU Nomor 14 Tahun 2008", "UU Nomor 5 Tahun 2017"], ans: 0 },
+            { id: 24, text: "Berdasarkan ketentuan peraturan perundang-undangan, lokasi yang dilarang secara mutlak untuk dijadikan tempat unjuk rasa atau demonstrasi adalah...", options: ["Alun-alun kota dan jalan protokol", "Lingkungan istana kepresidenan dan tempat ibadah", "Depan gedung Dewan Perwakilan Rakyat Daerah (DPRD)", "Lapangan terbuka milik fasilitas umum"], ans: 1 },
+            { id: 25, text: "Aplikasi resmi yang disediakan pemerintah (Kementerian PANRB) sebagai wadah pelayanan pengaduan dan aspirasi online bagi masyarakat adalah...", options: ["PeduliLindungi", "JKN Mobile", "LAPOR!", "JDIH Nasional"], ans: 2 },
+            { id: 26, text: "Sosiolog Abercrombie, Hill, dan Turner mendefinisikan tradisi sebagai...", options: ["Keputusan politik yang ditetapkan oleh lembaga parlemen negara", "Kebiasaan, kepercayaan, atau artefak yang diwariskan dari generasi ke generasi", "Aturan hukum tertulis yang memiliki sanksi pidana yang tegas", "Perilaku modern yang diadopsi dari kebudayaan bangsa asing"], ans: 1 },
+            { id: 27, text: "Kearifan lokal masyarakat Bali yang bersumber pada keharmonisan hubungan antara manusia dengan Tuhan, sesama manusia, dan alam disebut...", options: ["Tri Hita Karana", "Sad Rasa", "Tat Twam Asi", "Tri Kaya Parisudha"], ans: 0 },
+            { id: 28, text: "Pesan utama yang terkandung dalam filosofi masyarakat Baduy \"Gunung teu meunang dilebur, lebak teu meunang dirusak\" adalah...", options: ["Pentingnya membangun kawasan industri modern di pegunungan", "Kewajiban manusia untuk menjaga kelestarian alam dan lingkungan hidup", "Larangan keras mendirikan permukiman di dataran rendah", "Keharusan memanfaatkan hasil hutan secara maksimal untuk ekonomi"], ans: 1 },
+            { id: 29, text: "Undang-undang yang mengatur tentang Pemajuan Kebudayaan demi meningkatkan ketahanan budaya nasional di tengah peradaban dunia adalah...", options: ["UU Nomor 11 Tahun 2008", "UU Nomor 9 Tahun 1998", "UU Nomor 5 Tahun 2017", "UU Nomor 14 Tahun 2008"], ans: 2 },
+            { id: 30, text: "Kondisi ketika struktur penduduk suatu negara didominasi oleh kelompok usia produktif (usia kerja) disebut sebagai...", options: ["Urbanisasi penduduk", "Bonus demografi", "Transisi demografi", "Kepadatan agraris"], ans: 1 },
+            { id: 31, text: "Tiga wujud cita-cita nasional bangsa Indonesia secara jelas tercantum di dalam Pembukaan UUD NRI Tahun 1945 pada...", options: ["Alinea pertama", "Alinea kedua", "Alinea ketiga", "Alinea keempat"], ans: 1 },
+            { id: 32, text: "Sistem pertahanan dan keamanan negara yang bersifat semesta dengan melibatkan seluruh warga negara, wilayah, dan sumber daya nasional dikenal dengan istilah...", options: ["Hansip", "Sishankamrata", "Wajib militer", "Bela negara aktif"], ans: 1 },
+            { id: 33, text: "Pasal 28F UUD NRI Tahun 1945 secara khusus memberikan jaminan perlindungan hukum kepada setiap orang untuk...", options: ["Memilih pekerjaan dan penghidupan yang layak", "Berkomunikasi dan memperoleh informasi untuk pengembangan diri", "Memeluk agama dan beribadat menurut keyakinannya", "Mendapatkan pengajaran dan pendidikan dasar"], ans: 1 },
+            { id: 34, text: "Peran pers nasional di Indonesia dalam menyampaikan informasi yang tepat, akurat, dan benar diatur secara khusus dalam...", options: ["UU Nomor 40 Tahun 1999 tentang Pers", "UU Nomor 39 Tahun 1999 tentang HAM", "UU Nomor 14 Tahun 2008 tentang KIP", "UU Nomor 9 Tahun 1998 tentang Pendapat di Muka Umum"], ans: 0 },
+            { id: 35, text: "Bentuk nyata komitmen dan peran pelajar dalam menjaga keutuhan NKRI di lingkungan sekolah dapat diwujudkan melalui sikap...", options: ["Membentuk kelompok eksklusif berdasarkan kesamaan daerah asal", "Menaati tata tertib sekolah dan menjunjung tinggi toleransi antarteman", "Melakukan aksi protes keras ketika aturan sekolah dirasa memberatkan", "Mengabaikan kegiatan upacara bendera demi belajar mandiri di kelas"], ans: 1 },
+            // TIPE 3 (36-50)
+            { id: 36, text: "(Benar/Salah) Hubungan antara Pancasila dan UUD NRI Tahun 1945 diibaratkan seperti hubungan antara roh dan jasad yang tidak dapat dipisahkan satu sama lain.", options: ["Benar", "Salah"], ans: 0 },
+            { id: 37, text: "(Benar/Salah) Pembukaan UUD NRI Tahun 1945 dapat diamendemen sewaktu-waktu oleh MPR demi menyesuaikan dinamika politik modern global.", options: ["Benar", "Salah"], ans: 1 },
+            { id: 38, text: "(Benar/Salah) Menurut Prof. Dr. Notonegoro, kewajiban merupakan beban untuk memberikan sesuatu yang semestinya diberikan oleh pihak tertentu secara mutlak.", options: ["Benar", "Salah"], ans: 0 },
+            { id: 39, text: "(Benar/Salah) Hak asasi manusia di Indonesia bersifat mutlak tanpa batas aturan dan dapat digunakan secara bebas tanpa mempedulikan hak orang lain.", options: ["Benar", "Salah"], ans: 1 },
+            { id: 40, text: "(Benar/Salah) Peradilan militer merupakan lingkungan peradilan di bawah Mahkamah Agung yang bertugas mengadili tindak pidana yang dilakukan oleh militer.", options: ["Benar", "Salah"], ans: 0 },
+            { id: 41, text: "(Benar/Salah) Kegiatan unjuk rasa atau demonstrasi diperbolehkan dilakukan di lingkungan istana kepresidenan pada malam hari asalkan tidak merusak fasilitas umum.", options: ["Benar", "Salah"], ans: 1 },
+            { id: 42, text: "(Benar/Salah) Keterbukaan informasi publik di Indonesia diatur secara resmi dan dijamin melalui Undang-Undang Nomor 14 Tahun 2008.", options: ["Benar", "Salah"], ans: 0 },
+            { id: 43, text: "(Benar/Salah) Tradisi dan budaya lokal di Indonesia merupakan warisan masa lalu yang bersifat statis dan tidak memiliki nilai guna bagi masyarakat modern.", options: ["Benar", "Salah"], ans: 1 },
+            { id: 44, text: "(Benar/Salah) Filosofi \"Satu Tungku Tiga Batu\" merupakan wujud kearifan lokal masyarakat Fakfak di Papua Barat dalam merajut kerukunan dan toleransi beragama.", options: ["Benar", "Salah"], ans: 0 },
+            { id: 45, text: "(Benar/Salah) Hasil Sensus Penduduk 2020 menunjukkan bahwa sebagian besar jumlah penduduk Indonesia terkonsentrasi di luar Pulau Jawa.", options: ["Benar", "Salah"], ans: 1 },
+            { id: 46, text: "(Benar/Salah) Bonus demografi memberikan keuntungan ekonomi yang besar bagi negara apabila kualitas SDM usia produktif didukung oleh pendidikan dan kesehatan yang memadai.", options: ["Benar", "Salah"], ans: 0 },
+            { id: 47, text: "(Benar/Salah) Pasal 33 UUD NRI Tahun 1945 menegaskan bahwa bumi, air, dan kekayaan alam yang terkandung di dalamnya dikuasai oleh negara untuk sebesar-besar kemakmuran rakyat.", options: ["Benar", "Salah"], ans: 0 },
+            { id: 48, text: "(Benar/Salah) Aksi perundungan (bullying) di satuan pendidikan merupakan bentuk pelanggaran hak asasi manusia yang wajib dicegah dan dihindari bersama.", options: ["Benar", "Salah"], ans: 0 },
+            { id: 49, text: "(Benar/Salah) Kebebasan mengemukakan pendapat di muka umum tidak memerlukan batasan moral maupun etika karena telah dijamin penuh tanpa syarat oleh undang-undang.", options: ["Benar", "Salah"], ans: 1 },
+            { id: 50, text: "(Benar/Salah) Peran aktif peserta didik dalam menjaga keutuhan wilayah NKRI dapat dimulai dari hal sederhana seperti disiplin belajar, menaati aturan, dan menghormati perbedaan antarteman.", options: ["Benar", "Salah"], ans: 0 }
+        ];
+
+        // ==========================================
+        // 5. FUNGSI SETUP OTOMATIS & UTILITAS
+        // ==========================================
+        async function autoSetupDatabase() {
+            try {
+                // JIKA MODE DEMO (Untuk keperluan Pratinjau / Preview Canvas)
+                if (isDemoMode) {
+                    state.allStudents = RAW_STUDENTS.map(s => ({
+                        nis: s[0], nisn: s[1], nama: s[2], jk: s[3], kelas: s[4],
+                        status_ujian: false, nilai: 0, selesai_pada: null
+                    }));
+                    hideLoading();
+                    renderApp();
+                    return; // Hentikan fungsi di sini
+                }
+
+                // JIKA MENGGUNAKAN FIREBASE ASLI (Saat di-deploy)
+                // 1. Cek & Setup Soal
+                const qSnapshot = await getDocs(query(questionsRef));
+                if (qSnapshot.empty) {
+                    showLoading("Menyimpan Bank Soal ke Database...");
+                    const batch = writeBatch(db);
+                    RAW_QUESTIONS.forEach(q => {
+                        const dRef = doc(questionsRef, q.id.toString());
+                        batch.set(dRef, q);
+                    });
+                    await batch.commit();
+                }
+
+                // 2. Cek & Setup Siswa
+                const sSnapshot = await getDocs(query(studentsRef));
+                if (sSnapshot.empty) {
+                    showLoading("Menyimpan Data 173 Siswa ke Database...");
+                    const batch = writeBatch(db);
+                    RAW_STUDENTS.forEach(s => {
+                        const dRef = doc(studentsRef, s[0]);
+                        batch.set(dRef, {
+                            nis: s[0], nisn: s[1], nama: s[2], jk: s[3], kelas: s[4],
+                            status_ujian: false, nilai: 0, selesai_pada: null
+                        });
+                    });
+                    await batch.commit();
+                }
+
+                const latestStudents = await getDocs(query(studentsRef));
+                state.allStudents = latestStudents.docs.map(d => d.data());
+                
+                hideLoading();
+                renderApp();
+            } catch (error) {
+                console.error("Auto Setup Error:", error);
+                alert("Gagal memuat database. Periksa koneksi internet.");
+                hideLoading();
+            }
+        }
+
+        // Fungsi Loading UI
+        const showLoading = (text = "Memuat...") => {
+            document.getElementById('loadingText').innerText = text;
+            document.getElementById('loadingOverlay').classList.remove('hide');
+        };
+        const hideLoading = () => document.getElementById('loadingOverlay').classList.add('hide');
+
+        // Fungsi Pengacak Soal (Anti-Nyontek)
+        function shuffleArray(array) {
+            let curId = array.length;
+            while (0 !== curId) {
+                let randId = Math.floor(Math.random() * curId);
+                curId -= 1;
+                let tmp = array[curId];
+                array[curId] = array[randId];
+                array[randId] = tmp;
+            }
+            return array;
+        }
+
+        // ==========================================
+        // 6. RENDERING HALAMAN LOGIN
+        // ==========================================
+        function renderApp() {
+            if (state.isAdmin) {
+                renderAdminDashboard();
+            } else if (state.studentData) {
+                if(state.isExamFinished || state.studentData.status_ujian){
+                    renderResultPage();
+                } else if (!state.isConfirmed) {
+                    renderConfirmationPage(); // Tampilkan halaman konfirmasi data dulu
+                } else {
+                    renderExamPage();
+                }
+            } else {
+                renderLogin();
+            }
+        }
+
+        function renderLogin() {
+            const appDiv = document.getElementById('app');
+            const demoAlert = isDemoMode ? `<div class="bg-amber-100 text-amber-700 p-3 rounded-lg text-xs font-semibold mb-6 border border-amber-200 text-center shadow-sm">⚠️ MODE PRATINJAU (Tanpa Firebase).<br/>Semua data disimpan di memori sementara.</div>` : '';
+
+            appDiv.innerHTML = `
+                <div class="min-h-screen flex items-center justify-center p-4">
+                    <div class="glass w-full max-w-md rounded-2xl p-8 transition-all relative overflow-hidden">
+                        
+                        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+
+                        <div class="text-center mb-8 mt-2">
+                            <div class="w-20 h-20 bg-white rounded-2xl mx-auto shadow-md flex items-center justify-center mb-4 border border-slate-100">
+                                <i class="fas fa-book-reader text-4xl text-blue-600"></i>
+                            </div>
+                            <h1 class="text-2xl font-bold text-slate-800">Ujian PKN Kelas 9</h1>
+                            <p class="text-slate-500 text-sm mt-1">SMP Islam Ar-Ridho</p>
+                        </div>
+                        
+                        ${demoAlert}
+
+                        <!-- Tab Switcher -->
+                        <div class="flex p-1 bg-slate-100 rounded-xl mb-6">
+                            <button onclick="switchLoginTab('student')" id="tab-student" class="flex-1 py-2.5 text-sm font-semibold rounded-lg bg-white text-blue-600 shadow-sm transition-all duration-200">Peserta (Siswa)</button>
+                            <button onclick="switchLoginTab('admin')" id="tab-admin" class="flex-1 py-2.5 text-sm font-semibold rounded-lg text-slate-500 hover:text-slate-700 transition-all duration-200">Guru (Admin)</button>
+                        </div>
+
+                        <!-- Form Login Siswa -->
+                        <form id="form-student" onsubmit="handleStudentLogin(event)">
+                            <div class="space-y-5">
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Pilih Kelas</label>
+                                    <select id="kelasSelect" onchange="populateNames()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-slate-50 transition" required>
+                                        <option value="">-- Pilih Kelas Anda --</option>
+                                        <option value="9.1">Kelas 9.1</option>
+                                        <option value="9.2">Kelas 9.2</option>
+                                        <option value="9.3">Kelas 9.3</option>
+                                        <option value="9.4">Kelas 9.4</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Pilih Nama Lengkap</label>
+                                    <select id="namaSelect" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-slate-50 transition disabled:opacity-50" disabled required>
+                                        <option value="">-- Silakan Pilih Kelas Dahulu --</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
+                                OK Lanjut <i class="fas fa-arrow-right"></i>
+                            </button>
+                        </form>
+
+                        <!-- Form Login Admin -->
+                        <form id="form-admin" class="hide" onsubmit="handleAdminLogin(event)">
+                            <div class="space-y-5">
+                                <div>
+                                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">PIN Akses Guru</label>
+                                    <input type="password" id="adminPin" placeholder="Masukkan PIN" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-800 outline-none bg-slate-50 text-center tracking-widest text-lg font-bold" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full mt-8 bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-slate-300 transition-all flex items-center justify-center gap-2">
+                                Masuk Dashboard <i class="fas fa-lock"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.switchLoginTab = (tab) => {
+            const btnS = document.getElementById('tab-student');
+            const btnA = document.getElementById('tab-admin');
+            const formS = document.getElementById('form-student');
+            const formA = document.getElementById('form-admin');
+
+            if (tab === 'student') {
+                btnS.className = "flex-1 py-2.5 text-sm font-semibold rounded-lg bg-white text-blue-600 shadow-sm transition-all duration-200";
+                btnA.className = "flex-1 py-2.5 text-sm font-semibold rounded-lg text-slate-500 hover:text-slate-700 transition-all duration-200";
+                formS.classList.remove('hide');
+                formA.classList.add('hide');
+            } else {
+                btnA.className = "flex-1 py-2.5 text-sm font-semibold rounded-lg bg-white text-slate-800 shadow-sm transition-all duration-200";
+                btnS.className = "flex-1 py-2.5 text-sm font-semibold rounded-lg text-slate-500 hover:text-slate-700 transition-all duration-200";
+                formA.classList.remove('hide');
+                formS.classList.add('hide');
+            }
+        };
+
+        window.populateNames = () => {
+            const kelas = document.getElementById('kelasSelect').value;
+            const namaSelect = document.getElementById('namaSelect');
+            
+            if (!kelas) {
+                namaSelect.innerHTML = '<option value="">-- Silakan Pilih Kelas Dahulu --</option>';
+                namaSelect.disabled = true;
+                return;
+            }
+
+            const studentsInClass = state.allStudents.filter(s => s.kelas === kelas);
+            studentsInClass.sort((a,b) => a.nama.localeCompare(b.nama));
+            
+            let html = '<option value="">-- Pilih Nama Anda --</option>';
+            studentsInClass.forEach(s => html += `<option value="${s.nis}">${s.nama}</option>`);
+            
+            namaSelect.innerHTML = html;
+            namaSelect.disabled = false;
+        };
+
+        window.handleStudentLogin = async (e) => {
+            e.preventDefault();
+            const kelas = document.getElementById('kelasSelect').value;
+            const nis = document.getElementById('namaSelect').value;
+
+            if (!kelas || !nis) return alert("Pilih kelas dan nama terlebih dahulu!");
+
+            const student = state.allStudents.find(s => s.nis === nis);
+            state.studentData = student;
+            state.isConfirmed = false;
+            
+            renderApp();
+        };
+
+        function renderConfirmationPage() {
+            const appDiv = document.getElementById('app');
+            const s = state.studentData;
+            const jkLengkap = s.jk === 'L' ? 'Laki-laki' : 'Perempuan';
+
+            appDiv.innerHTML = `
+                <div class="min-h-screen flex items-center justify-center p-4">
+                    <div class="glass w-full max-w-md rounded-2xl p-8 transition-all relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
+                        
+                        <div class="text-center mb-6 mt-2">
+                            <div class="w-20 h-20 bg-blue-50 rounded-full mx-auto flex items-center justify-center mb-4 border border-blue-100 shadow-inner">
+                                <i class="fas fa-id-card text-4xl text-blue-600"></i>
+                            </div>
+                            <h2 class="text-2xl font-bold text-slate-800">Konfirmasi Data</h2>
+                            <p class="text-slate-500 text-sm mt-1">Pastikan ini adalah data diri Anda</p>
+                        </div>
+                        
+                        <div class="bg-white rounded-xl border border-slate-200 p-5 space-y-4 mb-8 shadow-sm">
+                            <div class="flex justify-between border-b border-slate-100 pb-3">
+                                <span class="text-slate-500 text-sm font-medium">NIS</span>
+                                <span class="text-slate-800 text-sm font-bold text-right">${s.nis}</span>
+                            </div>
+                            <div class="flex justify-between border-b border-slate-100 pb-3">
+                                <span class="text-slate-500 text-sm font-medium">NISN</span>
+                                <span class="text-slate-800 text-sm font-bold text-right">${s.nisn}</span>
+                            </div>
+                            <div class="flex flex-col border-b border-slate-100 pb-3 gap-1">
+                                <span class="text-slate-500 text-sm font-medium">Nama Lengkap</span>
+                                <span class="text-slate-800 text-base font-bold text-left leading-tight">${s.nama}</span>
+                            </div>
+                            <div class="flex justify-between border-b border-slate-100 pb-3">
+                                <span class="text-slate-500 text-sm font-medium">Kelas</span>
+                                <span class="text-slate-800 text-sm font-bold text-right">${s.kelas}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-500 text-sm font-medium">Jenis Kelamin</span>
+                                <span class="text-slate-800 text-sm font-bold text-right">${jkLengkap}</span>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button onclick="cancelLogin()" class="flex-1 py-3.5 px-4 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 hover:border-slate-300 transition-all">
+                                Kembali
+                            </button>
+                            <button onclick="confirmAndStartExam()" class="flex-1 py-3.5 px-4 rounded-xl bg-blue-600 text-white font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
+                                OK, Mulai <i class="fas fa-play"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.cancelLogin = () => {
+            state.studentData = null;
+            state.isConfirmed = false;
+            renderApp();
+        };
+
+        window.confirmAndStartExam = async () => {
+            if (!state.studentData.status_ujian) {
+                await prepareExam();
+            }
+            state.isConfirmed = true;
+            renderApp();
+        };
+
+        window.handleAdminLogin = async (e) => {
+            e.preventDefault();
+            const pin = document.getElementById('adminPin').value;
+            
+            showLoading("Verifikasi PIN...");
+            
+            setTimeout(() => {
+                if (pin === "202099") {
+                    state.isAdmin = true;
+                    hideLoading();
+                    renderApp();
+                } else {
+                    hideLoading();
+                    alert("PIN Salah! Akses ditolak.");
+                }
+            }, 800);
+        };
+
+        // ==========================================
+        // 7. LOGIKA UJIAN & ACAK SOAL
+        // ==========================================
+        async function prepareExam() {
+            showLoading("Mengacak dan menyiapkan soal...");
+            try {
+                let rawQuestions = [];
+                
+                if (isDemoMode) {
+                    rawQuestions = JSON.parse(JSON.stringify(RAW_QUESTIONS)); // Clone array
+                } else {
+                    const qSnap = await getDocs(query(questionsRef));
+                    qSnap.forEach(doc => rawQuestions.push({ id: doc.id, ...doc.data() }));
+                }
+
+                // ACAK URUTAN SOAL
+                rawQuestions = shuffleArray(rawQuestions);
+                
+                // ACAK URUTAN JAWABAN (Simpan ID mana yang benar)
+                state.examQuestions = rawQuestions.map(q => {
+                    let optionsWithIndex = q.options.map((opt, i) => ({ text: opt, isCorrect: i === q.ans }));
+                    optionsWithIndex = shuffleArray(optionsWithIndex);
+                    return { id: q.id, text: q.text, options: optionsWithIndex };
+                });
+                
+                state.currentQuestionIndex = 0;
+                state.answers = {};
+                
+                setTimeout(() => hideLoading(), 500);
+            } catch (err) {
+                hideLoading();
+                alert("Terjadi kesalahan saat menyiapkan soal.");
+            }
+        }
+
+        function renderExamPage() {
+            const appDiv = document.getElementById('app');
+            const qIndex = state.currentQuestionIndex;
+            const qData = state.examQuestions[qIndex];
+            const totalQ = state.examQuestions.length;
+            const savedAnswerIndex = state.answers[qData.id];
+
+            let optionsHtml = '';
+            const labels = ['A', 'B', 'C', 'D'];
+            
+            qData.options.forEach((opt, idx) => {
+                const isChecked = savedAnswerIndex === idx ? 'checked' : '';
+                optionsHtml += `
+                    <label class="relative block cursor-pointer mb-3 group">
+                        <input type="radio" name="answer" value="${idx}" class="peer sr-only radio-custom" onchange="selectAnswer('${qData.id}', ${idx})" ${isChecked}>
+                        <div class="rounded-xl border border-slate-200 bg-white p-4 transition-all duration-200 group-hover:bg-slate-50 flex items-start gap-4 shadow-sm group-hover:border-blue-300 group-hover:shadow">
+                            <div class="radio-circle mt-0.5 h-5 w-5 rounded-full border-2 border-slate-300 bg-white flex-shrink-0 relative transition-colors duration-200"></div>
+                            <span class="text-slate-700 font-medium leading-relaxed">
+                                <span class="font-bold mr-1 text-slate-800">${labels[idx]}.</span> ${opt.text}
+                            </span>
+                        </div>
+                    </label>
+                `;
+            });
+
+            const answeredCount = Object.keys(state.answers).length;
+            const progressPct = (answeredCount / totalQ) * 100;
+
+            appDiv.innerHTML = `
+                <div class="max-w-3xl mx-auto p-4 md:py-8 h-screen flex flex-col">
+                    <!-- Header Ujian -->
+                    <div class="glass rounded-2xl p-4 md:p-5 mb-5 flex items-center justify-between shrink-0 shadow-sm border border-slate-200/50">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-sm md:text-base font-bold text-slate-800">${state.studentData.nama}</h2>
+                                <p class="text-xs text-slate-500 font-medium">Kelas ${state.studentData.kelas} • NIS: ${state.studentData.nis}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-[11px] md:text-xs font-bold text-blue-700 bg-blue-100 px-3 py-1.5 rounded-full uppercase tracking-wider">
+                                Terjawab: ${answeredCount}/${totalQ}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-slate-200 h-2 rounded-full mb-6 overflow-hidden shrink-0 shadow-inner">
+                        <div class="bg-blue-600 h-full transition-all duration-500 ease-out" style="width: ${progressPct}%"></div>
+                    </div>
+
+                    <!-- Area Soal -->
+                    <div class="flex-1 overflow-y-auto pb-28 scrollbar-hide">
+                        <div class="mb-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-100">
+                            <span class="inline-block bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg mb-4 shadow-sm">Soal No. ${qIndex + 1}</span>
+                            <p class="text-base md:text-lg text-slate-800 font-semibold leading-relaxed whitespace-pre-line">${qData.text}</p>
+                        </div>
+                        <div class="mt-4">
+                            ${optionsHtml}
+                        </div>
+                    </div>
+
+                    <!-- Navigasi Bawah -->
+                    <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-md border-t border-slate-200 md:relative md:bg-transparent md:border-0 md:p-0 md:mt-4 shrink-0 shadow-[0_-10px_20px_rgba(0,0,0,0.03)] md:shadow-none">
+                        <div class="max-w-3xl mx-auto flex gap-3">
+                            <button onclick="navQuestion(-1)" class="flex-1 py-3.5 px-4 rounded-xl border-2 border-slate-200 text-slate-700 font-bold hover:bg-slate-50 hover:border-slate-300 transition-all ${qIndex === 0 ? 'opacity-40 cursor-not-allowed hover:bg-transparent hover:border-slate-200' : ''}" ${qIndex === 0 ? 'disabled' : ''}>
+                                <i class="fas fa-arrow-left mr-2"></i> Sebelumnya
+                            </button>
+                            
+                            ${qIndex === totalQ - 1 
+                                ? `<button onclick="finishExam()" class="flex-1 py-3.5 px-4 rounded-xl bg-green-600 text-white font-bold shadow-lg shadow-green-200 hover:bg-green-700 hover:-translate-y-0.5 transition-all">
+                                    Kirim Ujian <i class="fas fa-paper-plane ml-2"></i>
+                                   </button>`
+                                : `<button onclick="navQuestion(1)" class="flex-1 py-3.5 px-4 rounded-xl bg-blue-600 text-white font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 hover:-translate-y-0.5 transition-all">
+                                    Selanjutnya <i class="fas fa-arrow-right ml-2"></i>
+                                   </button>`
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        window.selectAnswer = (qId, optionIndex) => {
+            state.answers[qId] = optionIndex;
+            // UX: Auto-next setelah delay singkat agar siswa tidak perlu repot klik tombol 'Selanjutnya'
+            setTimeout(() => {
+                if (state.currentQuestionIndex < state.examQuestions.length - 1) {
+                    navQuestion(1);
+                } else {
+                    renderExamPage(); // Update UI progress bar
+                }
+            }, 350);
+        };
+
+        window.navQuestion = (dir) => {
+            state.currentQuestionIndex += dir;
+            renderExamPage();
+        };
+
+        // ==========================================
+        // 8. PENGIRIMAN JAWABAN & HASIL
+        // ==========================================
+        window.finishExam = async () => {
+            const totalQ = state.examQuestions.length;
+            const answeredCount = Object.keys(state.answers).length;
+            
+            if (answeredCount < totalQ) {
+                if(!confirm(`Ada ${totalQ - answeredCount} soal yang belum dijawab. Yakin ingin mengirim sekarang?`)) return;
+            } else {
+                if(!confirm("Kirim jawaban sekarang? Data tidak bisa diubah setelah dikirim.")) return;
+            }
+
+            showLoading("Menyimpan hasil ujian...");
+
+            // Hitung nilai (Otomatis)
+            let benar = 0;
+            state.examQuestions.forEach(q => {
+                const ansIdx = state.answers[q.id];
+                if (ansIdx !== undefined && q.options[ansIdx].isCorrect) benar++;
+            });
+            const finalScore = (benar / totalQ) * 100;
+
+            try {
+                if (isDemoMode) {
+                    // Simpan di Memory (Demo)
+                    const s = state.allStudents.find(x => x.nis === state.studentData.nis);
+                    s.status_ujian = true; s.nilai = finalScore; s.selesai_pada = new Date().toISOString();
+                    state.studentData = s;
+                } else {
+                    // Simpan ke Firestore
+                    await updateDoc(doc(studentsRef, state.studentData.nis), {
+                        status_ujian: true,
+                        nilai: finalScore,
+                        selesai_pada: new Date().toISOString()
+                    });
+                    state.studentData.status_ujian = true;
+                    state.studentData.nilai = finalScore;
+                }
+                
+                state.isExamFinished = true;
+                setTimeout(() => { hideLoading(); renderApp(); }, 500);
+
+            } catch (err) {
+                hideLoading();
+                alert("Gagal mengirim jawaban! Hubungi guru.");
+            }
+        };
+
+        function renderResultPage() {
+            const appDiv = document.getElementById('app');
+            appDiv.innerHTML = `
+                <div class="min-h-screen flex items-center justify-center p-4">
+                    <div class="glass w-full max-w-md rounded-2xl p-8 text-center shadow-xl border border-slate-100">
+                        <div class="w-24 h-24 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border border-green-100">
+                            <i class="fas fa-check-circle text-5xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-slate-800 mb-2">Ujian Selesai!</h2>
+                        <p class="text-slate-500 text-sm mb-8 leading-relaxed">Terima kasih <span class="font-bold text-slate-700">${state.studentData.nama}</span>, Anda telah menyelesaikan Ujian PKN. Jawaban Anda telah tersimpan dengan aman di sistem.</p>
+                        
+                        <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-5 mb-8 shadow-sm">
+                            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Nilai Anda</p>
+                            <p class="text-[54px] font-black text-blue-600 leading-none">${state.studentData.nilai}</p>
+                        </div>
+
+                        <button onclick="window.location.reload()" class="w-full py-3.5 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-900 shadow-lg shadow-slate-200 transition-all">
+                            Keluar & Kembali
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==========================================
+        // 9. DASHBOARD ADMIN (GURU)
+        // ==========================================
+        function renderAdminDashboard() {
+            const appDiv = document.getElementById('app');
+            appDiv.innerHTML = `
+                <div class="admin-layout bg-slate-50 min-h-screen">
+                    <!-- Sidebar (Desktop) -->
+                    <aside class="sidebar bg-slate-900 text-slate-300 flex flex-col fixed w-[250px] h-screen shadow-2xl">
+                        <div class="p-6 border-b border-slate-800">
+                            <h2 class="text-white font-bold text-lg flex items-center gap-3"><i class="fas fa-shield-alt text-blue-500"></i> JAYADI, S.Pd.</h2>
+                            <p class="text-xs text-slate-400 mt-1">Panel Guru - Ujian PKN</p>
+                        </div>
+                        <nav class="flex-1 py-4 space-y-1">
+                            <a href="#" class="flex items-center px-6 py-3 bg-blue-600/10 text-blue-400 font-medium border-l-4 border-blue-500"><i class="fas fa-chart-line w-6"></i> Rekap Nilai</a>
+                            <a href="#" onclick="alert('Ini mode pratinjau. Fitur bank soal bisa dikembangkan.')" class="flex items-center px-6 py-3 hover:bg-slate-800 hover:text-white transition"><i class="fas fa-book w-6"></i> Bank Soal</a>
+                        </nav>
+                        <div class="p-5 border-t border-slate-800">
+                            <button onclick="adminLogout()" class="w-full py-2.5 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition font-semibold flex items-center justify-center gap-2">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </div>
+                    </aside>
+
+                    <!-- Main Content -->
+                    <main class="md:ml-[250px] p-4 md:p-8">
+                        <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+                            <div>
+                                <h1 class="text-2xl font-bold text-slate-800 mb-1">Rekap Nilai Siswa</h1>
+                                <p class="text-slate-500 text-sm">Pemantauan hasil ujian secara Real-Time.</p>
+                            </div>
+                            <div class="flex gap-2 self-start md:self-auto">
+                                <button onclick="exportToCSV()" class="px-4 py-2.5 bg-green-600 text-white font-semibold rounded-lg shadow hover:bg-green-700 transition flex items-center gap-2">
+                                    <i class="fas fa-file-excel"></i> Download CSV
+                                </button>
+                                <button onclick="window.print()" class="px-4 py-2.5 bg-slate-800 text-white font-semibold rounded-lg shadow hover:bg-slate-900 transition flex items-center gap-2">
+                                    <i class="fas fa-print"></i> Cetak (PDF)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Panel Filter -->
+                        <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-wrap items-center gap-4">
+                            <span class="text-sm font-bold text-slate-700">Filter Kelas:</span>
+                            <select id="adminFilterKelas" onchange="fetchAdminData()" class="px-4 py-2 rounded-lg border border-slate-300 bg-slate-50 text-sm font-medium outline-none focus:border-blue-500 cursor-pointer">
+                                <option value="ALL">Semua Kelas 9</option>
+                                <option value="9.1">Kelas 9.1</option>
+                                <option value="9.2">Kelas 9.2</option>
+                                <option value="9.3">Kelas 9.3</option>
+                                <option value="9.4">Kelas 9.4</option>
+                            </select>
+                        </div>
+
+                        <!-- Tabel -->
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-sm whitespace-nowrap">
+                                    <thead class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold uppercase text-[11px] tracking-wider">
+                                        <tr>
+                                            <th class="px-6 py-4 text-center w-10">No</th>
+                                            <th class="px-6 py-4">Nama Lengkap</th>
+                                            <th class="px-6 py-4 text-center">Kelas</th>
+                                            <th class="px-6 py-4 text-center">Status</th>
+                                            <th class="px-6 py-4 text-center">Nilai</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="adminTableBody" class="divide-y divide-slate-100 text-slate-700">
+                                        <tr><td colspan="5" class="text-center py-10 text-slate-500">Memuat data...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </main>
+
+                    <!-- Bottom Nav (Mobile Admin) -->
+                    <div class="bottom-nav fixed bottom-0 w-full bg-slate-900 text-slate-400 p-2 justify-around border-t border-slate-800 z-40 shadow-[0_-10px_20px_rgba(0,0,0,0.1)]">
+                        <button class="flex flex-col items-center p-2 text-white"><i class="fas fa-chart-line text-lg mb-1"></i><span class="text-[10px] font-medium">Nilai</span></button>
+                        <button class="flex flex-col items-center p-2"><i class="fas fa-book text-lg mb-1"></i><span class="text-[10px] font-medium">Soal</span></button>
+                        <button onclick="adminLogout()" class="flex flex-col items-center p-2 text-red-400"><i class="fas fa-power-off text-lg mb-1"></i><span class="text-[10px] font-medium">Keluar</span></button>
+                    </div>
+                </div>
+            `;
+            fetchAdminData();
+        }
+
+        window.fetchAdminData = () => {
+            const filterKls = document.getElementById('adminFilterKelas').value;
+            
+            if (isDemoMode) {
+                renderFilteredData(state.allStudents, filterKls);
+                return;
+            }
+
+            if(state.unsubscribeAdmin) state.unsubscribeAdmin();
+            state.unsubscribeAdmin = onSnapshot(query(studentsRef), (snapshot) => {
+                let dataSiswa = [];
+                snapshot.forEach(doc => dataSiswa.push(doc.data()));
+                renderFilteredData(dataSiswa, filterKls);
+            });
+        };
+
+        function renderFilteredData(data, filterKls) {
+            if(filterKls !== 'ALL') data = data.filter(s => s.kelas === filterKls);
+            data.sort((a, b) => {
+                if(a.kelas !== b.kelas) return a.kelas.localeCompare(b.kelas);
+                return a.nama.localeCompare(b.nama);
+            });
+            
+            state.currentAdminData = data; // Simpan data ke memori agar bisa di-download Excel
+            renderAdminTable(data);
+        }
+
+        window.exportToCSV = () => {
+            const data = state.currentAdminData || [];
+            if(data.length === 0) {
+                alert("Tidak ada data untuk di-download.");
+                return;
+            }
+
+            const kelasFilter = document.getElementById('adminFilterKelas').value;
+            const filename = kelasFilter === 'ALL' ? 'Rekap_Nilai_Semua_Kelas_9.csv' : `Rekap_Nilai_Kelas_${kelasFilter}.csv`;
+
+            // Membuat Header CSV
+            let csvContent = "No,NIS,NISN,Nama Lengkap,Jenis Kelamin,Kelas,Status Ujian,Nilai\n";
+            
+            // Mengisi baris data per siswa
+            data.forEach((s, index) => {
+                const status = s.status_ujian ? "Selesai" : "Belum";
+                const nilai = s.status_ujian ? s.nilai : "0";
+                // Menggunakan ="" pada NIS agar Excel membacanya murni sebagai Teks (bukan angka/rumus)
+                csvContent += `${index + 1},="${s.nis}",="${s.nisn}","${s.nama}",${s.jk},${s.kelas},${status},${nilai}\n`;
+            });
+
+            // Trigger pengunduhan file .CSV otomatis ke perangkat Bapak
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        function renderAdminTable(data) {
+            const tbody = document.getElementById('adminTableBody');
+            if(!tbody) return;
+
+            let html = '';
+            if(data.length === 0) {
+                html = `<tr><td colspan="5" class="text-center py-10 text-slate-500 font-medium">Belum ada data siswa.</td></tr>`;
+            } else {
+                data.forEach((s, idx) => {
+                    const statusBadge = s.status_ujian 
+                        ? `<span class="bg-green-100 text-green-700 border border-green-200 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase">Selesai</span>` 
+                        : `<span class="bg-slate-100 text-slate-500 border border-slate-200 px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wide uppercase">Belum</span>`;
+                    
+                    const nilaiFmt = s.status_ujian ? `<span class="font-black text-blue-600 text-lg">${s.nilai}</span>` : '<span class="text-slate-300">-</span>';
+                    
+                    html += `
+                        <tr class="hover:bg-slate-50 transition-colors duration-150">
+                            <td class="px-6 py-4 text-center font-medium">${idx + 1}</td>
+                            <td class="px-6 py-4">
+                                <div class="font-bold text-slate-800">${s.nama}</div>
+                                <div class="text-[11px] text-slate-500 font-mono mt-0.5">NIS: ${s.nis}</div>
+                            </td>
+                            <td class="px-6 py-4 text-center font-bold text-slate-600">${s.kelas}</td>
+                            <td class="px-6 py-4 text-center">${statusBadge}</td>
+                            <td class="px-6 py-4 text-center">${nilaiFmt}</td>
+                        </tr>
+                    `;
+                });
+            }
+            tbody.innerHTML = html;
+        }
+
+        window.adminLogout = async () => {
+            state.isAdmin = false;
+            window.location.reload();
+        };
+
+        // ==========================================
+        // 10. INISIALISASI SAAT HALAMAN DIMUAT
+        // ==========================================
+        window.onload = async () => {
+            if (!isDemoMode) {
+                try { await signInAnonymously(auth); } catch(e) {}
+            }
+            
+            // Setup DB Dummy & Render Pertama
+            await autoSetupDatabase();
+        };
+    </script>
+</body>
+</html>
