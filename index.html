@@ -4,14 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ujian PKN SMP Islam Ar-Ridho</title>
-    <!-- Font dan Ikon -->
+    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- SweetAlert2 untuk Notifikasi -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Library untuk membaca Word dan PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
         :root {
@@ -20,417 +17,295 @@
             --gray-100: #F3F4F6; --gray-200: #E5E7EB; --gray-500: #6B7280; --gray-700: #374151;
             --bg-color: #F8FAFC; --card-bg: rgba(255, 255, 255, 0.95);
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--gray-700); min-height: 100vh; overflow-x: hidden; }
-
-        /* UI UMUM & GLASSMORPHISM */
-        .glass-card { background: var(--card-bg); backdrop-filter: blur(10px); border-radius: 16px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 10px 25px rgba(0,0,0,0.05); padding: 24px; }
-        .hidden { display: none !important; }
-        .btn { padding: 12px 24px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-primary { background-color: var(--primary); color: white; }
-        .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
-        .btn-success { background-color: var(--secondary); color: white; }
-        .btn-danger { background-color: var(--danger); color: white; }
-        .btn-outline { background-color: transparent; border: 2px solid var(--primary); color: var(--primary); }
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--dark); font-size: 0.9rem; }
-        .input-control { width: 100%; padding: 12px 16px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 1rem; transition: border-color 0.3s; outline: none; background: white; }
-        .input-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
-
-        /* HEADER LOGIN */
-        .header-login { text-align: center; margin-bottom: 30px; }
-        .header-login h1 { color: var(--dark); font-size: 1.5rem; font-weight: 800; }
-        .header-login p { color: var(--gray-500); font-size: 0.9rem; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-color); color: var(--gray-700); min-height: 100vh; }
+        .glass-card { background: var(--card-bg); backdrop-filter: blur(10px); border-radius: 16px; border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 10px 25px rgba(0,0,0,0.05); padding: 24px; }
         
-        /* HALAMAN LOGIN */
-        #login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-container { max-width: 450px; width: 100%; }
-        .login-tabs { display: flex; background: var(--gray-100); padding: 5px; border-radius: 10px; margin-bottom: 25px; }
-        .tab-btn { flex: 1; padding: 10px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; color: var(--gray-500); }
-        .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .btn-custom { padding: 12px 24px; border-radius: 10px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: none; }
+        .btn-primary-custom { background: linear-gradient(135deg, var(--primary), #5B21B6); color: white; box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
+        .btn-primary-custom:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(124, 58, 237, 0.4); }
+        .input-control { width: 100%; padding: 14px 16px; border: 2px solid var(--gray-200); border-radius: 10px; font-size: 1rem; font-weight: 500; transition: all 0.3s; outline: none; background: white; color: var(--dark); }
+        .input-control:focus { border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-light); }
 
-        /* HALAMAN UJIAN SISWA */
-        #ujian-page { max-width: 800px; margin: 0 auto; padding: 20px; padding-bottom: 80px; }
-        .header-ujian { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--gray-200); margin-bottom: 20px; }
-        .identitas-siswa h3 { color: var(--dark); margin-bottom: 5px; }
-        .soal-container { font-size: 1.1rem; line-height: 1.6; color: var(--dark); margin-bottom: 30px; }
-        .opsi-list { display: flex; flex-direction: column; gap: 15px; }
-        .opsi-item { display: flex; align-items: center; padding: 15px 20px; border: 2px solid var(--gray-200); border-radius: 12px; cursor: pointer; transition: 0.2s; background: white; }
+        .opsi-item { display: flex; align-items: flex-start; padding: 16px 20px; border: 2px solid var(--gray-200); border-radius: 12px; cursor: pointer; transition: 0.2s; background: white; margin-bottom: 12px; }
         .opsi-item:hover { border-color: var(--primary-light); background: var(--primary-light); }
         .opsi-item.selected { border-color: var(--primary); background: var(--primary-light); }
-        .opsi-item input { display: none; }
-        .opsi-label { font-weight: 600; margin-right: 15px; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; background: var(--gray-200); border-radius: 50%; font-size: 0.9rem; }
+        .opsi-label { font-weight: 700; margin-right: 15px; min-width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; background: var(--gray-200); border-radius: 50%; font-size: 0.9rem; flex-shrink: 0; }
         .opsi-item.selected .opsi-label { background: var(--primary); color: white; }
         
-        .navigasi-soal { display: flex; justify-content: space-between; margin-top: 30px; }
-        .nomor-soal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 10px; margin-top: 40px; border-top: 1px solid var(--gray-200); padding-top: 20px; }
-        .btn-nomor { width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--gray-200); background: white; font-weight: 600; cursor: pointer; }
+        .btn-nomor { width: 42px; height: 42px; border-radius: 10px; border: 2px solid var(--gray-200); background: white; font-weight: 700; cursor: pointer; transition: 0.2s; color: var(--gray-500); }
         .btn-nomor.dijawab { background: var(--primary); color: white; border-color: var(--primary); }
-        .btn-nomor.aktif { border: 2px solid var(--dark); box-shadow: 0 0 0 2px rgba(0,0,0,0.1); }
+        .btn-nomor.aktif { border-color: var(--dark); color: var(--dark); box-shadow: 0 0 0 3px rgba(0,0,0,0.1); }
 
-        /* DASHBOARD ADMIN */
         #admin-page { display: flex; min-height: 100vh; background: #F8FAFC; }
         .sidebar { width: 260px; background: white; border-right: 1px solid var(--gray-200); display: flex; flex-direction: column; }
-        .sidebar-header { padding: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--gray-200); }
-        .sidebar-header i { color: var(--primary); font-size: 1.5rem; }
-        .sidebar-header h2 { font-size: 1.25rem; font-weight: 800; color: var(--dark); }
-        .sidebar-menu { padding: 20px 15px; flex: 1; }
-        .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; color: var(--gray-500); font-weight: 600; cursor: pointer; transition: 0.2s; margin-bottom: 5px; }
+        .menu-item { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-radius: 10px; color: var(--gray-500); font-weight: 600; cursor: pointer; transition: 0.2s; margin-bottom: 4px; }
         .menu-item:hover { background: var(--gray-100); color: var(--dark); }
         .menu-item.active { background: var(--primary-light); color: var(--primary); }
-        .sidebar-footer { padding: 20px; border-top: 1px solid var(--gray-200); }
-        .user-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-        .avatar { width: 40px; height: 40px; background: var(--primary-light); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; }
-        .user-info h4 { color: var(--dark); font-size: 0.95rem; }
-        .user-info p { color: var(--gray-500); font-size: 0.8rem; }
         
-        .main-content { flex: 1; padding: 40px; overflow-y: auto; }
-        .page-header { margin-bottom: 30px; }
-        .page-header h1 { color: var(--dark); font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
-        .page-header p { color: var(--gray-500); }
-        
-        /* CARD STATISTIK */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-bottom: 30px; }
-        .stat-card { background: white; border-radius: 16px; padding: 24px; border: 1px solid var(--gray-200); position: relative; overflow: hidden; }
-        .stat-card.purple { border: 2px solid #C4B5FD; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.1); }
-        .stat-card.blue { border: 2px solid #93C5FD; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1); }
-        .stat-card.green { border: 2px solid #86EFAC; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1); }
-        .stat-title { color: var(--gray-500); font-weight: 600; font-size: 0.95rem; margin-bottom: 10px; }
-        .stat-value { color: var(--dark); font-size: 2.5rem; font-weight: 800; }
-        .stat-icon { position: absolute; right: 24px; top: 50%; transform: translateY(-50%); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
-        .purple .stat-icon { background: #F3E8FF; color: #A78BFA; }
-        .blue .stat-icon { background: #EFF6FF; color: #60A5FA; }
-        .green .stat-icon { background: #ECFDF5; color: #34D399; }
-
-        /* TABEL STATISTIK KELAS */
-        .class-stats-container { background: white; border-radius: 16px; border: 1px solid var(--gray-200); padding: 24px; margin-top: 30px; }
-        .class-stats-container h3 { margin-bottom: 20px; color: var(--dark); font-weight: 700; }
-
-        /* TABEL UMUM */
-        .data-table-container { background: white; border-radius: 16px; border: 1px solid var(--gray-200); overflow: hidden; }
-        .table-toolbar { padding: 20px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        .table-container { background: white; border-radius: 16px; border: 1px solid var(--gray-200); overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 15px 20px; text-align: left; border-bottom: 1px solid var(--gray-200); }
-        th { background: #F8FAFC; color: var(--gray-500); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        td { color: var(--dark); font-size: 0.95rem; }
-        tr:last-child td { border-bottom: none; }
-        .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
-        .badge-success { background: #ECFDF5; color: #10B981; }
-        .badge-warning { background: #FFFBEB; color: #F59E0B; }
-        .action-btns button { padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; color: white; font-size: 0.85rem; margin-right: 5px; }
-        .btn-delete { background: #EF4444; }
-        .btn-reset { background: #F59E0B; }
+        th, td { padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--gray-200); }
+        th { background: #F8FAFC; color: var(--gray-500); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { color: var(--dark); font-weight: 500; }
+        tr:hover td { background-color: #F8FAFC; }
 
-        /* MODAL */
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); }
-        .modal-content { background: white; padding: 30px; border-radius: 16px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .modal-header h2 { font-size: 1.5rem; color: var(--dark); }
-        
         @media (max-width: 768px) {
             #admin-page { flex-direction: column; }
             .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--gray-200); }
             .main-content { padding: 20px; }
-            .table-toolbar { flex-direction: column; align-items: stretch; }
-            .stats-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-    <div id="login-page">
-        <div class="login-container glass-card">
-            <div class="header-login">
-                <h1>Sistem Ujian Ar-Ridho</h1>
-                <p>Ulangan Harian Pendidikan Pancasila</p>
+    <div id="login-page" class="min-h-screen flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-md">
+            <div class="text-center mb-8">
+                <div class="w-20 h-20 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4 text-purple-600 text-3xl shadow-inner">
+                    <i class="fas fa-book-reader"></i>
+                </div>
+                <h1 class="text-2xl font-extrabold text-gray-800">Sistem Ujian Ar-Ridho</h1>
+                <p class="text-gray-500 font-medium">Ulangan Harian Pendidikan Pancasila</p>
             </div>
             
-            <div class="login-tabs">
-                <div class="tab-btn active" onclick="switchLogin('siswa')">Siswa</div>
-                <div class="tab-btn" onclick="switchLogin('guru')">Guru (Admin)</div>
+            <div class="flex bg-gray-100 p-1 rounded-xl mb-6">
+                <div class="flex-1 py-2 text-center rounded-lg cursor-pointer font-bold transition-all bg-white text-purple-600 shadow-sm" id="tab-siswa" onclick="switchLogin('siswa')">Siswa</div>
+                <div class="flex-1 py-2 text-center rounded-lg cursor-pointer font-bold transition-all text-gray-500" id="tab-guru" onclick="switchLogin('guru')">Guru</div>
             </div>
 
-            <!-- Form Siswa -->
-            <div id="form-siswa">
-                <div class="input-group">
-                    <label>Pilih Kelas</label>
-                    <select id="kelas-select" class="input-control" onchange="loadSiswaList()">
-                        <option value="">-- Pilih Kelas --</option>
+            <!-- Form Login Siswa -->
+            <div id="form-siswa" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Pilih Kelas</label>
+                    <select id="kelas-select" class="input-control cursor-pointer" onchange="loadSiswaList()">
+                        <option value="">-- Silakan Pilih Kelas --</option>
                         <option value="9.1">Kelas 9.1</option>
                         <option value="9.2">Kelas 9.2</option>
                         <option value="9.3">Kelas 9.3</option>
                         <option value="9.4">Kelas 9.4</option>
                     </select>
                 </div>
-                <div class="input-group">
-                    <label>Pilih Nama Siswa</label>
-                    <select id="nama-select" class="input-control" disabled>
-                        <option value="">-- Pilih Nama --</option>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Pilih Nama Lengkap</label>
+                    <select id="nama-select" class="input-control cursor-pointer disabled:opacity-50" disabled>
+                        <option value="">-- Pilih Kelas Terlebih Dahulu --</option>
                     </select>
                 </div>
-                <button class="btn btn-primary" style="width: 100%" onclick="cekDataSiswa()">Lanjut <i class="fas fa-arrow-right"></i></button>
+                <button class="btn-custom btn-primary-custom w-full mt-6 py-3.5" onclick="cekDataSiswa()">
+                    Mulai Ujian <i class="fas fa-arrow-right ml-1"></i>
+                </button>
             </div>
 
-            <!-- Form Guru -->
-            <div id="form-guru" class="hidden">
-                <div class="input-group">
-                    <label>PIN Admin (JAYADI, S.Pd.)</label>
-                    <input type="password" id="pin-guru" class="input-control" placeholder="Masukkan PIN rahasia">
+            <!-- Form Login Guru -->
+            <div id="form-guru" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">PIN Akses Admin</label>
+                    <input type="password" id="pin-guru" class="input-control text-center tracking-[0.5em] font-bold text-xl" placeholder="••••••">
                 </div>
-                <button class="btn btn-primary" style="width: 100%" onclick="loginGuru()">Masuk Dashboard <i class="fas fa-sign-in-alt"></i></button>
-            </div>
-        </div>
-    </div>
-
-    <div id="ujian-page" class="hidden">
-        <div class="glass-card">
-            <div class="header-ujian">
-                <div class="identitas-siswa">
-                    <h3 id="u-nama">Nama Siswa</h3>
-                    <p id="u-kelas" style="color: var(--gray-500); font-weight: 600;">Kelas 9.x | NIS: -</p>
-                </div>
-            </div>
-
-            <div class="soal-container">
-                <h4 style="margin-bottom: 15px; color: var(--primary);">Soal No. <span id="nomor-tampil">1</span></h4>
-                <div id="teks-soal" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 25px;">Memuat soal...</div>
-                <div class="opsi-list" id="opsi-list"></div>
-            </div>
-
-            <div class="navigasi-soal">
-                <button class="btn btn-outline" onclick="soalSebelumnya()" id="btn-prev"><i class="fas fa-chevron-left"></i> Sebelumnya</button>
-                <button class="btn btn-primary" onclick="soalSelanjutnya()" id="btn-next">Selanjutnya <i class="fas fa-chevron-right"></i></button>
-                <button class="btn btn-success hidden" onclick="kirimUjian()" id="btn-kirim"><i class="fas fa-paper-plane"></i> Kirim Jawaban</button>
-            </div>
-
-            <div class="nomor-soal-grid" id="grid-nomor"></div>
-        </div>
-    </div>
-
-    <div id="admin-page" class="hidden">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <i class="fas fa-shield-alt"></i>
-                <h2>AdminPanel</h2>
-            </div>
-            <div class="sidebar-menu">
-                <div class="menu-item active" onclick="switchAdminTab('beranda', this)">
-                    <i class="fas fa-border-all"></i> Beranda
-                </div>
-                <div class="menu-item" onclick="switchAdminTab('rekap', this)">
-                    <i class="fas fa-chart-line"></i> Rekap Nilai
-                </div>
-                <div class="menu-item" onclick="switchAdminTab('siswa', this)">
-                    <i class="fas fa-user-friends"></i> Kelola Siswa
-                </div>
-                <div class="menu-item" onclick="switchAdminTab('soal', this)">
-                    <i class="fas fa-file-signature"></i> Kelola Soal
-                </div>
-            </div>
-            <div class="sidebar-footer">
-                <div class="user-profile">
-                    <div class="avatar">J</div>
-                    <div class="user-info">
-                        <h4>JAYADI, S.Pd.</h4>
-                        <p>Guru PKN</p>
-                    </div>
-                </div>
-                <button class="btn btn-danger" style="width: 100%; padding: 10px;" onclick="logoutAdmin()">
-                    <i class="fas fa-sign-out-alt"></i> Keluar
+                <button class="btn-custom btn-primary-custom w-full mt-6 py-3.5" onclick="loginGuru()">
+                    Masuk Dashboard <i class="fas fa-sign-in-alt ml-1"></i>
                 </button>
             </div>
         </div>
+    </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            
-            <!-- Tab Beranda -->
-            <div id="tab-beranda" class="admin-tab">
-                <div class="page-header">
-                    <h1>Dashboard Guru</h1>
-                    <p>Monitoring pengerjaan Ulangan Harian PKN SMP Islam Ar-Ridho.</p>
-                </div>
-                
-                <div class="stats-grid">
-                    <div class="stat-card purple">
-                        <div class="stat-title">Total Soal</div>
-                        <div class="stat-value" id="stat-soal">0</div>
-                        <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
-                    </div>
-                    <div class="stat-card blue">
-                        <div class="stat-title">Siswa Terdaftar</div>
-                        <div class="stat-value" id="stat-siswa">0</div>
-                        <div class="stat-icon"><i class="fas fa-users"></i></div>
-                    </div>
-                    <div class="stat-card green">
-                        <div class="stat-title">Sudah Selesai</div>
-                        <div class="stat-value" id="stat-selesai">0</div>
-                        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
-                    </div>
-                </div>
-
-                <div class="class-stats-container">
-                    <h3>Statistik Per Kelas</h3>
-                    <div style="overflow-x: auto;">
-                        <table id="table-class-stats">
-                            <thead>
-                                <tr>
-                                    <th>Kelas</th>
-                                    <th>Total Siswa</th>
-                                    <th>Laki-Laki (L)</th>
-                                    <th>Perempuan (P)</th>
-                                    <th>Selesai Ujian</th>
-                                    <th>Belum Selesai</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
+    <div id="modal-konfirmasi" class="fixed inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm hidden items-center justify-center z-50 p-4 flex">
+        <div class="bg-white rounded-2xl p-8 max-w-sm w-full text-center shadow-2xl">
+            <div class="w-20 h-20 bg-green-100 text-green-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-4"><i class="fas fa-user-check"></i></div>
+            <h2 class="text-2xl font-extrabold text-gray-800 mb-6">Konfirmasi Data</h2>
+            <div class="bg-gray-50 rounded-xl p-4 text-left space-y-3 mb-6 border border-gray-100">
+                <div class="flex justify-between"><span class="text-gray-500 text-sm font-bold">Nama</span><span class="font-bold text-gray-800 text-right" id="k-nama"></span></div>
+                <div class="flex justify-between"><span class="text-gray-500 text-sm font-bold">Kelas</span><span class="font-bold text-gray-800" id="k-kelas"></span></div>
+                <div class="flex justify-between"><span class="text-gray-500 text-sm font-bold">NIS</span><span class="font-bold text-gray-800" id="k-nis"></span></div>
             </div>
-
-            <!-- Tab Rekap Nilai -->
-            <div id="tab-rekap" class="admin-tab hidden">
-                <div class="page-header">
-                    <h1>Rekap Nilai Siswa</h1>
-                </div>
-                <div class="data-table-container">
-                    <div class="table-toolbar">
-                        <select class="input-control" style="width: auto;" id="filter-nilai-kelas" onchange="renderTableNilai()">
-                            <option value="ALL">Semua Kelas 9</option>
-                            <option value="9.1">Kelas 9.1</option>
-                            <option value="9.2">Kelas 9.2</option>
-                            <option value="9.3">Kelas 9.3</option>
-                            <option value="9.4">Kelas 9.4</option>
-                        </select>
-                        <button class="btn btn-success" onclick="downloadCSV()"><i class="fas fa-file-excel"></i> Download Excel</button>
-                    </div>
-                    <div style="overflow-x: auto;">
-                        <table id="table-nilai">
-                            <thead>
-                                <tr>
-                                    <th>Nama Siswa</th>
-                                    <th>Kelas</th>
-                                    <th>NIS</th>
-                                    <th>Status</th>
-                                    <th>Nilai Akhir</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tab Kelola Siswa -->
-            <div id="tab-siswa" class="admin-tab hidden">
-                <div class="page-header">
-                    <h1>Kelola Data Siswa</h1>
-                </div>
-                <div class="data-table-container">
-                    <div class="table-toolbar">
-                        <select class="input-control" style="width: auto;" id="filter-kelola-kelas" onchange="renderTableSiswa()">
-                            <option value="ALL">Semua Kelas 9</option>
-                            <option value="9.1">Kelas 9.1</option>
-                            <option value="9.2">Kelas 9.2</option>
-                            <option value="9.3">Kelas 9.3</option>
-                            <option value="9.4">Kelas 9.4</option>
-                        </select>
-                        <button class="btn btn-primary" onclick="bukaModalPaste('siswa')"><i class="fas fa-paste"></i> Paste dari Excel</button>
-                    </div>
-                    <div style="overflow-x: auto;">
-                        <table id="table-kelola-siswa">
-                            <thead>
-                                <tr>
-                                    <th>Nama Lengkap</th>
-                                    <th>Kelas</th>
-                                    <th>NIS</th>
-                                    <th>L/P</th>
-                                    <th>Status</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tab Kelola Soal -->
-            <div id="tab-soal" class="admin-tab hidden">
-                <div class="page-header">
-                    <h1>Bank Soal PKN</h1>
-                </div>
-                <div class="data-table-container">
-                    <div class="table-toolbar">
-                        <h3 style="color: var(--dark); margin: 0;">Total: <span id="count-soal-list">0</span> Soal</h3>
-                        <button class="btn btn-primary" onclick="bukaModalPaste('soal')"><i class="fas fa-paste"></i> Paste dari Excel</button>
-                    </div>
-                    <div style="overflow-x: auto;">
-                        <table id="table-kelola-soal">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Pertanyaan</th>
-                                    <th>Kunci Jawaban</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody></tbody>
-                        </table>
-                    </div>
-                </div>
+            <div class="flex gap-3">
+                <button class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition" onclick="tutupModal('modal-konfirmasi')">Batal</button>
+                <button class="flex-1 py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition shadow-lg shadow-green-200" onclick="mulaiUjianPasti()">Ya, Benar</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL PASTE DATA EXCEL -->
-    <div id="modal-paste" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modal-paste-title">Paste Data</h2>
-                <button class="btn btn-outline" style="border:none; padding:5px;" onclick="tutupModal('modal-paste')"><i class="fas fa-times"></i></button>
+    <div id="ujian-page" class="hidden max-w-3xl mx-auto p-4 md:py-8 min-h-screen flex flex-col">
+        <div class="bg-white rounded-2xl p-5 mb-6 flex items-center justify-between shadow-sm border border-gray-200 flex-shrink-0">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold border border-purple-200"><i class="fas fa-user"></i></div>
+                <div>
+                    <h3 id="u-nama" class="font-extrabold text-gray-800 leading-tight">Nama</h3>
+                    <p id="u-kelas" class="text-xs font-bold text-gray-500 uppercase tracking-wide">Kelas</p>
+                </div>
             </div>
-            
-            <div style="margin-bottom: 20px; padding: 15px; background: #FEF3C7; border-radius: 8px; font-size: 0.9rem;">
-                <b id="paste-guide-title">Format Copy-Paste dari Excel:</b><br>
-                <code id="paste-guide-code" style="color: var(--primary); font-weight:bold;"></code><br>
-                Cukup blok baris/kolom di Excel, Copy (Ctrl+C), lalu Paste (Ctrl+V) di kotak bawah ini. Otomatis masuk ke Database tanpa error!
+            <div class="bg-purple-50 border border-purple-200 text-purple-700 px-4 py-2 rounded-xl font-bold text-sm">
+                Soal <span id="nomor-tampil">1</span>/50
             </div>
-            
-            <input type="hidden" id="paste-type">
-            <textarea id="paste-textarea" class="input-control" rows="10" placeholder="Paste (Ctrl+V) data dari Excel di sini..."></textarea>
+        </div>
 
-            <button class="btn" style="width: 100%; background: var(--primary); color: white; margin-top: 15px;" onclick="prosesPasteData()">
-                <i class="fas fa-save"></i> Simpan ke Database
+        <div class="flex-1 overflow-y-auto mb-24 pb-10">
+            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-200 mb-6">
+                <div id="teks-soal" class="text-lg font-semibold text-gray-800 leading-relaxed whitespace-pre-line">Memuat pertanyaan...</div>
+            </div>
+            <div id="opsi-list" class="space-y-3"></div>
+        </div>
+
+        <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/95 backdrop-blur-md border-t border-gray-200 flex justify-between items-center gap-4 z-40 shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)]">
+            <button class="py-3.5 px-6 rounded-xl font-bold text-gray-600 border-2 border-gray-200 hover:bg-gray-50 transition" onclick="soalSebelumnya()" id="btn-prev">
+                <i class="fas fa-chevron-left mr-1"></i> Sebelumnya
+            </button>
+            <button class="flex-1 py-3.5 rounded-xl font-bold text-white bg-purple-600 hover:bg-purple-700 shadow-lg shadow-purple-200 transition" onclick="soalSelanjutnya()" id="btn-next">
+                Selanjutnya <i class="fas fa-chevron-right ml-1"></i>
+            </button>
+            <button class="flex-1 py-3.5 rounded-xl font-bold text-white bg-green-500 hover:bg-green-600 shadow-lg shadow-green-200 transition hidden" onclick="kirimUjianPasti()" id="btn-kirim">
+                <i class="fas fa-paper-plane mr-1"></i> Kirim Ujian
+            </button>
+            <button class="py-3.5 px-4 rounded-xl font-bold text-purple-600 bg-purple-50 border border-purple-200" onclick="document.getElementById('modal-grid').classList.remove('hidden')">
+                <i class="fas fa-th"></i>
             </button>
         </div>
     </div>
 
-    <!-- MODAL KONFIRMASI SISWA -->
-    <div id="modal-konfirmasi" class="modal-overlay hidden">
-        <div class="modal-content" style="max-width: 400px; text-align: center;">
-            <i class="fas fa-user-circle" style="font-size: 4rem; color: var(--primary); margin-bottom: 15px;"></i>
-            <h2 style="margin-bottom: 20px; color: var(--dark);">Konfirmasi Data</h2>
-            <div style="text-align: left; background: var(--gray-100); padding: 15px; border-radius: 8px; margin-bottom: 25px;">
-                <p><strong>Nama:</strong> <span id="k-nama"></span></p>
-                <p><strong>Kelas:</strong> <span id="k-kelas"></span></p>
-                <p><strong>NIS:</strong> <span id="k-nis"></span></p>
-                <p><strong>L/P:</strong> <span id="k-jk"></span></p>
+    <div id="modal-grid" class="fixed inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm hidden flex items-end justify-center z-50">
+        <div class="bg-white w-full max-w-md rounded-t-3xl p-6 pb-10">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-extrabold text-lg text-gray-800">Daftar Soal</h3>
+                <button class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500" onclick="document.getElementById('modal-grid').classList.add('hidden')"><i class="fas fa-times"></i></button>
             </div>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn btn-outline" style="flex: 1;" onclick="tutupModal('modal-konfirmasi')">Batal</button>
-                <button class="btn btn-primary" style="flex: 1;" onclick="mulaiUjian()">Mulai Ujian</button>
+            <div class="grid grid-cols-5 gap-3 max-h-[60vh] overflow-y-auto p-1" id="grid-nomor"></div>
+        </div>
+    </div>
+
+    <div id="layar-selesai" class="min-h-screen hidden items-center justify-center p-4 bg-gray-50">
+        <div class="glass-card w-full max-w-md text-center py-10">
+            <div class="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center text-5xl mx-auto mb-6"><i class="fas fa-check"></i></div>
+            <h1 class="text-3xl font-extrabold text-gray-800 mb-2">Selesai!</h1>
+            <p class="text-gray-500 font-medium mb-8">Jawaban kamu telah berhasil disimpan di server Bapak Jayadi.</p>
+            <div class="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-8 inline-block min-w-[200px]">
+                <p class="text-sm font-extrabold text-blue-400 uppercase tracking-widest mb-1">Nilai Akhir</p>
+                <p class="text-6xl font-black text-blue-600" id="skor-akhir">100</p>
+            </div>
+            <button class="btn-custom btn-primary-custom w-full py-4" onclick="window.location.reload()">Keluar dari Ujian</button>
+        </div>
+    </div>
+
+    <div id="admin-page" class="hidden">
+        <div class="sidebar">
+            <div class="p-6 border-b border-gray-100 flex items-center gap-3">
+                <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center text-white"><i class="fas fa-shield-alt"></i></div>
+                <h2 class="text-xl font-extrabold text-gray-800">AdminPanel</h2>
+            </div>
+            <div class="p-4 flex-1 space-y-1">
+                <div class="menu-item active" onclick="switchAdminTab('beranda', this)"><i class="fas fa-chart-pie w-5"></i> Beranda</div>
+                <div class="menu-item" onclick="switchAdminTab('rekap', this)"><i class="fas fa-table w-5"></i> Rekap Nilai</div>
+                <div class="menu-item" onclick="switchAdminTab('siswa', this)"><i class="fas fa-users w-5"></i> Kelola Siswa</div>
+                <div class="menu-item" onclick="switchAdminTab('soal', this)"><i class="fas fa-file-alt w-5"></i> Bank Soal</div>
+            </div>
+            <div class="p-5 border-t border-gray-100">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 font-bold flex items-center justify-center">J</div>
+                    <div><p class="font-bold text-gray-800 text-sm">JAYADI, S.Pd.</p><p class="text-xs text-gray-500 font-medium">Guru PKN</p></div>
+                </div>
+                <button class="w-full py-2.5 rounded-lg font-bold text-red-600 bg-red-50 hover:bg-red-100 transition" onclick="window.location.reload()"><i class="fas fa-sign-out-alt mr-1"></i> Keluar</button>
+            </div>
+        </div>
+
+        <div class="flex-1 p-6 md:p-10 h-screen overflow-y-auto bg-gray-50">
+            <!-- Admin Beranda -->
+            <div id="tab-beranda" class="admin-tab">
+                <h1 class="text-3xl font-extrabold text-gray-800 mb-1">Dashboard Guru</h1>
+                <p class="text-gray-500 font-medium mb-8">Statistik Real-time Ulangan Harian PKN.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex items-center justify-between">
+                        <div><p class="text-gray-500 font-bold text-sm mb-1">Total Soal</p><p class="text-3xl font-black text-gray-800" id="stat-soal">0</p></div>
+                        <div class="w-14 h-14 bg-purple-50 text-purple-500 rounded-full flex items-center justify-center text-2xl"><i class="fas fa-file-signature"></i></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex items-center justify-between">
+                        <div><p class="text-gray-500 font-bold text-sm mb-1">Total Siswa</p><p class="text-3xl font-black text-gray-800" id="stat-siswa">0</p></div>
+                        <div class="w-14 h-14 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center text-2xl"><i class="fas fa-user-graduate"></i></div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-200 flex items-center justify-between">
+                        <div><p class="text-gray-500 font-bold text-sm mb-1">Sudah Selesai</p><p class="text-3xl font-black text-gray-800" id="stat-selesai">0</p></div>
+                        <div class="w-14 h-14 bg-green-50 text-green-500 rounded-full flex items-center justify-center text-2xl"><i class="fas fa-check-circle"></i></div>
+                    </div>
+                </div>
+
+                <div class="table-container p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">Progres Tiap Kelas</h3>
+                    <div class="overflow-x-auto">
+                        <table id="table-class-stats">
+                            <thead><tr><th>Kelas</th><th>Total Siswa</th><th>Laki-laki</th><th>Perempuan</th><th>Selesai</th><th>Belum</th></tr></thead>
+                            <tbody class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Rekap -->
+            <div id="tab-rekap" class="admin-tab hidden">
+                <div class="flex justify-between items-end mb-6">
+                    <div><h1 class="text-3xl font-extrabold text-gray-800 mb-1">Rekap Nilai</h1><p class="text-gray-500 font-medium">Data diperbarui secara otomatis.</p></div>
+                    <button class="bg-green-500 hover:bg-green-600 text-white font-bold py-2.5 px-5 rounded-xl shadow-md transition flex items-center gap-2" onclick="downloadCSV()"><i class="fas fa-file-excel"></i> Export CSV</button>
+                </div>
+                <div class="table-container">
+                    <div class="p-4 border-b border-gray-100 bg-gray-50 flex items-center gap-3">
+                        <span class="font-bold text-gray-600 text-sm">Filter Kelas:</span>
+                        <select class="px-4 py-2 rounded-lg border border-gray-200 font-bold text-gray-700 outline-none" id="filter-nilai" onchange="renderTabelRekap()">
+                            <option value="ALL">Semua Kelas 9</option><option value="9.1">9.1</option><option value="9.2">9.2</option><option value="9.3">9.3</option><option value="9.4">9.4</option>
+                        </select>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table id="table-nilai">
+                            <thead><tr><th>No</th><th>Nama Siswa</th><th>Kelas</th><th>NIS</th><th>Status</th><th>Nilai</th></tr></thead>
+                            <tbody class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Siswa -->
+            <div id="tab-siswa" class="admin-tab hidden">
+                <h1 class="text-3xl font-extrabold text-gray-800 mb-1">Kelola Siswa</h1>
+                <p class="text-gray-500 font-medium mb-6">Reset ujian siswa jika terjadi kendala.</p>
+                <div class="table-container">
+                    <div class="p-4 border-b border-gray-100 bg-gray-50 flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-gray-600 text-sm">Filter Kelas:</span>
+                            <select class="px-4 py-2 rounded-lg border border-gray-200 font-bold text-gray-700 outline-none" id="filter-siswa" onchange="renderTabelSiswa()">
+                                <option value="ALL">Semua Kelas 9</option><option value="9.1">9.1</option><option value="9.2">9.2</option><option value="9.3">9.3</option><option value="9.4">9.4</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table id="table-kelola-siswa">
+                            <thead><tr><th>NIS</th><th>Nama Lengkap</th><th>Kelas</th><th>L/P</th><th>Status</th><th>Aksi</th></tr></thead>
+                            <tbody class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Soal -->
+            <div id="tab-soal" class="admin-tab hidden">
+                <h1 class="text-3xl font-extrabold text-gray-800 mb-1">Bank Soal PKN</h1>
+                <p class="text-gray-500 font-medium mb-6">Tinjau daftar soal dan kunci jawaban.</p>
+                <div class="table-container">
+                    <div class="p-5 border-b border-gray-100 bg-gray-50">
+                        <h3 class="font-extrabold text-gray-800">Total: <span id="count-soal">50</span> Soal Aktif</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table id="table-kelola-soal">
+                            <thead><tr><th>No</th><th>Pertanyaan</th><th>Kunci Jawaban</th></tr></thead>
+                            <tbody class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, getDocs, doc, updateDoc, setDoc, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, getDocs, updateDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
-        // Konfigurasi Asli Pak Jayadi
+        // Konfigurasi Database Firebase Bapak Jayadi
         const firebaseConfig = {
             apiKey: "AIzaSyDExMRbUfrN-R8mKVznYCVpng4K6F8iaSg",
             authDomain: "uh-pkn-kelas-9.firebaseapp.com",
@@ -439,12 +314,11 @@
             messagingSenderId: "468330303384",
             appId: "1:468330303384:web:c5ed6f5b821ca1d58ae5ed"
         };
-
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // DATA MENTAH 173 SISWA DAN 50 SOAL (SISTEM AUTO-INJECT)
-        const rawSiswa = `
+        // DATA 173 SISWA (9.1 - 9.4) BAPAK JAYADI
+        const rawSiswaStr = `
 ABIDZAR AL GHIFARI LUBIS|242507001|L|9.1
 AISHA RIZKYA ZHAFIRA|242507185|P|9.1
 ALDIAN FAIZ ABIMANYU|242507049|L|9.1
@@ -620,18 +494,19 @@ SITI AZZAHRA BATUBARA|242507177|P|9.4
 SITI SALWA KHAMALIYAH|242507042|P|9.4
 `;
 
-        const rawSoal = `
+        // DATA 50 SOAL PKN BAPAK JAYADI
+        const rawSoalStr = `
 1|Analisis hubungan antara Pancasila dan Pembukaan UUD NRI Tahun 1945: (1) Pancasila berkedudukan di atas konstitusi sebagai norma dasar. (2) Pembukaan UUD 1945 dapat diubah sewaktu-waktu. (3) Pembukaan UUD 1945 memuat rumusan Pancasila.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b
-2|Karakteristik hubungan Pancasila dengan Bhinneka Tunggal Ika: (1) Sila ketiga meletakkan dasar kebangsaan. (2) Keberagaman harus diseragamkan. (3) Pancasila menjamin hak yang setara bagi setiap warga.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b
-3|Implementasi semangat Pancasila dalam kehidupan bernegara: (1) Mengutamakan musyawarah mufakat. (2) Memperlakukan orang lain secara adil. (3) Memaksakan kehendak kelompok mayoritas.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
+2|Karakteristik hubungan Pancasila dengan Bhinneka Tunggal Ika: (1) Sila ketiga meletakkan dasar kebangsaan. (2) Keberagaman harus diseragamkan. (3) Pancasila menjamin hak yang setara.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b
+3|Implementasi semangat Pancasila dalam kehidupan bernegara: (1) Mengutamakan musyawarah mufakat. (2) Memperlakukan orang lain secara adil. (3) Memaksakan kehendak mayoritas.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
 4|Analisis pandangan para ahli mengenai konsep hak dan kewajiban: (1) Notonegoro menyatakan hak adalah kekuasaan menerima. (2) John Salmond mengelompokkan hak kekebalan. (3) Kewajiban warga negara bersifat opsional.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
 5|Pengaturan hak dan kewajiban warga negara dalam UUD 1945: (1) Hak atas pekerjaan diatur Pasal 27 ayat 2. (2) Hak berserikat diatur Pasal 28E. (3) Warga negara dibebaskan dari kewajiban hukum.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
-6|Peran lembaga penegak hukum dalam sistem peradilan di Indonesia: (1) Polri memelihara keamanan. (2) Kejaksaan melaksanakan penuntutan perkara pidana. (3) Hakim bertindak sebagai penasihat hukum terdakwa.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
+6|Peran lembaga penegak hukum dalam sistem peradilan di Indonesia: (1) Polri memelihara keamanan. (2) Kejaksaan melaksanakan penuntutan perkara pidana. (3) Hakim bertindak sebagai penasihat hukum.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
 7|Hakikat kemerdekaan berpendapat sebagai hak asasi manusia: (1) Tolok ukur negara demokrasi. (2) Dapat dilaksanakan sebebas-bebasnya tanpa batas. (3) Harus diimbangi kewajiban menghormati hak orang lain.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b
-8|Ketentuan hukum penyampaian pendapat di muka umum (UU No 9/1998): (1) Dilarang di istana kepresidenan dan tempat ibadah. (2) Diwujudkan melalui unjuk rasa atau pawai. (3) Diizinkan malam hari tanpa batasan waktu.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
+8|Ketentuan hukum penyampaian pendapat di muka umum (UU No 9/1998): (1) Dilarang di istana kepresidenan dan tempat ibadah. (2) Diwujudkan melalui unjuk rasa atau pawai. (3) Diizinkan malam hari tanpa batas.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
 9|Prinsip keterbukaan informasi publik (UU No 14/2008): (1) Menjamin hak warga mengetahui kebijakan publik. (2) Mendorong partisipasi aktif masyarakat. (3) Menutupi dokumen negara dari pengawasan.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
 10|Karakteristik tradisi dan kearifan lokal di Indonesia: (1) Tradisi diwariskan turun-temurun. (2) Kearifan lokal memuat budi pekerti luhur. (3) Tradisi bersifat statis mutlak dan tidak beradaptasi.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
-11|Analisis nilai filosofis kearifan lokal nusantara: (1) Tri Hita Karana mengajarkan keharmonisan. (2) Ajining diri saka lathi menekankan pentingnya etika. (3) Lojor teu meunang dipotong mendorong eksploitasi hutan.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
+11|Analisis nilai filosofis kearifan lokal nusantara: (1) Tri Hita Karana mengajarkan keharmonisan. (2) Ajining diri saka lathi menekankan pentingnya etika. (3) Lojor teu meunang dipotong mendorong eksploitasi.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
 12|Ruang lingkup objek pemajuan kebudayaan (UU No 5/2017): (1) Tradisi lisan dan upacara adat. (2) Permainan rakyat dan olahraga tradisional. (3) Industri manufaktur mesin berat.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
 13|Analisis tantangan demografi Indonesia (Sensus 2020): (1) Bonus demografi ditandai dominasi usia produktif. (2) Sebaran penduduk merata di pulau terluar. (3) Peningkatan kualitas SDM sangat krusial.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b
 14|Wujud cita-cita bangsa dan sistem pertahanan NKRI: (1) Membentuk masyarakat adil makmur. (2) Menerapkan Sishankamrata. (3) Mengisolasi diri dari kerja sama internasional.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
@@ -673,55 +548,68 @@ SITI SALWA KHAMALIYAH|242507042|P|9.4
 50|Peran menjaga NKRI bagi siswa dimulai dari disiplin dan menghormati teman.|Benar|Salah|-|-|a
 `;
 
-        // EKSEKUSI AUTO INJECT SAAT WEB DIMUAT PERTAMA KALI
-        async function runAutoSetup() {
+        async function jalankanAutoInject() {
             try {
-                const usersSnap = await getDocs(collection(db, "users"));
-                // Jika database kosong, tembak data
-                if(usersSnap.empty) {
-                    Swal.fire({title: 'Menyiapkan Data Ujian...', text: 'Tunggu 3 detik, data 173 siswa & 50 soal sedang dimasukkan...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
-                    
-                    const batch = writeBatch(db);
+                const cekUsers = await getDocs(collection(db, "users"));
+                // Jika database belum ada isinya sama sekali
+                if(cekUsers.empty) {
+                    let timerInterval;
+                    Swal.fire({
+                        title: 'Menyiapkan Ujian Ar-Ridho...',
+                        html: 'Menyuntikkan 173 Siswa & 50 Soal ke Database secara otomatis.<br>Mohon tunggu <b></b> detik.',
+                        timer: 4000,
+                        timerProgressBar: true,
+                        allowOutsideClick: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                            const b = Swal.getHtmlContainer().querySelector('b');
+                            timerInterval = setInterval(() => { b.textContent = (Swal.getTimerLeft() / 1000).toFixed(0); }, 100);
+                        },
+                        willClose: () => { clearInterval(timerInterval); }
+                    });
 
-                    // Suntik Siswa
-                    const linesSiswa = rawSiswa.trim().split('\n');
+                    const batchSiswa = writeBatch(db);
+                    const linesSiswa = rawSiswaStr.trim().split('\n');
                     for(let line of linesSiswa) {
                         const p = line.split('|');
                         const idSiswa = 'siswa_' + p[1].trim(); 
-                        batch.set(doc(db, "users", idSiswa), {
+                        batchSiswa.set(doc(db, "users", idSiswa), {
                             nama: p[0].trim(), nis: p[1].trim(), jk: p[2].trim(), kelas: p[3].trim(), status: 'belum', nilai: 0, jawaban: {}
                         });
                     }
+                    await batchSiswa.commit();
 
-                    // Suntik Soal
-                    const linesSoal = rawSoal.trim().split('\n');
+                    const batchSoal = writeBatch(db);
+                    const linesSoal = rawSoalStr.trim().split('\n');
                     for(let i=0; i<linesSoal.length; i++) {
                         const p = linesSoal[i].split('|');
                         const idSoal = 'soal_pkn_' + (i+1);
-                        batch.set(doc(db, "questions", idSoal), {
+                        batchSoal.set(doc(db, "questions", idSoal), {
                             soal: p[1].trim(), a: p[2].trim(), b: p[3].trim(), c: p[4].trim(), d: p[5].trim(), jawaban: p[6].trim().toLowerCase()
                         });
                     }
-
-                    await batch.commit();
-                    Swal.fire('Selesai!', 'Sistem Ujian Siap Digunakan!', 'success').then(() => window.location.reload());
+                    await batchSoal.commit();
+                    
+                    // Selesai inject, refresh agar data terbaca ke UI
+                    window.location.reload();
                 }
             } catch(e) {
-                console.error("Auto Setup Error:", e);
+                console.error("Auto Inject Gagal:", e);
             }
         }
-
-        // Panggil fungsi auto setup
-        runAutoSetup();
+        
+        // Panggil fungsi auto-inject saat pertama kali web di-load
+        jalankanAutoInject();
 
         let usersData = [], questionsData = [], currentUser = null;
         let soalAcakSiswa = [], indeksSoalSaatIni = 0, jawabanSiswa = {}; 
 
+        // Listener Firebase (Realtime Update)
         onSnapshot(collection(db, "users"), (snapshot) => {
             usersData = [];
             snapshot.forEach(doc => usersData.push({ id: doc.id, ...doc.data() }));
             if(!document.getElementById('admin-page').classList.contains('hidden')){
-                updateDashboardStats(); renderTableNilai(); renderTableSiswa();
+                updateDashboardStats(); renderTabelRekap(); renderTabelSiswa();
             }
         });
 
@@ -730,17 +618,17 @@ SITI SALWA KHAMALIYAH|242507042|P|9.4
             snapshot.forEach(doc => questionsData.push({ id: doc.id, ...doc.data() }));
             if(!document.getElementById('admin-page').classList.contains('hidden')){
                 document.getElementById('stat-soal').innerText = questionsData.length;
-                document.getElementById('count-soal-list').innerText = questionsData.length;
-                renderTableSoal();
+                document.getElementById('count-soal').innerText = questionsData.length;
+                renderTabelSoal();
             }
         });
 
+        // ================== FUNGSI SISWA ==================
         window.switchLogin = function(tipe) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById('form-siswa').classList.add('hidden');
-            document.getElementById('form-guru').classList.add('hidden');
-            document.getElementById(tipe === 'siswa' ? 'form-siswa' : 'form-guru').classList.remove('hidden');
-            document.querySelectorAll('.tab-btn')[tipe === 'siswa' ? 0 : 1].classList.add('active');
+            document.getElementById('tab-siswa').className = `flex-1 py-2 text-center rounded-lg cursor-pointer font-bold transition-all ${tipe === 'siswa' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-500'}`;
+            document.getElementById('tab-guru').className = `flex-1 py-2 text-center rounded-lg cursor-pointer font-bold transition-all ${tipe === 'guru' ? 'bg-white text-purple-600 shadow-sm' : 'text-gray-500'}`;
+            document.getElementById('form-siswa').classList.toggle('hidden', tipe !== 'siswa');
+            document.getElementById('form-guru').classList.toggle('hidden', tipe !== 'guru');
         };
 
         window.loadSiswaList = function() {
@@ -749,7 +637,8 @@ SITI SALWA KHAMALIYAH|242507042|P|9.4
             selectNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
             if(kelas) {
                 usersData.filter(u => u.kelas === kelas).sort((a,b) => a.nama.localeCompare(b.nama)).forEach(s => {
-                    let opt = document.createElement('option'); opt.value = s.id; opt.textContent = s.nama;
+                    let opt = document.createElement('option'); opt.value = s.id; 
+                    opt.textContent = s.status === 'selesai' ? `${s.nama} (SELESAI)` : s.nama;
                     selectNama.appendChild(opt);
                 });
                 selectNama.disabled = false;
@@ -758,36 +647,42 @@ SITI SALWA KHAMALIYAH|242507042|P|9.4
 
         window.cekDataSiswa = function() {
             const idSiswa = document.getElementById('nama-select').value;
-            if(!idSiswa) return Swal.fire('Error', 'Pilih nama dahulu', 'error');
+            if(!idSiswa) return Swal.fire('Error', 'Silakan pilih kelas dan nama Anda', 'error');
             const siswa = usersData.find(u => u.id === idSiswa);
-            if(siswa.status === 'selesai') return Swal.fire('Informasi', 'Anda sudah selesai ujian.', 'info');
+            if(siswa.status === 'selesai') return Swal.fire('Informasi', 'Anda sudah selesai mengerjakan ujian ini.', 'info');
             currentUser = siswa;
             document.getElementById('k-nama').innerText = siswa.nama;
             document.getElementById('k-kelas').innerText = siswa.kelas;
+            document.getElementById('k-nis').innerText = siswa.nis;
             document.getElementById('modal-konfirmasi').classList.remove('hidden');
         };
 
         window.tutupModal = (id) => document.getElementById(id).classList.add('hidden');
 
-        window.mulaiUjian = function() {
-            document.getElementById('modal-konfirmasi').classList.add('hidden');
+        window.mulaiUjianPasti = function() {
+            tutupModal('modal-konfirmasi');
             document.getElementById('login-page').classList.add('hidden');
             document.getElementById('ujian-page').classList.remove('hidden');
             document.getElementById('u-nama').innerText = currentUser.nama;
+            document.getElementById('u-kelas').innerText = `Kelas ${currentUser.kelas} | NIS: ${currentUser.nis}`;
             
             const savedSession = localStorage.getItem('ujian_sesi_' + currentUser.id);
             if(savedSession) {
                 const sesiData = JSON.parse(savedSession);
                 soalAcakSiswa = sesiData.soal; jawabanSiswa = sesiData.jawaban; indeksSoalSaatIni = sesiData.lastIndex || 0;
             } else {
-                soalAcakSiswa = questionsData.sort(() => Math.random() - 0.5).map(s => ({
-                    ...s, opsiAcak: [{key:'a',teks:s.a}, {key:'b',teks:s.b}, {key:'c',teks:s.c}, {key:'d',teks:s.d}].sort(() => Math.random() - 0.5)
+                soalAcakSiswa = acakArray([...questionsData]).map(s => ({
+                    ...s, opsiAcak: acakArray([{key:'a',teks:s.a}, {key:'b',teks:s.b}, {key:'c',teks:s.c}, {key:'d',teks:s.d}])
                 }));
                 jawabanSiswa = {}; indeksSoalSaatIni = 0; simpanSesiLokal(); 
             }
             renderGridNomor(); tampilkanSoal(indeksSoalSaatIni);
         };
 
+        function acakArray(array) {
+            for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; }
+            return array;
+        }
         function simpanSesiLokal() { localStorage.setItem('ujian_sesi_'+currentUser.id, JSON.stringify({soal: soalAcakSiswa, jawaban: jawabanSiswa, lastIndex: indeksSoalSaatIni})); }
 
         window.tampilkanSoal = function(index) {
@@ -798,17 +693,18 @@ SITI SALWA KHAMALIYAH|242507042|P|9.4
             
             const listOpsi = document.getElementById('opsi-list'); listOpsi.innerHTML = '';
             soal.opsiAcak.forEach((ops, idx) => {
-                if(ops.teks === '-') return; // Skip opsi kosong (untuk soal Benar/Salah)
+                if(ops.teks === '-') return; 
                 const div = document.createElement('div');
                 div.className = `opsi-item ${jawabanSiswa[soal.id] === ops.key ? 'selected' : ''}`;
                 div.onclick = () => { jawabanSiswa[soal.id] = ops.key; simpanSesiLokal(); tampilkanSoal(indeksSoalSaatIni); renderGridNomor(); };
-                div.innerHTML = `<div class="opsi-label">${['A','B','C','D'][idx]}</div><div>${ops.teks}</div>`;
+                div.innerHTML = `<div class="opsi-label">${['A','B','C','D'][idx]}</div><div class="font-medium text-gray-700">${ops.teks}</div>`;
                 listOpsi.appendChild(div);
             });
 
             document.getElementById('btn-prev').classList.toggle('hidden', index === 0);
             document.getElementById('btn-next').classList.toggle('hidden', index === soalAcakSiswa.length - 1);
             document.getElementById('btn-kirim').classList.toggle('hidden', index !== soalAcakSiswa.length - 1);
+            
             document.querySelectorAll('.btn-nomor').forEach((btn, i) => btn.classList.toggle('aktif', i === index));
         };
 
@@ -820,15 +716,22 @@ SITI SALWA KHAMALIYAH|242507042|P|9.4
             soalAcakSiswa.forEach((s, i) => {
                 const btn = document.createElement('button');
                 btn.className = `btn-nomor ${jawabanSiswa[s.id] ? 'dijawab' : ''}`;
-                btn.innerText = i + 1; btn.onclick = () => tampilkanSoal(i);
+                btn.innerText = i + 1; btn.onclick = () => { tampilkanSoal(i); tutupModal('modal-grid'); };
                 grid.appendChild(btn);
             });
         }
 
-        window.kirimUjian = async function() {
-            if(!confirm('Kirim jawaban sekarang?')) return;
-            Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+        window.kirimUjianPasti = async function() {
+            const trjw = Object.keys(jawabanSiswa).length;
+            if(trjw < soalAcakSiswa.length) {
+                const k = await Swal.fire({ title: 'Yakin Kirim?', text: `Baru ${trjw} dari ${soalAcakSiswa.length} soal dijawab!`, icon: 'warning', showCancelButton: true, confirmButtonText: 'Kirim Paksa' });
+                if(!k.isConfirmed) return;
+            } else {
+                const k2 = await Swal.fire({ title: 'Kirim Jawaban?', icon: 'question', showCancelButton: true, confirmButtonText: 'Ya, Kirim!' });
+                if(!k2.isConfirmed) return;
+            }
 
+            Swal.fire({ title: 'Menyimpan ke Server...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             let benar = 0;
             for(let idSoal in jawabanSiswa) {
                 const soalAsli = questionsData.find(s => s.id === idSoal);
@@ -839,8 +742,12 @@ SITI SALWA KHAMALIYAH|242507042|P|9.4
             try {
                 await updateDoc(doc(db, "users", currentUser.id), { status: 'selesai', nilai: nilaiAkhir, jawaban: jawabanSiswa });
                 localStorage.removeItem('ujian_sesi_' + currentUser.id);
-                Swal.fire('Berhasil!', `Ujian selesai.`, 'success').then(() => window.location.reload());
-            } catch(e) { Swal.fire('Error', 'Gagal mengirim', 'error'); }
+                Swal.close();
+                document.getElementById('ujian-page').classList.add('hidden');
+                document.getElementById('layar-selesai').classList.remove('hidden');
+                document.getElementById('layar-selesai').classList.add('flex');
+                document.getElementById('skor-akhir').innerText = nilaiAkhir;
+            } catch(e) { Swal.fire('Error', 'Koneksi terputus. Coba klik kirim lagi.', 'error'); }
         };
 
         window.loginGuru = function() {
@@ -868,95 +775,46 @@ SITI SALWA KHAMALIYAH|242507042|P|9.4
             const tbody = document.querySelector('#table-class-stats tbody'); tbody.innerHTML = '';
             Object.keys(statKelas).sort().forEach(kls => {
                 const s = statKelas[kls];
-                tbody.innerHTML += `<tr><td style="color:var(--primary); font-weight:bold">${kls}</td><td>${s.total}</td><td>${s.L}</td><td>${s.P}</td><td><span class="badge badge-success">${s.selesai}</span></td><td><span class="badge badge-warning">${s.total - s.selesai}</span></td></tr>`;
+                tbody.innerHTML += `<tr><td class="font-extrabold text-purple-600">${kls}</td><td class="font-bold">${s.total} Siswa</td><td>${s.L}</td><td>${s.P}</td><td><span class="bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold text-xs">${s.selesai} Selesai</span></td><td><span class="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full font-bold text-xs">${s.total - s.selesai} Belum</span></td></tr>`;
             });
         }
 
-        window.renderTableNilai = function() {
-            const filter = document.getElementById('filter-nilai-kelas').value;
+        window.renderTabelRekap = function() {
+            const filter = document.getElementById('filter-nilai').value;
             const list = filter === 'ALL' ? usersData : usersData.filter(u => u.kelas === filter);
             const tbody = document.querySelector('#table-nilai tbody'); tbody.innerHTML = '';
-            list.sort((a,b) => a.nama.localeCompare(b.nama)).forEach(u => {
-                tbody.innerHTML += `<tr><td>${u.nama}</td><td>${u.kelas}</td><td>${u.nis}</td><td>${u.status==='selesai'?'<span class="badge badge-success">Selesai</span>':'<span class="badge badge-warning">Belum</span>'}</td><td><b>${u.status==='selesai'?u.nilai:'-'}</b></td></tr>`;
+            list.sort((a,b) => a.nama.localeCompare(b.nama)).forEach((u, i) => {
+                tbody.innerHTML += `<tr><td class="text-gray-400 font-bold">${i+1}</td><td class="font-bold text-gray-800">${u.nama}</td><td class="font-bold text-purple-600">${u.kelas}</td><td class="text-sm">${u.nis}</td><td>${u.status==='selesai'?'<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold text-xs">Selesai</span>':'<span class="bg-gray-100 text-gray-500 px-3 py-1 rounded-full font-bold text-xs">Belum</span>'}</td><td class="font-black text-xl text-blue-600">${u.status==='selesai'?u.nilai:'-'}</td></tr>`;
             });
         };
 
         window.downloadCSV = function() {
-            const filter = document.getElementById('filter-nilai-kelas').value;
+            const filter = document.getElementById('filter-nilai').value;
             const list = filter === 'ALL' ? usersData : usersData.filter(u => u.kelas === filter);
             let csv = "Nama,Kelas,NIS,Status,Nilai\n";
             list.sort((a,b) => a.nama.localeCompare(b.nama)).forEach(u => csv += `${u.nama},${u.kelas},${u.nis},${u.status},${u.status==='selesai'?u.nilai:''}\n`);
             const link = document.createElement("a"); link.href = encodeURI("data:text/csv;charset=utf-8," + csv); link.download = `Rekap_PKN_${filter}.csv`; link.click();
         };
 
-        window.renderTableSiswa = function() {
-            const filter = document.getElementById('filter-kelola-kelas').value;
+        window.renderTabelSiswa = function() {
+            const filter = document.getElementById('filter-siswa').value;
             const list = filter === 'ALL' ? usersData : usersData.filter(u => u.kelas === filter);
             const tbody = document.querySelector('#table-kelola-siswa tbody'); tbody.innerHTML = '';
             list.sort((a,b) => a.nama.localeCompare(b.nama)).forEach(u => {
-                tbody.innerHTML += `<tr><td>${u.nama}</td><td>${u.kelas}</td><td>${u.nis}</td><td>${u.jk}</td><td>${u.status}</td><td>${u.status==='selesai'?`<button class="btn-reset" onclick="resetUjian('${u.id}')"><i class="fas fa-undo"></i></button>`:''}<button class="btn-delete" onclick="hapusDoc('users','${u.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
+                tbody.innerHTML += `<tr><td class="font-bold text-gray-500">${u.nis}</td><td class="font-extrabold text-gray-800">${u.nama}</td><td class="font-bold text-purple-600">${u.kelas}</td><td>${u.jk}</td><td>${u.status}</td><td>${u.status==='selesai'?`<button class="bg-blue-100 text-blue-600 hover:bg-blue-200 px-3 py-1.5 rounded-lg text-xs font-bold transition mr-2" onclick="resetUjian('${u.id}')"><i class="fas fa-undo"></i> Reset</button>`:''}<button class="bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1.5 rounded-lg text-xs font-bold transition" onclick="hapusDoc('users','${u.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
             });
         };
 
-        window.renderTableSoal = function() {
+        window.renderTabelSoal = function() {
             const tbody = document.querySelector('#table-kelola-soal tbody'); tbody.innerHTML = '';
             questionsData.forEach((q, i) => {
-                tbody.innerHTML += `<tr><td>${i+1}</td><td>${q.soal}</td><td style="color:var(--secondary);font-weight:bold">${q.jawaban?q.jawaban.toUpperCase():''}</td><td><button class="btn-delete" onclick="hapusDoc('questions','${q.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
+                tbody.innerHTML += `<tr><td class="font-bold text-gray-400">${i+1}</td><td class="font-medium text-gray-800 max-w-md">${q.soal}</td><td class="font-bold text-green-600 text-lg uppercase">${q.jawaban || '-'}</td><td><button class="bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1.5 rounded-lg text-xs font-bold transition" onclick="hapusDoc('questions','${q.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
             });
         };
 
-        window.resetUjian = async (id) => { if(confirm('Reset siswa ini?')) await updateDoc(doc(db, "users", id), { status: 'belum', nilai: 0, jawaban: {} }); };
-        window.hapusDoc = async (koleksi, id) => { if(confirm('Hapus permanen?')) await deleteDoc(doc(db, koleksi, id)); };
+        window.resetUjian = async (id) => { if(confirm('Yakin reset anak ini?')) await updateDoc(doc(db, "users", id), { status: 'belum', nilai: 0, jawaban: {} }); };
+        window.hapusDoc = async (koleksi, id) => { if(confirm('Yakin Hapus?')) await deleteDoc(doc(db, koleksi, id)); };
 
-        window.bukaModalPaste = function(tipe) {
-            document.getElementById('paste-type').value = tipe;
-            document.getElementById('paste-textarea').value = '';
-            if(tipe === 'siswa') {
-                document.getElementById('modal-paste-title').innerText = "Paste Data Siswa";
-                document.getElementById('paste-guide-code').innerText = "Kolom 1: Nama | Kolom 2: Kelas | Kolom 3: NIS | Kolom 4: L/P";
-            } else {
-                document.getElementById('modal-paste-title').innerText = "Paste Soal Ujian";
-                document.getElementById('paste-guide-code').innerText = "Kolom 1: Soal | Kol 2: Opsi A | Kol 3: Opsi B | Kol 4: Opsi C | Kol 5: Opsi D | Kol 6: Kunci (a/b/c/d)";
-            }
-            document.getElementById('modal-paste').classList.remove('hidden');
-        };
-
-        window.prosesPasteData = async function() {
-            const tipe = document.getElementById('paste-type').value;
-            const text = document.getElementById('paste-textarea').value.trim();
-            if(!text) return alert("Kotak paste masih kosong!");
-            
-            Swal.fire({ title: 'Menyimpan ke Database...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-            const lines = text.split('\n');
-            let berhasil = 0;
-
-            try {
-                if(tipe === 'siswa') {
-                    for(let line of lines) {
-                        const cols = line.split('\t'); 
-                        if(cols.length >= 4) {
-                            const idSiswa = 'siswa_' + cols[2].trim();
-                            await setDoc(doc(db, "users", idSiswa), { nama: cols[0].trim(), kelas: cols[1].trim(), nis: cols[2].trim(), jk: cols[3].trim(), status: 'belum', nilai: 0, jawaban: {} });
-                            berhasil++;
-                        }
-                    }
-                } else {
-                    for(let line of lines) {
-                        const cols = line.split('\t');
-                        if(cols.length >= 6) {
-                            const idSoal = 'soal_' + Date.now() + Math.floor(Math.random()*1000);
-                            await setDoc(doc(db, "questions", idSoal), { soal: cols[0].trim(), a: cols[1].trim(), b: cols[2].trim(), c: cols[3].trim(), d: cols[4].trim(), jawaban: cols[5].trim().toLowerCase() });
-                            berhasil++;
-                        }
-                    }
-                }
-                document.getElementById('modal-paste').classList.add('hidden');
-                Swal.fire('Berhasil!', `${berhasil} Data telah tersimpan di Database.`, 'success');
-            } catch(e) {
-                Swal.fire('Error', 'Gagal memproses data. Pastikan format kolom dari Excel sudah benar.', 'error');
-            }
-        };
     </script>
 </body>
 </html>
