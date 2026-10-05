@@ -5,97 +5,441 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ujian PKN - SMP Islam Ar-Ridho</title>
     
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PWA Setup -->
+    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiVWppYW4gUEtOIiwic2hvcnRfbmFtZSI6IlVqaWFuIFBLTiIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3ciOiIjZmZmZmZmIiwidGhlbWVfY29sb3ciOiIjNzQzM2ZmIn0=">
     
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="data:application/manifest+json;base64,eyJuYW1lIjoiVWppYW4gUEtOIEFyLVJpZGhvIiwic2hvcnRfbmFtZSI6IlVqaWFuIFBLTiIsInN0YXJ0X3VybCI6Ii4iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjZmZmZmZmIiwidGhlbWVfY29sb3IiOiIjMjU2M2ViIiwiaWNvbnMiOlt7InNyYyI6Imh0dHBzOi8vcGxhY2Vob2xkLmNvLzE5MngxOTIvMjU2M2ViL2ZmZmZmZj90ZXh0PVVqaWFuIiwic2l6ZXMiOiIxOTJ4MTkyIiwidHlwZSI6ImltYWdlL3BuZyJ9XX0=">
+    <!-- Tailwind CSS (Desain Modern) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Document Parsers (Membaca Word & PDF) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';</script>
 
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f8fafc;
-            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-            background-size: 24px 24px;
-            color: #0f172a;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .glass {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-        }
-        .hide { display: none !important; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .gradient-text { background: linear-gradient(135deg, #7c3aed, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hidden-menu { display: none; }
         
-        /* Custom Radio Button Style untuk Opsi Jawaban */
-        .radio-custom:checked + div {
-            background-color: #eff6ff;
-            border-color: #3b82f6;
-            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);
-        }
-        .radio-custom:checked + div .radio-circle {
-            background-color: #3b82f6;
-            border-color: #3b82f6;
-        }
-        .radio-custom:checked + div .radio-circle::after {
-            content: '';
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 8px; height: 8px;
-            border-radius: 50%;
-            background: white;
-        }
-        
-        /* Animasi Loader */
-        .loader { 
-            border: 3px solid #e2e8f0; 
-            border-top: 3px solid #3b82f6; 
-            border-radius: 50%; 
-            width: 32px; height: 32px; 
-            animation: spin 1s linear infinite; 
-        }
+        /* Loading Spinner */
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid #7c3aed; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        /* Layout Admin Responsif */
-        @media (min-width: 768px) {
-            .admin-layout { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
-            .bottom-nav { display: none; }
-        }
-        @media (max-width: 767px) {
-            .admin-layout { display: block; padding-bottom: 70px; }
-            .sidebar { display: none; }
-            .bottom-nav { display: flex; }
-        }
-        
-        /* Hide scrollbar for cleaner look in exam area */
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="antialiased min-h-screen relative selection:bg-blue-200">
+<body class="text-gray-800 antialiased h-screen overflow-hidden flex">
 
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/90 backdrop-blur-sm transition-opacity duration-300">
+    <!-- LOADING SCREEN -->
+    <div id="globalLoading" class="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center">
         <div class="loader mb-4"></div>
-        <p id="loadingText" class="text-slate-600 font-medium animate-pulse">Memuat sistem ujian...</p>
+        <p class="text-gray-500 font-medium">Memuat sistem ujian...</p>
     </div>
 
-    <!-- MAIN APP CONTAINER -->
-    <div id="app" class="w-full h-full min-h-screen"></div>
+    <!-- =============== TAMPILAN SISWA =============== -->
+    <div id="viewSiswa" class="w-full h-full overflow-y-auto hidden">
+        <div class="max-w-3xl mx-auto p-4 md:p-6 pb-24">
+            
+            <!-- HEADER SISWA -->
+            <div class="text-center mb-8 pt-4">
+                <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Ulangan Harian <span class="gradient-text">PKN</span></h1>
+                <p class="text-gray-500 font-medium">SMP Islam Ar-Ridho Citeureup</p>
+            </div>
 
-    <!-- Firebase SDK (Modular) -->
+            <!-- HALAMAN LOGIN SISWA -->
+            <div id="siswaLoginScreen" class="glass-card rounded-3xl shadow-xl p-8 mb-8 border border-gray-100 relative overflow-hidden">
+                <div class="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 bg-purple-100 rounded-full blur-3xl opacity-50"></div>
+                
+                <h2 class="text-2xl font-bold mb-6 text-gray-800 relative z-10">Pilih Data Diri</h2>
+                
+                <div class="space-y-5 relative z-10">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Kelas</label>
+                        <select id="selectKelas" onchange="loadNamaSiswa()" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition bg-gray-50">
+                            <option value="">-- Pilih Kelas --</option>
+                            <option value="9.1">Kelas 9.1</option>
+                            <option value="9.2">Kelas 9.2</option>
+                            <option value="9.3">Kelas 9.3</option>
+                            <option value="9.4">Kelas 9.4</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Pilih Nama Lengkap</label>
+                        <select id="selectNama" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 outline-none transition bg-gray-50" disabled>
+                            <option value="">-- Pilih Kelas Terlebih Dahulu --</option>
+                        </select>
+                    </div>
+                    <button onclick="prosesLoginSiswa()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-purple-200 mt-4">
+                        OK Lanjut
+                    </button>
+                    <div class="text-center pt-4 border-t border-gray-100">
+                        <button onclick="switchView('viewGuru')" class="text-sm text-gray-400 hover:text-purple-600 transition">Masuk sebagai Guru</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HALAMAN KONFIRMASI DATA SISWA -->
+            <div id="siswaConfirmScreen" class="glass-card rounded-3xl shadow-xl p-8 mb-8 border border-gray-100 hidden">
+                <div class="flex items-center justify-center w-16 h-16 bg-green-100 text-green-600 rounded-full mx-auto mb-4 text-2xl">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Konfirmasi Data</h2>
+                
+                <div class="bg-gray-50 rounded-2xl p-6 space-y-4 mb-6">
+                    <div class="flex justify-between border-b border-gray-200 pb-2">
+                        <span class="text-gray-500 text-sm">Nama Lengkap</span>
+                        <span id="confNama" class="font-bold text-gray-800"></span>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-200 pb-2">
+                        <span class="text-gray-500 text-sm">Kelas</span>
+                        <span id="confKelas" class="font-bold text-gray-800"></span>
+                    </div>
+                    <div class="flex justify-between border-b border-gray-200 pb-2">
+                        <span class="text-gray-500 text-sm">NIS</span>
+                        <span id="confNis" class="font-bold text-gray-800"></span>
+                    </div>
+                    <div class="flex justify-between pb-2">
+                        <span class="text-gray-500 text-sm">Jenis Kelamin</span>
+                        <span id="confJK" class="font-bold text-gray-800"></span>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button onclick="batalLogin()" class="w-1/3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3.5 rounded-xl transition">Batal</button>
+                    <button onclick="mulaiUjian()" class="w-2/3 bg-green-500 hover:bg-green-600 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-green-200">OK Mulai Ujian</button>
+                </div>
+            </div>
+
+            <!-- HALAMAN UJIAN (SOAL) -->
+            <div id="siswaUjianScreen" class="hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100 font-bold text-purple-600">
+                        Soal <span id="currentSoalNum">1</span> / <span id="totalSoalNum">50</span>
+                    </div>
+                    <div id="timer" class="bg-white px-4 py-2 rounded-xl shadow-sm border border-gray-100 font-mono font-bold text-gray-700">
+                        <i class="far fa-clock mr-2 text-purple-500"></i><span id="timeText">--:--</span>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-3xl shadow-xl p-6 md:p-8 border border-gray-100">
+                    <h3 id="teksSoal" class="text-lg md:text-xl font-semibold text-gray-800 mb-6 leading-relaxed"></h3>
+                    
+                    <div id="opsiJawaban" class="space-y-3">
+                        <!-- Opsi akan dirender di sini via JS -->
+                    </div>
+                </div>
+
+                <div class="flex justify-between mt-6">
+                    <button id="btnPrev" onclick="prevSoal()" class="bg-white text-gray-700 font-semibold py-3 px-6 rounded-xl shadow-sm border border-gray-200 hover:bg-gray-50 transition hidden">
+                        <i class="fas fa-arrow-left mr-2"></i> Sebelumnya
+                    </button>
+                    <div class="flex-grow"></div>
+                    <button id="btnNext" onclick="nextSoal()" class="bg-purple-600 text-white font-semibold py-3 px-8 rounded-xl shadow-md shadow-purple-200 hover:bg-purple-700 transition">
+                        Selanjutnya <i class="fas fa-arrow-right ml-2"></i>
+                    </button>
+                    <button id="btnSubmit" onclick="submitUjian()" class="bg-green-500 text-white font-semibold py-3 px-8 rounded-xl shadow-md shadow-green-200 hover:bg-green-600 transition hidden">
+                        Kirim Jawaban <i class="fas fa-check ml-2"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- HALAMAN SELESAI -->
+            <div id="siswaSelesaiScreen" class="glass-card rounded-3xl shadow-xl p-10 mb-8 border border-gray-100 text-center hidden">
+                <div class="w-20 h-20 bg-green-100 text-green-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-6">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">Ujian Selesai!</h2>
+                <p class="text-gray-500 mb-8">Jawaban kamu telah berhasil disimpan. Terima kasih sudah mengerjakan dengan jujur.</p>
+                <button onclick="keluarSiswa()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 px-8 rounded-xl transition">Kembali ke Awal</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- =============== TAMPILAN GURU (ADMIN PANEL) =============== -->
+    <div id="viewGuru" class="w-full h-full bg-gray-50 hidden flex-col md:flex-row">
+        
+        <!-- SIDEBAR -->
+        <div class="w-full md:w-64 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col h-full shadow-sm">
+            <div class="p-6 border-b border-gray-100 flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-purple-600 flex items-center justify-center text-white font-bold">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h2 class="text-xl font-bold text-gray-800">AdminPanel</h2>
+            </div>
+            
+            <!-- Menu Navigasi (Hanya tampil jika sudah login) -->
+            <div id="adminNav" class="p-4 flex-grow space-y-2 hidden">
+                <button onclick="changeAdminTab('beranda')" id="tab-beranda" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-purple-700 bg-purple-50 font-semibold transition admin-tab">
+                    <i class="fas fa-border-all w-5"></i> Beranda
+                </button>
+                <button onclick="changeAdminTab('rekap')" id="tab-rekap" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 font-semibold transition admin-tab">
+                    <i class="fas fa-chart-bar w-5"></i> Rekap Nilai
+                </button>
+                <button onclick="changeAdminTab('siswa')" id="tab-siswa" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 font-semibold transition admin-tab">
+                    <i class="fas fa-users w-5"></i> Kelola Siswa
+                </button>
+                <button onclick="changeAdminTab('soal')" id="tab-soal" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-500 hover:bg-gray-50 font-semibold transition admin-tab">
+                    <i class="fas fa-file-signature w-5"></i> Kelola Soal
+                </button>
+            </div>
+
+            <!-- Profile & Logout (Hanya tampil jika sudah login) -->
+            <div id="adminProfile" class="p-4 border-t border-gray-100 hidden">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold">J</div>
+                    <div>
+                        <div class="font-bold text-gray-800 text-sm">JAYADI, S.Pd.</div>
+                        <div class="text-xs text-gray-400">Guru PKN</div>
+                    </div>
+                </div>
+                <button onclick="logoutGuru()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-red-600 bg-red-50 hover:bg-red-100 font-semibold transition text-sm">
+                    <i class="fas fa-sign-out-alt"></i> Keluar
+                </button>
+            </div>
+            
+            <div id="adminNavBack" class="p-4">
+                <button onclick="switchView('viewSiswa')" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-gray-500 border border-gray-200 hover:bg-gray-50 font-semibold transition text-sm">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Siswa
+                </button>
+            </div>
+        </div>
+
+        <!-- KONTEN ADMIN -->
+        <div class="flex-grow h-full overflow-y-auto p-4 md:p-8">
+            
+            <!-- Login Guru -->
+            <div id="guruLoginScreen" class="max-w-md mx-auto mt-12 glass-card rounded-3xl p-8 border border-gray-100 shadow-xl">
+                <h2 class="text-2xl font-bold text-center text-gray-800 mb-2">Akses Guru</h2>
+                <p class="text-center text-gray-500 mb-6 text-sm">Masukkan PIN Khusus Bapak Jayadi</p>
+                <input type="password" id="guruPin" placeholder="Masukkan 6 Digit PIN" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none mb-4 text-center tracking-[0.5em] font-bold text-lg">
+                <button onclick="loginGuru()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-purple-200 transition">
+                    Masuk Dashboard
+                </button>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div id="guruDashboard" class="max-w-6xl mx-auto hidden">
+                
+                <!-- TAB BERANDA -->
+                <div id="content-beranda" class="admin-content block">
+                    <h1 class="text-3xl font-extrabold text-gray-800 mb-2">Dashboard Guru</h1>
+                    <p class="text-gray-500 mb-8">Monitoring pengerjaan Ulangan Harian PKN SMP Islam Ar-Ridho.</p>
+
+                    <!-- 3 Kotak Utama -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Card 1 -->
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-purple-200 relative overflow-hidden">
+                            <div class="absolute right-0 bottom-0 p-4 opacity-10">
+                                <i class="fas fa-file-alt text-8xl text-purple-600"></i>
+                            </div>
+                            <h3 class="text-gray-500 font-semibold mb-1 relative z-10">Total Soal</h3>
+                            <div class="text-4xl font-extrabold text-gray-800 relative z-10" id="statTotalSoal">0</div>
+                        </div>
+                        <!-- Card 2 -->
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-blue-200 relative overflow-hidden">
+                            <div class="absolute right-0 bottom-0 p-4 opacity-10">
+                                <i class="fas fa-users text-8xl text-blue-600"></i>
+                            </div>
+                            <h3 class="text-gray-500 font-semibold mb-1 relative z-10">Siswa Terdaftar</h3>
+                            <div class="text-4xl font-extrabold text-gray-800 relative z-10" id="statSiswa">0</div>
+                        </div>
+                        <!-- Card 3 -->
+                        <div class="bg-white p-6 rounded-3xl shadow-sm border border-green-200 relative overflow-hidden">
+                            <div class="absolute right-0 bottom-0 p-4 opacity-10">
+                                <i class="fas fa-check-circle text-8xl text-green-600"></i>
+                            </div>
+                            <h3 class="text-gray-500 font-semibold mb-1 relative z-10">Sudah Selesai</h3>
+                            <div class="text-4xl font-extrabold text-gray-800 relative z-10" id="statSelesai">0</div>
+                        </div>
+                    </div>
+
+                    <h2 class="text-xl font-bold text-gray-800 mt-10 mb-4">Statistik Per Kelas</h2>
+                    <!-- Kotak Statistik Kelas -->
+                    <div id="classStatsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Render via JS -->
+                    </div>
+                </div>
+
+                <!-- TAB REKAP NILAI -->
+                <div id="content-rekap" class="admin-content hidden">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                        <h1 class="text-2xl font-bold text-gray-800">Rekapitulasi Nilai</h1>
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <select id="filterKelas" onchange="renderTabelNilai()" class="px-4 py-2 rounded-xl border border-gray-200 outline-none text-sm bg-white shadow-sm flex-grow sm:flex-grow-0">
+                                <option value="semua">Semua Kelas</option>
+                                <option value="9.1">Kelas 9.1</option>
+                                <option value="9.2">Kelas 9.2</option>
+                                <option value="9.3">Kelas 9.3</option>
+                                <option value="9.4">Kelas 9.4</option>
+                            </select>
+                            <button onclick="downloadCSV()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-xl shadow-sm transition text-sm flex items-center gap-2 whitespace-nowrap">
+                                <i class="fas fa-download"></i> Excel
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 text-gray-500 text-sm uppercase tracking-wider border-b border-gray-100">
+                                        <th class="p-4 font-semibold">No</th>
+                                        <th class="p-4 font-semibold">Nama Siswa</th>
+                                        <th class="p-4 font-semibold">Kelas</th>
+                                        <th class="p-4 font-semibold">NIS</th>
+                                        <th class="p-4 font-semibold">Status</th>
+                                        <th class="p-4 font-semibold text-right">Nilai</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelNilaiBody" class="divide-y divide-gray-100">
+                                    <!-- Render via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB KELOLA SISWA -->
+                <div id="content-siswa" class="admin-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-2xl font-bold text-gray-800">Manajemen Data Siswa</h1>
+                        <div class="flex gap-2">
+                            <select id="filterKelasSiswa" onchange="renderTabelSiswa()" class="px-4 py-2 rounded-xl border border-gray-200 outline-none text-sm bg-white shadow-sm">
+                                <option value="semua">Semua Kelas</option>
+                                <option value="9.1">9.1</option>
+                                <option value="9.2">9.2</option>
+                                <option value="9.3">9.3</option>
+                                <option value="9.4">9.4</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-gray-50 text-gray-500 text-sm uppercase tracking-wider border-b border-gray-100">
+                                        <th class="p-4 font-semibold cursor-pointer" onclick="toggleSortSiswa()">Nama <i class="fas fa-sort ml-1"></i></th>
+                                        <th class="p-4 font-semibold">Kelas</th>
+                                        <th class="p-4 font-semibold">NIS / NISN</th>
+                                        <th class="p-4 font-semibold">JK</th>
+                                        <th class="p-4 font-semibold text-right">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelSiswaBody" class="divide-y divide-gray-100">
+                                    <!-- Render via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB KELOLA SOAL -->
+                <div id="content-soal" class="admin-content hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h1 class="text-2xl font-bold text-gray-800">Bank Soal Ujian</h1>
+                        <div class="flex gap-2">
+                            <button onclick="openModal('aiModal')" class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-xl shadow-sm transition text-sm flex items-center gap-2">
+                                <i class="fas fa-magic"></i> Generator AI
+                            </button>
+                            <button onclick="openModal('soalModal')" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-xl shadow-sm transition text-sm flex items-center gap-2">
+                                <i class="fas fa-plus"></i> Tambah Manual
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4" id="listSoalContainer">
+                        <!-- Render via JS -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL GENERATOR AI -->
+    <div id="aiModal" class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-lg shadow-xl border border-gray-100">
+            <h2 class="text-xl font-bold mb-4 text-gray-800"><i class="fas fa-magic text-purple-600 mr-2"></i>AI Soal Generator</h2>
+            <p class="text-sm text-gray-500 mb-4">Upload file PDF, Word (.docx), atau .txt materi Anda. AI akan merapikan dan memecahnya menjadi format pilihan ganda secara otomatis.</p>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Upload File Soal/Materi</label>
+                <input type="file" id="aiFileInput" accept=".txt,.pdf,.docx" class="w-full px-4 py-2 border border-gray-200 rounded-xl bg-gray-50">
+            </div>
+
+            <div class="mb-6 p-4 bg-purple-50 rounded-xl border border-purple-100">
+                <label class="block text-sm font-semibold text-purple-800 mb-1">Gemini API Key (Opsional)</label>
+                <p class="text-xs text-purple-600 mb-2">Jika Anda mengisi kunci rahasia ini, AI dapat <b>memikirkan dan merekomendasikan jawaban yang benar</b> meskipun file Anda tidak memiliki kunci jawaban. Jika dikosongkan, sistem hanya akan merapikan format teksnya saja.</p>
+                <input type="password" id="aiApiKey" placeholder="Masukkan API Key (AIzaSy...)" class="w-full px-3 py-2 border border-purple-200 rounded-lg outline-none text-sm">
+            </div>
+
+            <div id="aiLoading" class="hidden flex flex-col items-center justify-center mb-4">
+                <div class="loader mb-2"></div>
+                <p class="text-sm text-purple-600 font-semibold animate-pulse">AI sedang menganalisis & meracik soal...</p>
+            </div>
+
+            <div class="flex justify-end gap-2">
+                <button onclick="closeModal('aiModal')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-xl transition">Batal</button>
+                <button onclick="processAIGenerator()" class="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded-xl shadow-md transition">Upload & Generate</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL KELOLA SOAL (Manual) -->
+    <div id="soalModal" class="fixed inset-0 z-50 hidden bg-gray-900 bg-opacity-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-xl shadow-xl max-h-[90vh] overflow-y-auto">
+            <h2 id="soalModalTitle" class="text-xl font-bold mb-4 text-gray-800">Tambah/Edit Soal</h2>
+            <input type="hidden" id="soalEditId">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Teks Pertanyaan</label>
+                    <textarea id="soalFormTeks" rows="3" class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none focus:border-purple-500"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Opsi A</label>
+                        <input type="text" id="soalFormA" class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Opsi B</label>
+                        <input type="text" id="soalFormB" class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Opsi C</label>
+                        <input type="text" id="soalFormC" class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Opsi D</label>
+                        <input type="text" id="soalFormD" class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Kunci Jawaban Benar</label>
+                    <select id="soalFormKunci" class="w-full px-4 py-2 rounded-xl border border-gray-200 outline-none">
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 mt-6">
+                <button onclick="closeModal('soalModal')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 px-4 rounded-xl">Batal</button>
+                <button onclick="simpanSoalDb()" class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-6 rounded-xl shadow-md">Simpan Soal</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- FIREBASE SDK & LOGIC UTAMA -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, getDocs, doc, setDoc, updateDoc, query, onSnapshot, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, doc, deleteDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // ==========================================
-        // 1. KONFIGURASI FIREBASE & MODE DEMO
-        // ==========================================
+        // CONFIG FIREBASE ASLI PAK JAYADI
         const firebaseConfig = {
             apiKey: "AIzaSyDExMRbUfrN-R8mKVznYCVpng4K6F8iaSg",
             authDomain: "uh-pkn-kelas-9.firebaseapp.com",
@@ -106,943 +450,1223 @@
             measurementId: "G-5B951533XB"
         };
 
-        // Otomatis jalankan Mode Demo jika API Key belum diisi (Untuk fitur Pratinjau / Preview)
-        const isDemoMode = firebaseConfig.apiKey === "API_KEY_BAPAK";
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // State Global
+        let allUsers = [];
+        let allQuestions = [];
+        let currentUser = null; // Siswa yg login
         
-        let app, db, auth, studentsRef, questionsRef;
-        
-        if (!isDemoMode) {
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-            studentsRef = collection(db, 'students');
-            questionsRef = collection(db, 'questions');
-        }
+        // State Ujian
+        let shuffledQuestions = [];
+        let currentSoalIndex = 0;
+        let userAnswers = {}; // Format: { id_soal: "A" }
+        let timerInterval;
+        let timeLeft = 3600; // 60 menit
 
-        // ==========================================
-        // 2. STATE APLIKASI (Penyimpanan Memori Sementara)
-        // ==========================================
-        const state = {
-            userType: null, // 'student' atau 'admin'
-            studentData: null, // Data profil siswa yg sedang ujian
-            allStudents: [], // List seluruh siswa untuk dropdown login / tabel admin
-            examQuestions: [], // Soal yang sudah diacak urutannya
-            currentQuestionIndex: 0, 
-            answers: {}, // Jawaban yang dipilih siswa { questionId: indexPilihan }
-            isAdmin: false,
-            adminTab: 'beranda', // Default tab untuk admin
-            isExamFinished: false,
-            isConfirmed: false, // Menandakan siswa sudah konfirmasi data diri
-            unsubscribeAdmin: null,
-            currentAdminData: [] // Menyimpan data rekap saat ini untuk didownload
-        };
-
-        // ==========================================
-        // 3. DATABASE DUMMY: 173 SISWA KELAS 9
-        // ==========================================
-        const RAW_STUDENTS = [
-            // Kelas 9.1
-            ["242507001","0112250701","ABIDZAR AL GHIFARI LUBIS","L","9.1"],["242507185","0118468729","AISHA RIZKYA ZHAFIRA","P","9.1"],["242507049","0115521932","ALDIAN FAIZ ABIMANYU","L","9.1"],["242507051","03113035206","AN NISA AULIA RAHMAH","P","9.1"],["242507140","3126598859","ASSYIPA ALDAWIYAH","P","9.1"],["242507006","3115132886","ATARA NAWAWINA ALAYA","P","9.1"],["242507053","0129682086","DANISH ALDRIC KANDELA","L","9.1"],["242507011","0128031712","ELVINA RAMADHANI","P","9.1"],["242507144","0125950149","FAKHRI AL YASIN","L","9.1"],["242507146","0126738383","HAIKAL YUSUF MUTAQIN","L","9.1"],["242507148","0127732474","HELMAWATI NISPI","P","9.1"],["242507150","0123215234","KALILA AZZAHRA AGSYA","P","9.1"],["242507151","0123810952","KARIN PUTRI RAHMANIAR","P","9.1"],["242507154","0111262830","MEDINA RAYANI PUTRI","P","9.1"],["242507067","3115858704","MUHAMAD FIKRI HAIKAL","L","9.1"],["242507110","3128561717","MUHAMAD KURNIAWAN","L","9.1"],["242507163","0119272535","MUHAMAD RISKI","L","9.1"],["242507156","0114707555","MUHAMAD RIZKY ALFARIZI","L","9.1"],["242507023","3114407011","MUHAMAD YAHYA SEPTIAN","L","9.1"],["242507026","0121453887","MUHAMMAD AMMAR AZZIKRA","L","9.1"],["242507113","0127804343","MUHAMMAD AZZAM ZAIDDAN","L","9.1"],["242507066","0125048100","MUHAMMAD FADIL ALFARIZKY","L","9.1"],["242507029","0121991684","MUHAMMAD IMAM RIYADHUSSOLIHIN","L","9.1"],["242507074","0112208538","MUHAMMAD NICKY PRATAMA","L","9.1"],["242507167","0126632131","MULYANA BADAR MUHTAR","L","9.1"],["242507116","0126757694","NAJLAA KIRANA PUTRI","P","9.1"],["242507117","0129767780","NARENDRA DARVESH PRADITYA","L","9.1"],["242507031","3122953563","NAZWA ZAKIYAH","P","9.1"],["242507032","3128551310","NOVITA DWI LESTARI","P","9.1"],["242507123","0124575918","RAFA FAEYZA ADITYA","L","9.1"],["242507081","0118347648","RAFI IMADUL BILAD","L","9.1"],["242507174","0115176085","RIDHONINO SETIAWAN","L","9.1"],["242507126","0124959392","RIYAN AZZARI DALIMUNTE","L","9.1"],["242507129","0114585043","SIFA RAMADANI","P","9.1"],["242507130","0115912357","SILVIA HIDAYAT","P","9.1"],["242507086","3120214186","SITI SILVIAWATI","P","9.1"],["242507087","0116017127","SITI WINDI AZAHIRA","P","9.1"],["242507088","0129243631","SITI ZAHIRA","P","9.1"],["242507186","0122849032","SYLA RAHMANIA","P","9.1"],["242507089","0117682754","VIOLA ZULFIANI","P","9.1"],["242507090","3125102794","VISKA ARIANI","P","9.1"],["242507046","3112799899","WILDAN NURULLOH","L","9.1"],["242507179","0112922469","ZIDAN ALGIFARI SURYAMAN","L","9.1"],
-            // Kelas 9.2
-            ["242507093","0123145389","AFRINA RAFANIA RHAMDANI","P","9.2"],["242507094","0112458312","AL ZAHIRA SRI WIJAYA","P","9.2"],["242507050","3110372642","ALFAN ANDRIAN","L","9.2"],["242507005","3114044196","ARSYAVIN WIDAN SAPUTRA","L","9.2"],["242507139","0119108501","ARYA NAILUL KHALIL","L","9.2"],["242507052","3126814449","AURORA MIKHAYLA RAMADANTI","P","9.2"],["242507141","0121057775","AZZAHRA WIDYASIH PUTRI","P","9.2"],["242507008","3128932716","BUNGA KEYSHA DARMAWAN","P","9.2"],["242507054","0124462929","DENDY ALFAREZ PUTRA WIDODO","L","9.2"],["242507010","3114633046","EGI","L","9.2"],["242507056","3111616100","FAHMI PUTRA RIFA'I","L","9.2"],["242507101","3114479502","FAIRUZ FUADI SAPUTRA","L","9.2"],["242507102","3125296816","FAJAR ADHITAMA","L","9.2"],["242507145","0127713764","FARASKA SURYA FADILAH","L","9.2"],["242507057","0113281236","FARSHA FAIZI SAPUTRA","L","9.2"],["242507147","0117447040","HASBI ALGANI","L","9.2"],["242507104","0111135296","IBRAHIM DZAKI CHANDRA","L","9.2"],["242507149","0129554291","INTAN SYIFA MUFADHILAH","P","9.2"],["242507060","0116127084","IRVAN MAULANA","L","9.2"],["242507016","0121692888","JERRY AHMAD AL-FARIZZI","L","9.2"],["242507017","0126563139","KALILA RIFDA","P","9.2"],["242507063","3122278981","KHANZA CHAERUNNISA","P","9.2"],["242507073","0127635435","MUHAMAD ALVIN MULYADI","L","9.2"],["242507021","0117756964","MUHAMAD DHARIN DIMYATI","L","9.2"],["242507111","3115697782","MUHAMAD RAFI FAHRUROHMAN","L","9.2"],["242507114","0114059284","MUHAMMAD AZZMI KHAIRAN","L","9.2"],["242507159","3127311018","MUHAMMAD ENO KURNIAWAN","L","9.2"],["242507161","0122039029","MUHAMMAD FAHRY FIQRIANI","L","9.2"],["242507028","3129677731","MUHAMMAD IBNU SABIL","L","9.2"],["242507076","0121473107","MUHAMMAD RENALDY SYAHRILLAH","L","9.2"],["242507162","0119702922","MUHAMMAD RIFYAN","L","9.2"],["242507187","0102357258","NAJWATUL LATIFAH","P","9.2"],["242507119","3117784761","NAWA AURA WAHYUDI","P","9.2"],["242507078","0118972393","NUGIH PRATAMA","L","9.2"],["242507080","0115974381","NUR SHAFA KAMILA","P","9.2"],["242507169","0116845427","PUTRI CAHYA YULIA","P","9.2"],["242507170","0127658437","RAFIF NAUFAL FADHILAH","L","9.2"],["242507127","3125609025","ROFI ALKHAYIS PUTRA YOLANDA","L","9.2"],["242507085","0127368315","SHEREN AZKIA CALISTA","P","9.2"],["242507041","0113065360","SITI QISWAH","P","9.2"],["242507044","0129472451","ULFAH HAKIMAH AKBAR","P","9.2"],["242507131","3115175343","YASMIN ADZKIA","P","9.2"],["242507133","0113300370","YUNITA PERMATA SARI","P","9.2"],["242507092","0127178677","ZAHRAH ZAAFARANI","P","9.2"],
-            // Kelas 9.3
-            ["242507002","3118256582","ACHDAN YUSUF KRISTIANTO","L","9.3"],["242507003","0128183889","ADELIA ALYA PUTRI","P","9.3"],["242507047","0128502377","AFRAM MAHAWIRA","L","9.3"],["242507095","3120024158","ALFIAN SYAHPUTRA","L","9.3"],["242507138","0116206407","ALIKA KHOIRUNNISA","P","9.3"],["242507007","0123010248","BALQIS UFAIRAH","P","9.3"],["242507009","0121170697","CALLISTA NEYSA SAFARI","P","9.3"],["242507098","0128640046","DHENA ZAHRA RAMADHANI","P","9.3"],["242507100","0116919283","FAHRI NURHAKIM","L","9.3"],["242507013","0129629537","FATIMAH RAHMA","P","9.3"],["242507014","0117318247","FIKRI SURYA PRATAMA RAMADHAN","L","9.3"],["242507015","0111856130","GEMA ARVI RAMADHAN","L","9.3"],["242507103","0125846934","HILMA AYUNINDIA PUTRI","P","9.3"],["252608188","0114001833","KENZA ALGIYASA RAMADHAN","L","9.3"],["242507064","0114668414","LAURA KIRANA SYIFAN","P","9.3"],["242507107","0107534944","M. RAMLAN","L","9.3"],["242507153","0129560342","MAURA SILVIANA DEVI","P","9.3"],["242507069","3118528446","MUHAMAD HASBI AL-HADORI","L","9.3"],["242507155","3122869484","MUHAMAD RAMA HAIKAL ANDRIAN","L","9.3"],["242507157","3128263561","MUHAMAD SYAGHILUL KHAIR","L","9.3"],["242507071","3127683602","MUHAMMAD AGHA ALDZAKWAN","L","9.3"],["242507072","0118702008","MUHAMMAD ALIF AHDAN","L","9.3"],["242507027","3120581901","MUHAMMAD GALEN HAMIZAN FAIQ","L","9.3"],["242507030","0115155912","MUHAMMAD MAHAMERU","L","9.3"],["242507075","0125695290","MUHAMMAD RAFI AL ZAKI","L","9.3"],["242507164","0113012488","MUHAMMAD SALMAN ALPARIZZI","L","9.3"],["242507079","0114829364","NUR AKBAR","L","9.3"],["242507121","0124241649","PRADIPTA DAMAR ATMAJA","L","9.3"],["242507034","0125010329","RAFA ALDIAN SIREGAR","L","9.3"],["242507035","0128054159","RAHMA FITRIANI","P","9.3"],["242507082","0125692386","RAISSA RAWNIE RIANTA","P","9.3"],["242507083","3127004840","RAVAEL ARIFIAN","L","9.3"],["242507172","0127614774","REYHANI KURNIA RAMADHANI","P","9.3"],["242507128","3123791401","SABRINA SOFIA FIRDAUS","P","9.3"],["242507040","31108930891","SASKIA SHAFARANI","P","9.3"],["242507084","3118689729","SHAFA RIZKIKA RAMADHANI","P","9.3"],["242507043","3119726769","TSANI LATIFA","P","9.3"],["242507091","0121650332","WAHYU RIFTIANSYAH CAHYO PRAYOG","L","9.3"],["242507132","0116646191","YASMIN NABILA RAMADHANI","P","9.3"],["242507134","0122321920","ZAIN GIBRAN","L","9.3"],["242507135","0115864404","ZARA ALIFAH NOVIANTI","P","9.3"],["242507136","0117852452","ZASKIA OKTAVIANI","P","9.3"],["242507178","3120378578","ZEIN ABDULLAH SOPYAN","L","9.3"],
-            // Kelas 9.4
-            ["242507137","0114272306","ADISTYA SAHIRA NASUTION","P","9.4"],["242507048","3113568980","AHTAR MAULANA SANJAYA","L","9.4"],["242507004","3113858725","ANANDA CHIARA CHANA LUCITA HAR","P","9.4"],["242507096","3129608907","ANDHIKA MAULANA RIZKY","L","9.4"],["242507184","0118448564","ANNALISA PUTRI ANGGRAENI","P","9.4"],["242507055","0119756570","DESHINTA MAHARANI","P","9.4"],["242507142","0128579453","DHIA AYU SYARAFANA","P","9.4"],["242507099","0114364305","DINDA RIZKY LESTARI","P","9.4"],["242507012","0111449123","FAHMI NURUL DZIHNI","L","9.4"],["242507143","0107745175","FAJAR RAMADHAN","L","9.4"],["242507058","3122354991","IKRIMA AZZAHRA","P","9.4"],["242507059","0126291785","INDRIYANA","P","9.4"],["242507061","0144020622","JOE HANDY VICKY ATMAJA","L","9.4"],["242507018","0116692650","KENZIE EKO SADUBI","L","9.4"],["242507062","0114934071","KHADIZAH PUTRI FAUZIAH","P","9.4"],["242507152","0111138804","MAULANA ABDUL HADI","L","9.4"],["242507019","0126737439","MUHAMAD ARYA PRATAMA","L","9.4"],["242507020","0124559999","MUHAMAD DANU PERMANA","L","9.4"],["242507068","0128155135","MUHAMAD GISMA APRIATNA","L","9.4"],["242507070","3122395422","MUHAMAD ILHAM FIQRIANSYAH","L","9.4"],["242507077","0126156847","MUHAMAD RIFAT SULAEMAN","L","9.4"],["242507024","0118598035","MUHAMAD YUSUF GHAZALI SUTISNA","L","9.4"],["242507025","0129777548","MUHAMMAD ABIAN PRATAMA PUTRA","L","9.4"],["242507112","3129727489","MUHAMMAD ANWARUDIN","L","9.4"],["242507065","0123775509","MUHAMMAD ARKA SAPUTRA","L","9.4"],["242507158","3114586617","MUHAMMAD AZKA ADYARIZKY","L","9.4"],["242507160","3128358398","MUHAMMAD FACHRI TIRTAYASA","L","9.4"],["242507182","0121665902","MUHAMMAD SYATHIR","L","9.4"],["242507165","0127611686","MUHAMMAD TIBRIZIK MUKODAM","L","9.4"],["242507166","0123762074","MUHAMMAD VICKY AKBAR","L","9.4"],["242507033","3118668179","NUFFAH JASMINE HAURA KHANSA","P","9.4"],["242507168","3125724996","NURHILMA NAFILA","P","9.4"],["242507120","0112620301","OCTA NUR'AENI","P","9.4"],["242507122","0128792685","PUTRI AYUDIA INKAN","P","9.4"],["242507036","0128822909","RAIF AL YASIR","L","9.4"],["242507037","3124118938","RAISA ALKAUTSAR","P","9.4"],["242507124","0114866515","RAYHAN HERMANSYAH","L","9.4"],["242507173","0116362683","REZKY AJI SAPUTRA","L","9.4"],["242507038","3125354904","SAEPUDIN","L","9.4"],["242507039","0121847853","SALWA ALFINA HUSNIYAH","P","9.4"],["242507176","3127820485","SITI AYRA","P","9.4"],["242507177","0115727627","SITI AZZAHRA BATUBARA","P","9.4"],["242507042","3121489131","SITI SALWA KHAMALIYAH","P","9.4"]
-        ];
-
-        // ==========================================
-        // 4. DATABASE DUMMY: 50 SOAL PKN
-        // ==========================================
-        const RAW_QUESTIONS = [
-            // TIPE 1 (1-15)
-            { id: 1, text: "Analisis hubungan antara Pancasila dan Pembukaan UUD NRI Tahun 1945:\n(1) Pancasila berkedudukan di atas konstitusi sebagai norma dasar.\n(2) Pembukaan UUD 1945 dapat diubah sewaktu-waktu oleh MPR.\n(3) Pembukaan UUD 1945 memuat rumusan Pancasila sebagai dasar negara yang sah dan tidak boleh diubah.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 1 },
-            { id: 2, text: "Karakteristik hubungan Pancasila dengan Bhinneka Tunggal Ika:\n(1) Sila ketiga Pancasila meletakkan dasar kebangsaan sebagai simpul persatuan.\n(2) Keberagaman suku dan agama di Indonesia harus diseragamkan.\n(3) Pancasila menjamin hak yang setara bagi setiap warga tanpa membedakan SARA.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 1 },
-            { id: 3, text: "Implementasi semangat Pancasila dalam kehidupan bernegara:\n(1) Mengutamakan musyawarah mufakat dalam pengambilan keputusan.\n(2) Memperlakukan orang lain secara adil tanpa memandang status sosial.\n(3) Memaksakan kehendak kelompok mayoritas terhadap minoritas.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
-            { id: 4, text: "Analisis pandangan para ahli mengenai konsep hak dan kewajiban:\n(1) Prof. Dr. Notonegoro menyatakan hak adalah kekuasaan untuk menerima sesuatu yang semestinya diterima.\n(2) John Salmond mengelompokkan hak ke dalam bentuk seperti hak kemerdekaan dan kekebalan.\n(3) Kewajiban warga negara bersifat opsional.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
-            { id: 5, text: "Pengaturan hak dan kewajiban warga negara dalam UUD NRI Tahun 1945:\n(1) Hak atas pekerjaan dan penghidupan yang layak diatur dalam Pasal 27 ayat (2).\n(2) Hak kemerdekaan berserikat dan mengeluarkan pendapat diatur dalam Pasal 28E.\n(3) Warga negara dibebaskan dari segala bentuk kewajiban hukum.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
-            { id: 6, text: "Peran lembaga penegak hukum dalam sistem peradilan di Indonesia:\n(1) Kepolisian bertugas memelihara keamanan dan menegakkan hukum.\n(2) Kejaksaan memiliki wewenang utama dalam melaksanakan penuntutan perkara pidana.\n(3) Hakim bertindak sebagai penasihat hukum bagi terdakwa.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
-            { id: 7, text: "Hakikat kemerdekaan berpendapat sebagai bagian dari hak asasi manusia:\n(1) Merupakan salah satu tolok ukur utama dalam negara demokrasi.\n(2) Dapat dilaksanakan secara sebebas-bebasnya tanpa batas aturan.\n(3) Harus diimbangi dengan kewajiban menghormati hak orang lain.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 1 },
-            { id: 8, text: "Ketentuan hukum penyampaian pendapat di muka umum (UU No. 9 Tahun 1998):\n(1) Dilarang keras dilaksanakan di lingkungan istana kepresidenan dan tempat ibadah.\n(2) Dapat diwujudkan melalui bentuk unjuk rasa, pawai, rapat umum.\n(3) Pelaksanaannya diizinkan pada malam hari tanpa batasan waktu.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
-            { id: 9, text: "Prinsip keterbukaan informasi publik (UU No. 14 Tahun 2008):\n(1) Menjamin hak warga negara untuk mengetahui rencana kebijakan publik.\n(2) Mendorong partisipasi aktif masyarakat dalam negara transparan.\n(3) Menutupi seluruh dokumen penyelenggaraan negara.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
-            { id: 10, text: "Karakteristik tradisi dan kearifan lokal di Indonesia:\n(1) Tradisi merupakan produk keputusan manusia yang diwariskan turun-temurun.\n(2) Kearifan lokal memuat nilai budi pekerti luhur selaras dengan alam.\n(3) Tradisi bersifat statis mutlak sehingga tidak boleh beradaptasi.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
-            { id: 11, text: "Analisis nilai filosofis kearifan lokal nusantara:\n(1) Tri Hita Karana di Bali mengajarkan keharmonisan hubungan manusia dengan Tuhan, sesama, dan alam.\n(2) Filosofi \"Ajining diri saka lathi\" menekankan etika perkataan.\n(3) Filosofi masyarakat Baduy mendorong eksploitasi kawasan hutan.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
-            { id: 12, text: "Ruang lingkup objek pemajuan kebudayaan (UU No. 5 Tahun 2017):\n(1) Tradisi lisan, bahasa, manuskrip kuno, serta upacara adat.\n(2) Permainan rakyat dan olahraga tradisional.\n(3) Industri manufaktur mesin berat.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
-            { id: 13, text: "Analisis tantangan demografi dan kependudukan Indonesia:\n(1) Bonus demografi ditandai oleh dominasi penduduk usia produktif.\n(2) Sebaran penduduk Indonesia terkonsentrasi merata di pulau kecil.\n(3) Peningkatan kualitas SDM sangat krusial menghadapi bonus demografi.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 1 },
-            { id: 14, text: "Wujud cita-cita bangsa dan sistem pertahanan NKRI:\n(1) Membentuk masyarakat yang adil dan makmur materiel maupun spiritual.\n(2) Menerapkan sistem pertahanan keamanan rakyat semesta (Sishankamrata).\n(3) Mengisolasi diri sepenuhnya dari pergaulan diplomasi internasional.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
-            { id: 15, text: "Peran aktif peserta didik dalam menjaga keutuhan wilayah NKRI:\n(1) Belajar dengan tekun dan meningkatkan kapasitas diri.\n(2) Menjaga kerukunan serta menghindari tindakan intoleransi.\n(3) Melakukan tindakan anarkis di ruang publik.", options: ["Jika pernyataan (1) dan (2) benar", "Jika pernyataan (1) dan (3) benar", "Jika pernyataan (2) dan (3) benar", "Jika pernyataan (1), (2), dan (3) benar"], ans: 0 },
-            // TIPE 2 (16-35)
-            { id: 16, text: "Pendapat yang menyatakan bahwa hubungan antara Pancasila dan UUD NRI Tahun 1945 ibarat hubungan antara roh dan jasad yang tidak dapat dipisahkan dikemukakan oleh...", options: ["Prof. Dr. Notonegoro", "Jimly Asshiddiqie", "Yudi Latif", "Moh. Hatta"], ans: 0 },
-            { id: 17, text: "Alasan utama Pembukaan UUD NRI Tahun 1945 tidak boleh diubah (diamendemen) oleh MPR adalah karena di dalamnya memuat...", options: ["Aturan peralihan sistem pemerintahan", "Rumusan dasar negara Pancasila dan tujuan berdirinya NKRI", "Rincian pasal-pasal teknis penyelenggaraan negara", "Jadwal pelaksanaan pemilihan umum"], ans: 1 },
-            { id: 18, text: "Menurut Prof. Dr. Notonegoro, hak diartikan sebagai...", options: ["Kepentingan yang dilindungi oleh hukum positif", "Beban untuk memberikan sesuatu yang semestinya diberikan", "Kekuasaan untuk menerima atau melakukan sesuatu yang semestinya diterima oleh pihak tertentu", "Izin atau kekuasaan yang diberikan secara mutlak oleh penguasa"], ans: 2 },
-            { id: 19, text: "Pasal dalam UUD NRI Tahun 1945 yang secara tegas menjamin kebebasan penduduk untuk memeluk agamanya masing-masing dan beribadat menurut agama dan kepercayaannya adalah...", options: ["Pasal 27 ayat (1)", "Pasal 28D ayat (1)", "Pasal 29 ayat (2)", "Pasal 31 ayat (1)"], ans: 2 },
-            { id: 20, text: "Perilaku berikut yang mencerminkan keseimbangan antara pelaksanaan hak dan kewajiban di lingkungan sekolah adalah...", options: ["Menuntut fasilitas belajar yang lengkap tanpa mau merawat dan menjaga inventaris kelas", "Mendapatkan pelajaran dengan tenang serta melaksanakan kewajiban menaati tata tertib sekolah", "Meminta guru mengulang penjelasan tanpa mau memperhatikan materi pelajaran", "Mengabaikan tugas piket kebersihan kelas demi mendapatkan nilai rapor yang tinggi"], ans: 1 },
-            { id: 21, text: "Lembaga peradilan di bawah Mahkamah Agung yang bertugas mengadili perkara perdata dan pidana umum bagi masyarakat pencari keadilan adalah...", options: ["Peradilan Tata Usaha Negara", "Peradilan Agama", "Peradilan Militer", "Peradilan Umum"], ans: 3 },
-            { id: 22, text: "Berdasarkan Undang-Undang Nomor 2 Tahun 2002, tugas utama Kepolisian Negara Republik Indonesia (Polri) adalah...", options: ["Menguji undang-undang terhadap UUD 1945", "Memelihara keamanan dan ketertiban masyarakat serta menegakkan hukum", "Menjatuhkan putusan vonis bersalah kepada terdakwa di persidangan", "Melaksanakan penuntutan perkara ke hadapan sidang pengadilan"], ans: 1 },
-            { id: 23, text: "Undang-undang yang secara khusus mengatur tentang kemerdekaan menyampaikan pendapat di muka umum adalah...", options: ["UU Nomor 9 Tahun 1998", "UU Nomor 39 Tahun 1999", "UU Nomor 14 Tahun 2008", "UU Nomor 5 Tahun 2017"], ans: 0 },
-            { id: 24, text: "Berdasarkan ketentuan peraturan perundang-undangan, lokasi yang dilarang secara mutlak untuk dijadikan tempat unjuk rasa atau demonstrasi adalah...", options: ["Alun-alun kota dan jalan protokol", "Lingkungan istana kepresidenan dan tempat ibadah", "Depan gedung Dewan Perwakilan Rakyat Daerah (DPRD)", "Lapangan terbuka milik fasilitas umum"], ans: 1 },
-            { id: 25, text: "Aplikasi resmi yang disediakan pemerintah (Kementerian PANRB) sebagai wadah pelayanan pengaduan dan aspirasi online bagi masyarakat adalah...", options: ["PeduliLindungi", "JKN Mobile", "LAPOR!", "JDIH Nasional"], ans: 2 },
-            { id: 26, text: "Sosiolog Abercrombie, Hill, dan Turner mendefinisikan tradisi sebagai...", options: ["Keputusan politik yang ditetapkan oleh lembaga parlemen negara", "Kebiasaan, kepercayaan, atau artefak yang diwariskan dari generasi ke generasi", "Aturan hukum tertulis yang memiliki sanksi pidana yang tegas", "Perilaku modern yang diadopsi dari kebudayaan bangsa asing"], ans: 1 },
-            { id: 27, text: "Kearifan lokal masyarakat Bali yang bersumber pada keharmonisan hubungan antara manusia dengan Tuhan, sesama manusia, dan alam disebut...", options: ["Tri Hita Karana", "Sad Rasa", "Tat Twam Asi", "Tri Kaya Parisudha"], ans: 0 },
-            { id: 28, text: "Pesan utama yang terkandung dalam filosofi masyarakat Baduy \"Gunung teu meunang dilebur, lebak teu meunang dirusak\" adalah...", options: ["Pentingnya membangun kawasan industri modern di pegunungan", "Kewajiban manusia untuk menjaga kelestarian alam dan lingkungan hidup", "Larangan keras mendirikan permukiman di dataran rendah", "Keharusan memanfaatkan hasil hutan secara maksimal untuk ekonomi"], ans: 1 },
-            { id: 29, text: "Undang-undang yang mengatur tentang Pemajuan Kebudayaan demi meningkatkan ketahanan budaya nasional di tengah peradaban dunia adalah...", options: ["UU Nomor 11 Tahun 2008", "UU Nomor 9 Tahun 1998", "UU Nomor 5 Tahun 2017", "UU Nomor 14 Tahun 2008"], ans: 2 },
-            { id: 30, text: "Kondisi ketika struktur penduduk suatu negara didominasi oleh kelompok usia produktif (usia kerja) disebut sebagai...", options: ["Urbanisasi penduduk", "Bonus demografi", "Transisi demografi", "Kepadatan agraris"], ans: 1 },
-            { id: 31, text: "Tiga wujud cita-cita nasional bangsa Indonesia secara jelas tercantum di dalam Pembukaan UUD NRI Tahun 1945 pada...", options: ["Alinea pertama", "Alinea kedua", "Alinea ketiga", "Alinea keempat"], ans: 1 },
-            { id: 32, text: "Sistem pertahanan dan keamanan negara yang bersifat semesta dengan melibatkan seluruh warga negara, wilayah, dan sumber daya nasional dikenal dengan istilah...", options: ["Hansip", "Sishankamrata", "Wajib militer", "Bela negara aktif"], ans: 1 },
-            { id: 33, text: "Pasal 28F UUD NRI Tahun 1945 secara khusus memberikan jaminan perlindungan hukum kepada setiap orang untuk...", options: ["Memilih pekerjaan dan penghidupan yang layak", "Berkomunikasi dan memperoleh informasi untuk pengembangan diri", "Memeluk agama dan beribadat menurut keyakinannya", "Mendapatkan pengajaran dan pendidikan dasar"], ans: 1 },
-            { id: 34, text: "Peran pers nasional di Indonesia dalam menyampaikan informasi yang tepat, akurat, dan benar diatur secara khusus dalam...", options: ["UU Nomor 40 Tahun 1999 tentang Pers", "UU Nomor 39 Tahun 1999 tentang HAM", "UU Nomor 14 Tahun 2008 tentang KIP", "UU Nomor 9 Tahun 1998 tentang Pendapat di Muka Umum"], ans: 0 },
-            { id: 35, text: "Bentuk nyata komitmen dan peran pelajar dalam menjaga keutuhan NKRI di lingkungan sekolah dapat diwujudkan melalui sikap...", options: ["Membentuk kelompok eksklusif berdasarkan kesamaan daerah asal", "Menaati tata tertib sekolah dan menjunjung tinggi toleransi antarteman", "Melakukan aksi protes keras ketika aturan sekolah dirasa memberatkan", "Mengabaikan kegiatan upacara bendera demi belajar mandiri di kelas"], ans: 1 },
-            // TIPE 3 (36-50)
-            { id: 36, text: "(Benar/Salah) Hubungan antara Pancasila dan UUD NRI Tahun 1945 diibaratkan seperti hubungan antara roh dan jasad yang tidak dapat dipisahkan satu sama lain.", options: ["Benar", "Salah"], ans: 0 },
-            { id: 37, text: "(Benar/Salah) Pembukaan UUD NRI Tahun 1945 dapat diamendemen sewaktu-waktu oleh MPR demi menyesuaikan dinamika politik modern global.", options: ["Benar", "Salah"], ans: 1 },
-            { id: 38, text: "(Benar/Salah) Menurut Prof. Dr. Notonegoro, kewajiban merupakan beban untuk memberikan sesuatu yang semestinya diberikan oleh pihak tertentu secara mutlak.", options: ["Benar", "Salah"], ans: 0 },
-            { id: 39, text: "(Benar/Salah) Hak asasi manusia di Indonesia bersifat mutlak tanpa batas aturan dan dapat digunakan secara bebas tanpa mempedulikan hak orang lain.", options: ["Benar", "Salah"], ans: 1 },
-            { id: 40, text: "(Benar/Salah) Peradilan militer merupakan lingkungan peradilan di bawah Mahkamah Agung yang bertugas mengadili tindak pidana yang dilakukan oleh militer.", options: ["Benar", "Salah"], ans: 0 },
-            { id: 41, text: "(Benar/Salah) Kegiatan unjuk rasa atau demonstrasi diperbolehkan dilakukan di lingkungan istana kepresidenan pada malam hari asalkan tidak merusak fasilitas umum.", options: ["Benar", "Salah"], ans: 1 },
-            { id: 42, text: "(Benar/Salah) Keterbukaan informasi publik di Indonesia diatur secara resmi dan dijamin melalui Undang-Undang Nomor 14 Tahun 2008.", options: ["Benar", "Salah"], ans: 0 },
-            { id: 43, text: "(Benar/Salah) Tradisi dan budaya lokal di Indonesia merupakan warisan masa lalu yang bersifat statis dan tidak memiliki nilai guna bagi masyarakat modern.", options: ["Benar", "Salah"], ans: 1 },
-            { id: 44, text: "(Benar/Salah) Filosofi \"Satu Tungku Tiga Batu\" merupakan wujud kearifan lokal masyarakat Fakfak di Papua Barat dalam merajut kerukunan dan toleransi beragama.", options: ["Benar", "Salah"], ans: 0 },
-            { id: 45, text: "(Benar/Salah) Hasil Sensus Penduduk 2020 menunjukkan bahwa sebagian besar jumlah penduduk Indonesia terkonsentrasi di luar Pulau Jawa.", options: ["Benar", "Salah"], ans: 1 },
-            { id: 46, text: "(Benar/Salah) Bonus demografi memberikan keuntungan ekonomi yang besar bagi negara apabila kualitas SDM usia produktif didukung oleh pendidikan dan kesehatan yang memadai.", options: ["Benar", "Salah"], ans: 0 },
-            { id: 47, text: "(Benar/Salah) Pasal 33 UUD NRI Tahun 1945 menegaskan bahwa bumi, air, dan kekayaan alam yang terkandung di dalamnya dikuasai oleh negara untuk sebesar-besar kemakmuran rakyat.", options: ["Benar", "Salah"], ans: 0 },
-            { id: 48, text: "(Benar/Salah) Aksi perundungan (bullying) di satuan pendidikan merupakan bentuk pelanggaran hak asasi manusia yang wajib dicegah dan dihindari bersama.", options: ["Benar", "Salah"], ans: 0 },
-            { id: 49, text: "(Benar/Salah) Kebebasan mengemukakan pendapat di muka umum tidak memerlukan batasan moral maupun etika karena telah dijamin penuh tanpa syarat oleh undang-undang.", options: ["Benar", "Salah"], ans: 1 },
-            { id: 50, text: "(Benar/Salah) Peran aktif peserta didik dalam menjaga keutuhan wilayah NKRI dapat dimulai dari hal sederhana seperti disiplin belajar, menaati aturan, dan menghormati perbedaan antarteman.", options: ["Benar", "Salah"], ans: 0 }
-        ];
-
-        // ==========================================
-        // 5. FUNGSI SETUP OTOMATIS & UTILITAS
-        // ==========================================
-        async function autoSetupDatabase() {
-            try {
-                // JIKA MODE DEMO (Untuk keperluan Pratinjau / Preview Canvas)
-                if (isDemoMode) {
-                    state.allStudents = RAW_STUDENTS.map(s => ({
-                        nis: s[0], nisn: s[1], nama: s[2], jk: s[3], kelas: s[4],
-                        status_ujian: false, nilai: 0, selesai_pada: null
-                    }));
-                    hideLoading();
-                    renderApp();
-                    return; // Hentikan fungsi di sini
-                }
-
-                // JIKA MENGGUNAKAN FIREBASE ASLI (Saat di-deploy)
-                // 1. Cek & Setup Soal
-                const qSnapshot = await getDocs(query(questionsRef));
-                if (qSnapshot.empty) {
-                    showLoading("Menyimpan Bank Soal ke Database...");
-                    const batch = writeBatch(db);
-                    RAW_QUESTIONS.forEach(q => {
-                        const dRef = doc(questionsRef, q.id.toString());
-                        batch.set(dRef, q);
-                    });
-                    await batch.commit();
-                }
-
-                // 2. Cek & Setup Siswa
-                const sSnapshot = await getDocs(query(studentsRef));
-                if (sSnapshot.empty) {
-                    showLoading("Menyimpan Data 173 Siswa ke Database...");
-                    const batch = writeBatch(db);
-                    RAW_STUDENTS.forEach(s => {
-                        const dRef = doc(studentsRef, s[0]);
-                        batch.set(dRef, {
-                            nis: s[0], nisn: s[1], nama: s[2], jk: s[3], kelas: s[4],
-                            status_ujian: false, nilai: 0, selesai_pada: null
-                        });
-                    });
-                    await batch.commit();
-                }
-
-                const latestStudents = await getDocs(query(studentsRef));
-                state.allStudents = latestStudents.docs.map(d => d.data());
-                
-                hideLoading();
-                renderApp();
-            } catch (error) {
-                console.error("Auto Setup Error:", error);
-                alert("Gagal memuat database. Periksa koneksi internet.");
-                hideLoading();
-            }
-        }
-
-        // Fungsi Loading UI
-        const showLoading = (text = "Memuat...") => {
-            document.getElementById('loadingText').innerText = text;
-            document.getElementById('loadingOverlay').classList.remove('hide');
-        };
-        const hideLoading = () => document.getElementById('loadingOverlay').classList.add('hide');
-
-        // Fungsi Pengacak Soal (Anti-Nyontek)
-        function shuffleArray(array) {
-            let curId = array.length;
-            while (0 !== curId) {
-                let randId = Math.floor(Math.random() * curId);
-                curId -= 1;
-                let tmp = array[curId];
-                array[curId] = array[randId];
-                array[randId] = tmp;
-            }
-            return array;
-        }
-
-        // ==========================================
-        // 6. RENDERING HALAMAN LOGIN
-        // ==========================================
-        function renderApp() {
-            if (state.isAdmin) {
-                renderAdminDashboard();
-            } else if (state.studentData) {
-                if(state.isExamFinished || state.studentData.status_ujian){
-                    renderResultPage();
-                } else if (!state.isConfirmed) {
-                    renderConfirmationPage(); // Tampilkan halaman konfirmasi data dulu
-                } else {
-                    renderExamPage();
-                }
-            } else {
-                renderLogin();
-            }
-        }
-
-        function renderLogin() {
-            const appDiv = document.getElementById('app');
-            const demoAlert = isDemoMode ? `<div class="bg-amber-100 text-amber-700 p-3 rounded-lg text-xs font-semibold mb-6 border border-amber-200 text-center shadow-sm">⚠️ MODE PRATINJAU (Tanpa Firebase).<br/>Semua data disimpan di memori sementara.</div>` : '';
-
-            appDiv.innerHTML = `
-                <div class="min-h-screen flex items-center justify-center p-4">
-                    <div class="glass w-full max-w-md rounded-2xl p-8 transition-all relative overflow-hidden">
-                        
-                        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
-
-                        <div class="text-center mb-8 mt-2">
-                            <div class="w-20 h-20 bg-white rounded-2xl mx-auto shadow-md flex items-center justify-center mb-4 border border-slate-100">
-                                <i class="fas fa-book-reader text-4xl text-blue-600"></i>
-                            </div>
-                            <h1 class="text-2xl font-bold text-slate-800">Ujian PKN Kelas 9</h1>
-                            <p class="text-slate-500 text-sm mt-1">SMP Islam Ar-Ridho</p>
-                        </div>
-                        
-                        ${demoAlert}
-
-                        <!-- Tab Switcher -->
-                        <div class="flex p-1 bg-slate-100 rounded-xl mb-6">
-                            <button onclick="switchLoginTab('student')" id="tab-student" class="flex-1 py-2.5 text-sm font-semibold rounded-lg bg-white text-blue-600 shadow-sm transition-all duration-200">Peserta (Siswa)</button>
-                            <button onclick="switchLoginTab('admin')" id="tab-admin" class="flex-1 py-2.5 text-sm font-semibold rounded-lg text-slate-500 hover:text-slate-700 transition-all duration-200">Guru (Admin)</button>
-                        </div>
-
-                        <!-- Form Login Siswa -->
-                        <form id="form-student" onsubmit="handleStudentLogin(event)">
-                            <div class="space-y-5">
-                                <div>
-                                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Pilih Kelas</label>
-                                    <select id="kelasSelect" onchange="populateNames()" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-slate-50 transition" required>
-                                        <option value="">-- Pilih Kelas Anda --</option>
-                                        <option value="9.1">Kelas 9.1</option>
-                                        <option value="9.2">Kelas 9.2</option>
-                                        <option value="9.3">Kelas 9.3</option>
-                                        <option value="9.4">Kelas 9.4</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">Pilih Nama Lengkap</label>
-                                    <select id="namaSelect" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none bg-slate-50 transition disabled:opacity-50" disabled required>
-                                        <option value="">-- Silakan Pilih Kelas Dahulu --</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <button type="submit" class="w-full mt-8 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-blue-200 transition-all flex items-center justify-center gap-2">
-                                OK Lanjut <i class="fas fa-arrow-right"></i>
-                            </button>
-                        </form>
-
-                        <!-- Form Login Admin -->
-                        <form id="form-admin" class="hide" onsubmit="handleAdminLogin(event)">
-                            <div class="space-y-5">
-                                <div>
-                                    <label class="block text-sm font-semibold text-slate-700 mb-1.5">PIN Akses Guru</label>
-                                    <input type="password" id="adminPin" placeholder="Masukkan PIN" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-800 outline-none bg-slate-50 text-center tracking-widest text-lg font-bold" required>
-                                </div>
-                            </div>
-                            <button type="submit" class="w-full mt-8 bg-slate-800 hover:bg-slate-900 text-white font-semibold py-3.5 rounded-xl shadow-lg shadow-slate-300 transition-all flex items-center justify-center gap-2">
-                                Masuk Dashboard <i class="fas fa-lock"></i>
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            `;
-        }
-
-        window.switchLoginTab = (tab) => {
-            const btnS = document.getElementById('tab-student');
-            const btnA = document.getElementById('tab-admin');
-            const formS = document.getElementById('form-student');
-            const formA = document.getElementById('form-admin');
-
-            if (tab === 'student') {
-                btnS.className = "flex-1 py-2.5 text-sm font-semibold rounded-lg bg-white text-blue-600 shadow-sm transition-all duration-200";
-                btnA.className = "flex-1 py-2.5 text-sm font-semibold rounded-lg text-slate-500 hover:text-slate-700 transition-all duration-200";
-                formS.classList.remove('hide');
-                formA.classList.add('hide');
-            } else {
-                btnA.className = "flex-1 py-2.5 text-sm font-semibold rounded-lg bg-white text-slate-800 shadow-sm transition-all duration-200";
-                btnS.className = "flex-1 py-2.5 text-sm font-semibold rounded-lg text-slate-500 hover:text-slate-700 transition-all duration-200";
-                formA.classList.remove('hide');
-                formS.classList.add('hide');
-            }
-        };
-
-        window.populateNames = () => {
-            const kelas = document.getElementById('kelasSelect').value;
-            const namaSelect = document.getElementById('namaSelect');
+        // Setup awal saat web dimuat
+        window.onload = async () => {
+            await autoSetupDatabase(); // Cek & injeksi data jika kosong
             
-            if (!kelas) {
-                namaSelect.innerHTML = '<option value="">-- Silakan Pilih Kelas Dahulu --</option>';
-                namaSelect.disabled = true;
+            // Listen realtime untuk tabel admin
+            onSnapshot(collection(db, "users"), (snapshot) => {
+                allUsers = [];
+                snapshot.forEach(doc => allUsers.push({ id: doc.id, ...doc.data() }));
+                renderTabelNilai();
+                renderTabelSiswa();
+                updateDashboardStats();
+            });
+
+            onSnapshot(collection(db, "questions"), (snapshot) => {
+                allQuestions = [];
+                snapshot.forEach(doc => allQuestions.push({ id: doc.id, ...doc.data() }));
+                renderDaftarSoal();
+                updateDashboardStats();
+            });
+
+            // Cek Auto-Resume Siswa jika refresh
+            const savedSession = localStorage.getItem('ujian_session');
+            if(savedSession) {
+                const sessionData = JSON.parse(savedSession);
+                // Hanya resume jika status belum selesai di DB
+                const checkStatus = setTimeout(() => {
+                    const dbUser = allUsers.find(u => u.id === sessionData.userId);
+                    if(dbUser && !dbUser.status_ujian) {
+                        resumeUjian(sessionData);
+                    } else {
+                        localStorage.removeItem('ujian_session'); // Sudah selesai
+                    }
+                }, 1500); // Tunggu data turun
+            }
+
+            document.getElementById('globalLoading').classList.add('hidden');
+            document.getElementById('viewSiswa').classList.remove('hidden');
+        };
+
+        // --- FUNGSI TAMPILAN ---
+        window.switchView = (viewId) => {
+            document.getElementById('viewSiswa').classList.add('hidden');
+            document.getElementById('viewGuru').classList.add('hidden');
+            document.getElementById(viewId).classList.remove('hidden');
+        }
+
+        window.changeAdminTab = (tabName) => {
+            document.querySelectorAll('.admin-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.admin-tab').forEach(el => {
+                el.classList.remove('text-purple-700', 'bg-purple-50');
+                el.classList.add('text-gray-500');
+            });
+            
+            document.getElementById(`content-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabName}`).classList.remove('text-gray-500');
+            document.getElementById(`tab-${tabName}`).classList.add('text-purple-700', 'bg-purple-50');
+        }
+
+        window.openModal = (id) => document.getElementById(id).classList.remove('hidden');
+        window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+
+        // --- ALUR LOGIN SISWA ---
+        window.loadNamaSiswa = () => {
+            const kelas = document.getElementById('selectKelas').value;
+            const selectNama = document.getElementById('selectNama');
+            selectNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+            
+            if(!kelas) {
+                selectNama.disabled = true;
                 return;
             }
-
-            const studentsInClass = state.allStudents.filter(s => s.kelas === kelas);
-            studentsInClass.sort((a,b) => a.nama.localeCompare(b.nama));
             
-            let html = '<option value="">-- Pilih Nama Anda --</option>';
-            studentsInClass.forEach(s => html += `<option value="${s.nis}">${s.nama}</option>`);
+            const filteredUsers = allUsers.filter(u => u.kelas === kelas);
+            // Urutkan abjad
+            filteredUsers.sort((a, b) => a.nama.localeCompare(b.nama));
             
-            namaSelect.innerHTML = html;
-            namaSelect.disabled = false;
-        };
-
-        window.handleStudentLogin = async (e) => {
-            e.preventDefault();
-            const kelas = document.getElementById('kelasSelect').value;
-            const nis = document.getElementById('namaSelect').value;
-
-            if (!kelas || !nis) return alert("Pilih kelas dan nama terlebih dahulu!");
-
-            const student = state.allStudents.find(s => s.nis === nis);
-            state.studentData = student;
-            state.isConfirmed = false;
-            
-            renderApp();
-        };
-
-        function renderConfirmationPage() {
-            const appDiv = document.getElementById('app');
-            const s = state.studentData;
-            const jkLengkap = s.jk === 'L' ? 'Laki-laki' : 'Perempuan';
-
-            appDiv.innerHTML = `
-                <div class="min-h-screen flex items-center justify-center p-4">
-                    <div class="glass w-full max-w-md rounded-2xl p-8 transition-all relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-indigo-600"></div>
-                        
-                        <div class="text-center mb-6 mt-2">
-                            <div class="w-20 h-20 bg-blue-50 rounded-full mx-auto flex items-center justify-center mb-4 border border-blue-100 shadow-inner">
-                                <i class="fas fa-id-card text-4xl text-blue-600"></i>
-                            </div>
-                            <h2 class="text-2xl font-bold text-slate-800">Konfirmasi Data</h2>
-                            <p class="text-slate-500 text-sm mt-1">Pastikan ini adalah data diri Anda</p>
-                        </div>
-                        
-                        <div class="bg-white rounded-xl border border-slate-200 p-5 space-y-4 mb-8 shadow-sm">
-                            <div class="flex justify-between border-b border-slate-100 pb-3">
-                                <span class="text-slate-500 text-sm font-medium">NIS</span>
-                                <span class="text-slate-800 text-sm font-bold text-right">${s.nis}</span>
-                            </div>
-                            <div class="flex justify-between border-b border-slate-100 pb-3">
-                                <span class="text-slate-500 text-sm font-medium">NISN</span>
-                                <span class="text-slate-800 text-sm font-bold text-right">${s.nisn}</span>
-                            </div>
-                            <div class="flex flex-col border-b border-slate-100 pb-3 gap-1">
-                                <span class="text-slate-500 text-sm font-medium">Nama Lengkap</span>
-                                <span class="text-slate-800 text-base font-bold text-left leading-tight">${s.nama}</span>
-                            </div>
-                            <div class="flex justify-between border-b border-slate-100 pb-3">
-                                <span class="text-slate-500 text-sm font-medium">Kelas</span>
-                                <span class="text-slate-800 text-sm font-bold text-right">${s.kelas}</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-slate-500 text-sm font-medium">Jenis Kelamin</span>
-                                <span class="text-slate-800 text-sm font-bold text-right">${jkLengkap}</span>
-                            </div>
-                        </div>
-
-                        <div class="flex gap-3">
-                            <button onclick="cancelLogin()" class="flex-1 py-3.5 px-4 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 hover:border-slate-300 transition-all">
-                                Kembali
-                            </button>
-                            <button onclick="confirmAndStartExam()" class="flex-1 py-3.5 px-4 rounded-xl bg-blue-600 text-white font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2">
-                                OK, Mulai <i class="fas fa-play"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
+            filteredUsers.forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = u.id;
+                opt.textContent = u.nama;
+                if(u.status_ujian) opt.textContent += " (Sudah Selesai)";
+                selectNama.appendChild(opt);
+            });
+            selectNama.disabled = false;
         }
 
-        window.cancelLogin = () => {
-            state.studentData = null;
-            state.isConfirmed = false;
-            renderApp();
-        };
-
-        window.confirmAndStartExam = async () => {
-            if (!state.studentData.status_ujian) {
-                await prepareExam();
-            }
-            state.isConfirmed = true;
-            renderApp();
-        };
-
-        window.handleAdminLogin = async (e) => {
-            e.preventDefault();
-            const pin = document.getElementById('adminPin').value;
+        window.prosesLoginSiswa = () => {
+            const userId = document.getElementById('selectNama').value;
+            if(!userId) return alert('Pilih nama Anda terlebih dahulu!');
             
-            showLoading("Verifikasi PIN...");
+            currentUser = allUsers.find(u => u.id === userId);
             
-            setTimeout(() => {
-                if (pin === "202099") {
-                    state.isAdmin = true;
-                    hideLoading();
-                    renderApp();
-                } else {
-                    hideLoading();
-                    alert("PIN Salah! Akses ditolak.");
-                }
-            }, 800);
-        };
-
-        // ==========================================
-        // 7. LOGIKA UJIAN & ACAK SOAL
-        // ==========================================
-        async function prepareExam() {
-            showLoading("Mengacak dan menyiapkan soal...");
-            try {
-                let rawQuestions = [];
-                
-                if (isDemoMode) {
-                    rawQuestions = JSON.parse(JSON.stringify(RAW_QUESTIONS)); // Clone array
-                } else {
-                    const qSnap = await getDocs(query(questionsRef));
-                    qSnap.forEach(doc => rawQuestions.push({ id: doc.id, ...doc.data() }));
-                }
-
-                // ACAK URUTAN SOAL
-                rawQuestions = shuffleArray(rawQuestions);
-                
-                // ACAK URUTAN JAWABAN (Simpan ID mana yang benar)
-                state.examQuestions = rawQuestions.map(q => {
-                    let optionsWithIndex = q.options.map((opt, i) => ({ text: opt, isCorrect: i === q.ans }));
-                    optionsWithIndex = shuffleArray(optionsWithIndex);
-                    return { id: q.id, text: q.text, options: optionsWithIndex };
-                });
-                
-                state.currentQuestionIndex = 0;
-                state.answers = {};
-                
-                setTimeout(() => hideLoading(), 500);
-            } catch (err) {
-                hideLoading();
-                alert("Terjadi kesalahan saat menyiapkan soal.");
+            if(currentUser.status_ujian) {
+                return alert('Anda sudah menyelesaikan ujian ini dan tidak dapat mengulang.');
             }
+
+            // Tampilkan Konfirmasi
+            document.getElementById('confNama').innerText = currentUser.nama;
+            document.getElementById('confKelas').innerText = currentUser.kelas;
+            document.getElementById('confNis').innerText = currentUser.nis;
+            document.getElementById('confJK').innerText = currentUser.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan';
+            
+            document.getElementById('siswaLoginScreen').classList.add('hidden');
+            document.getElementById('siswaConfirmScreen').classList.remove('hidden');
         }
 
-        function renderExamPage() {
-            const appDiv = document.getElementById('app');
-            const qIndex = state.currentQuestionIndex;
-            const qData = state.examQuestions[qIndex];
-            const totalQ = state.examQuestions.length;
-            const savedAnswerIndex = state.answers[qData.id];
+        window.batalLogin = () => {
+            document.getElementById('siswaConfirmScreen').classList.add('hidden');
+            document.getElementById('siswaLoginScreen').classList.remove('hidden');
+            currentUser = null;
+        }
 
-            let optionsHtml = '';
+        // --- SISTEM UJIAN & ANTI RESET (AUTO-RESUME) ---
+        window.mulaiUjian = () => {
+            if(allQuestions.length === 0) return alert('Soal belum tersedia!');
+            
+            document.getElementById('siswaConfirmScreen').classList.add('hidden');
+            document.getElementById('siswaUjianScreen').classList.remove('hidden');
+            document.getElementById('totalSoalNum').innerText = allQuestions.length;
+            
+            // Acak Soal dan Jawaban
+            shuffledQuestions = allQuestions.map(q => {
+                let opsiArr = [
+                    { key: 'A', text: q.opsi.A }, { key: 'B', text: q.opsi.B },
+                    { key: 'C', text: q.opsi.C }, { key: 'D', text: q.opsi.D }
+                ];
+                // Acak urutan opsi A,B,C,D
+                opsiArr = opsiArr.sort(() => Math.random() - 0.5);
+                
+                return {
+                    id: q.id,
+                    teks_soal: q.teks_soal,
+                    kunci_asli: q.kunci_jawaban,
+                    opsi_acak: opsiArr 
+                };
+            }).sort(() => Math.random() - 0.5); // Acak urutan soal
+
+            currentSoalIndex = 0;
+            userAnswers = {};
+            timeLeft = 3600; // Reset waktu
+            
+            simpanSession(); // Simpan state awal
+            renderSoal();
+            startTimer();
+        }
+
+        // Auto Resume dari LocalStorage
+        function resumeUjian(sessionData) {
+            currentUser = allUsers.find(u => u.id === sessionData.userId);
+            shuffledQuestions = sessionData.shuffledQuestions;
+            currentSoalIndex = sessionData.currentSoalIndex;
+            userAnswers = sessionData.userAnswers;
+            timeLeft = sessionData.timeLeft;
+
+            document.getElementById('siswaLoginScreen').classList.add('hidden');
+            document.getElementById('siswaUjianScreen').classList.remove('hidden');
+            document.getElementById('totalSoalNum').innerText = shuffledQuestions.length;
+            
+            renderSoal();
+            startTimer();
+        }
+
+        function simpanSession() {
+            if(!currentUser) return;
+            const sessionData = {
+                userId: currentUser.id,
+                shuffledQuestions: shuffledQuestions,
+                currentSoalIndex: currentSoalIndex,
+                userAnswers: userAnswers,
+                timeLeft: timeLeft
+            };
+            localStorage.setItem('ujian_session', JSON.stringify(sessionData));
+        }
+
+        window.renderSoal = () => {
+            const q = shuffledQuestions[currentSoalIndex];
+            document.getElementById('currentSoalNum').innerText = currentSoalIndex + 1;
+            document.getElementById('teksSoal').innerText = q.teks_soal;
+            
+            const opsiDiv = document.getElementById('opsiJawaban');
+            opsiDiv.innerHTML = '';
+            
             const labels = ['A', 'B', 'C', 'D'];
-            
-            qData.options.forEach((opt, idx) => {
-                const isChecked = savedAnswerIndex === idx ? 'checked' : '';
-                optionsHtml += `
-                    <label class="relative block cursor-pointer mb-3 group">
-                        <input type="radio" name="answer" value="${idx}" class="peer sr-only radio-custom" onchange="selectAnswer('${qData.id}', ${idx})" ${isChecked}>
-                        <div class="rounded-xl border border-slate-200 bg-white p-4 transition-all duration-200 group-hover:bg-slate-50 flex items-start gap-4 shadow-sm group-hover:border-blue-300 group-hover:shadow">
-                            <div class="radio-circle mt-0.5 h-5 w-5 rounded-full border-2 border-slate-300 bg-white flex-shrink-0 relative transition-colors duration-200"></div>
-                            <span class="text-slate-700 font-medium leading-relaxed">
-                                <span class="font-bold mr-1 text-slate-800">${labels[idx]}.</span> ${opt.text}
-                            </span>
-                        </div>
-                    </label>
-                `;
-            });
-
-            const answeredCount = Object.keys(state.answers).length;
-            const progressPct = (answeredCount / totalQ) * 100;
-
-            appDiv.innerHTML = `
-                <div class="max-w-3xl mx-auto p-4 md:py-8 h-screen flex flex-col">
-                    <!-- Header Ujian -->
-                    <div class="glass rounded-2xl p-4 md:p-5 mb-5 flex items-center justify-between shrink-0 shadow-sm border border-slate-200/50">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div>
-                                <h2 class="text-sm md:text-base font-bold text-slate-800">${state.studentData.nama}</h2>
-                                <p class="text-xs text-slate-500 font-medium">Kelas ${state.studentData.kelas} • NIS: ${state.studentData.nis}</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-[11px] md:text-xs font-bold text-blue-700 bg-blue-100 px-3 py-1.5 rounded-full uppercase tracking-wider">
-                                Terjawab: ${answeredCount}/${totalQ}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Progress Bar -->
-                    <div class="w-full bg-slate-200 h-2 rounded-full mb-6 overflow-hidden shrink-0 shadow-inner">
-                        <div class="bg-blue-600 h-full transition-all duration-500 ease-out" style="width: ${progressPct}%"></div>
-                    </div>
-
-                    <!-- Area Soal -->
-                    <div class="flex-1 overflow-y-auto pb-28 scrollbar-hide">
-                        <div class="mb-5 bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-100">
-                            <span class="inline-block bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg mb-4 shadow-sm">Soal No. ${qIndex + 1}</span>
-                            <p class="text-base md:text-lg text-slate-800 font-semibold leading-relaxed whitespace-pre-line">${qData.text}</p>
-                        </div>
-                        <div class="mt-4">
-                            ${optionsHtml}
-                        </div>
-                    </div>
-
-                    <!-- Navigasi Bawah -->
-                    <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-md border-t border-slate-200 md:relative md:bg-transparent md:border-0 md:p-0 md:mt-4 shrink-0 shadow-[0_-10px_20px_rgba(0,0,0,0.03)] md:shadow-none">
-                        <div class="max-w-3xl mx-auto flex gap-3">
-                            <button onclick="navQuestion(-1)" class="flex-1 py-3.5 px-4 rounded-xl border-2 border-slate-200 text-slate-700 font-bold hover:bg-slate-50 hover:border-slate-300 transition-all ${qIndex === 0 ? 'opacity-40 cursor-not-allowed hover:bg-transparent hover:border-slate-200' : ''}" ${qIndex === 0 ? 'disabled' : ''}>
-                                <i class="fas fa-arrow-left mr-2"></i> Sebelumnya
-                            </button>
-                            
-                            ${qIndex === totalQ - 1 
-                                ? `<button onclick="finishExam()" class="flex-1 py-3.5 px-4 rounded-xl bg-green-600 text-white font-bold shadow-lg shadow-green-200 hover:bg-green-700 hover:-translate-y-0.5 transition-all">
-                                    Kirim Ujian <i class="fas fa-paper-plane ml-2"></i>
-                                   </button>`
-                                : `<button onclick="navQuestion(1)" class="flex-1 py-3.5 px-4 rounded-xl bg-blue-600 text-white font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 hover:-translate-y-0.5 transition-all">
-                                    Selanjutnya <i class="fas fa-arrow-right ml-2"></i>
-                                   </button>`
-                            }
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-
-        window.selectAnswer = (qId, optionIndex) => {
-            state.answers[qId] = optionIndex;
-            // UX: Auto-next setelah delay singkat agar siswa tidak perlu repot klik tombol 'Selanjutnya'
-            setTimeout(() => {
-                if (state.currentQuestionIndex < state.examQuestions.length - 1) {
-                    navQuestion(1);
-                } else {
-                    renderExamPage(); // Update UI progress bar
-                }
-            }, 350);
-        };
-
-        window.navQuestion = (dir) => {
-            state.currentQuestionIndex += dir;
-            renderExamPage();
-        };
-
-        // ==========================================
-        // 8. PENGIRIMAN JAWABAN & HASIL
-        // ==========================================
-        window.finishExam = async () => {
-            const totalQ = state.examQuestions.length;
-            const answeredCount = Object.keys(state.answers).length;
-            
-            if (answeredCount < totalQ) {
-                if(!confirm(`Ada ${totalQ - answeredCount} soal yang belum dijawab. Yakin ingin mengirim sekarang?`)) return;
-            } else {
-                if(!confirm("Kirim jawaban sekarang? Data tidak bisa diubah setelah dikirim.")) return;
-            }
-
-            showLoading("Menyimpan hasil ujian...");
-
-            // Hitung nilai (Otomatis)
-            let benar = 0;
-            state.examQuestions.forEach(q => {
-                const ansIdx = state.answers[q.id];
-                if (ansIdx !== undefined && q.options[ansIdx].isCorrect) benar++;
-            });
-            const finalScore = (benar / totalQ) * 100;
-
-            try {
-                if (isDemoMode) {
-                    // Simpan di Memory (Demo)
-                    const s = state.allStudents.find(x => x.nis === state.studentData.nis);
-                    s.status_ujian = true; s.nilai = finalScore; s.selesai_pada = new Date().toISOString();
-                    state.studentData = s;
-                } else {
-                    // Simpan ke Firestore
-                    await updateDoc(doc(studentsRef, state.studentData.nis), {
-                        status_ujian: true,
-                        nilai: finalScore,
-                        selesai_pada: new Date().toISOString()
-                    });
-                    state.studentData.status_ujian = true;
-                    state.studentData.nilai = finalScore;
-                }
+            q.opsi_acak.forEach((opt, index) => {
+                const label = labels[index];
+                const isSelected = userAnswers[q.id] === opt.key; // Cek apakah pernah dipilih
                 
-                state.isExamFinished = true;
-                setTimeout(() => { hideLoading(); renderApp(); }, 500);
-
-            } catch (err) {
-                hideLoading();
-                alert("Gagal mengirim jawaban! Hubungi guru.");
-            }
-        };
-
-        function renderResultPage() {
-            const appDiv = document.getElementById('app');
-            appDiv.innerHTML = `
-                <div class="min-h-screen flex items-center justify-center p-4">
-                    <div class="glass w-full max-w-md rounded-2xl p-8 text-center shadow-xl border border-slate-100">
-                        <div class="w-24 h-24 bg-green-50 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner border border-green-100">
-                            <i class="fas fa-check-circle text-5xl"></i>
-                        </div>
-                        <h2 class="text-2xl font-bold text-slate-800 mb-2">Ujian Selesai!</h2>
-                        <p class="text-slate-500 text-sm mb-8 leading-relaxed">Terima kasih <span class="font-bold text-slate-700">${state.studentData.nama}</span>, Anda telah menyelesaikan Ujian PKN. Jawaban Anda telah tersimpan dengan aman di sistem.</p>
-                        
-                        <div class="bg-blue-50/50 border border-blue-100 rounded-2xl p-5 mb-8 shadow-sm">
-                            <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Nilai Anda</p>
-                            <p class="text-[54px] font-black text-blue-600 leading-none">${state.studentData.nilai}</p>
-                        </div>
-
-                        <button onclick="window.location.reload()" class="w-full py-3.5 bg-slate-800 text-white rounded-xl font-bold hover:bg-slate-900 shadow-lg shadow-slate-200 transition-all">
-                            Keluar & Kembali
-                        </button>
+                const btn = document.createElement('div');
+                btn.className = `p-4 rounded-xl border-2 cursor-pointer transition flex items-start gap-4 ${isSelected ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-purple-300'}`;
+                btn.onclick = () => pilihJawaban(q.id, opt.key);
+                
+                btn.innerHTML = `
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${isSelected ? 'bg-purple-500 text-white' : 'bg-gray-100 text-gray-500'}">
+                        ${label}
                     </div>
-                </div>
-            `;
-        }
-
-        // ==========================================
-        // 9. DASHBOARD ADMIN (GURU) - LAYOUT BARU
-        // ==========================================
-        function renderAdminDashboard() {
-            const appDiv = document.getElementById('app');
-            appDiv.innerHTML = `
-                <div class="bg-slate-50 min-h-screen flex text-slate-800 font-sans">
-                    <!-- Sidebar Kiri -->
-                    <aside class="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col shadow-[2px_0_10px_rgba(0,0,0,0.02)] fixed h-full z-10">
-                        <div class="p-6 flex items-center gap-3 border-b border-slate-100 mt-2">
-                            <div class="w-8 h-8 rounded-lg text-purple-600 flex items-center justify-center">
-                                <i class="fas fa-shield-halved text-2xl"></i>
-                            </div>
-                            <span class="font-black text-slate-800 text-xl tracking-tight">AdminPanel</span>
-                        </div>
-                        <nav class="flex-1 p-5 space-y-2 overflow-y-auto mt-2">
-                            <button onclick="switchAdminTab('beranda')" id="nav-beranda" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-slate-50 font-medium transition-all">
-                                <i class="fas fa-border-all w-5 text-center text-lg"></i> Beranda
-                            </button>
-                            <button onclick="switchAdminTab('rekap')" id="nav-rekap" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-slate-50 font-medium transition-all">
-                                <i class="fas fa-chart-bar w-5 text-center text-lg"></i> Rekap Nilai
-                            </button>
-                            <button onclick="switchAdminTab('siswa')" id="nav-siswa" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-slate-50 font-medium transition-all">
-                                <i class="fas fa-user-group w-5 text-center text-lg"></i> Kelola Siswa
-                            </button>
-                            <button onclick="switchAdminTab('soal')" id="nav-soal" class="w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-slate-50 font-medium transition-all">
-                                <i class="fas fa-file-signature w-5 text-center text-lg"></i> Kelola Soal
-                            </button>
-                        </nav>
-                        <div class="p-5 border-t border-slate-100">
-                            <div class="flex items-center gap-3 px-2 mb-5">
-                                <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-bold">J</div>
-                                <div>
-                                    <p class="text-sm font-bold text-slate-700">JAYADI, S.Pd.</p>
-                                    <p class="text-[11px] text-slate-400 font-medium">Guru PKN</p>
-                                </div>
-                            </div>
-                            <button onclick="adminLogout()" class="w-full py-3 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all font-bold flex items-center justify-center gap-2 text-sm">
-                                <i class="fas fa-sign-out-alt"></i> Keluar
-                            </button>
-                        </div>
-                    </aside>
-
-                    <!-- Area Konten Utama -->
-                    <main class="flex-1 md:ml-64 p-6 md:p-12 h-screen overflow-y-auto w-full bg-[#f8fafc]" id="adminContentArea">
-                        <!-- Konten Tab Akan Dimasukkan Di Sini -->
-                    </main>
-                    
-                    <!-- Navigasi Bawah (Mobile) -->
-                    <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex justify-around p-2 z-20 shadow-[0_-5px_15px_rgba(0,0,0,0.05)]">
-                        <button onclick="switchAdminTab('beranda')" class="p-2 text-purple-600 flex flex-col items-center"><i class="fas fa-border-all text-xl mb-1"></i><span class="text-[10px] font-bold">Beranda</span></button>
-                        <button onclick="switchAdminTab('rekap')" class="p-2 text-slate-400 flex flex-col items-center"><i class="fas fa-chart-bar text-xl mb-1"></i><span class="text-[10px] font-medium">Rekap</span></button>
-                        <button onclick="adminLogout()" class="p-2 text-red-400 flex flex-col items-center"><i class="fas fa-sign-out-alt text-xl mb-1"></i><span class="text-[10px] font-medium">Keluar</span></button>
-                    </div>
-                </div>
-            `;
-            
-            // Set Tab Awal dan Ambil Data
-            switchAdminTab(state.adminTab);
-            fetchAdminData();
-        }
-
-        window.switchAdminTab = (tab) => {
-            state.adminTab = tab;
-            
-            // Update Gaya CSS Tombol Navigasi Sidebar
-            const navs = ['beranda', 'rekap', 'siswa', 'soal'];
-            navs.forEach(n => {
-                const el = document.getElementById(`nav-${n}`);
-                if(el) {
-                    if(n === tab) {
-                        el.className = "w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl bg-[#f3e8ff] text-[#7e22ce] font-bold transition-all";
-                    } else {
-                        el.className = "w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-slate-500 hover:bg-slate-50 font-medium transition-all";
-                    }
-                }
+                    <div class="pt-1 text-gray-700">${opt.text}</div>
+                `;
+                opsiDiv.appendChild(btn);
             });
 
-            renderAdminContent();
-        };
+            // Navigasi
+            document.getElementById('btnPrev').classList.toggle('hidden', currentSoalIndex === 0);
+            
+            if(currentSoalIndex === shuffledQuestions.length - 1) {
+                document.getElementById('btnNext').classList.add('hidden');
+                document.getElementById('btnSubmit').classList.remove('hidden');Siap, Pak Jayadi! Masukan Bapak benar-benar brilian. Aplikasi ini akan jauh lebih sempurna dengan dua penambahan tersebut. 
 
-        function renderAdminContent() {
-            const area = document.getElementById('adminContentArea');
-            if(!area) return;
+Tugas saya di sini adalah memudahkan Bapak. Oleh karena itu, saya **sudah menulis ulang seluruh kodenya hingga tuntas (tanpa ada bagian yang harus Bapak ubah sendiri)**. 
 
-            if(state.adminTab === 'beranda') {
-                area.innerHTML = `
-                    <div class="max-w-5xl">
-                        <h1 class="text-[28px] font-black text-[#1e293b] mb-1 tracking-tight">Dashboard Guru</h1>
-                        <p class="text-slate-500 text-[15px] font-medium mb-10">Monitoring pengerjaan Ulangan Harian PKN SMP Islam Ar-Ridho.</p>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <!-- Widget 1: Total Soal -->
-                            <div class="bg-white border-[1.5px] border-purple-400 rounded-2xl p-6 relative overflow-hidden shadow-sm h-32 flex flex-col justify-center">
-                                <p class="text-slate-500 text-sm font-semibold mb-1">Total Soal</p>
-                                <h3 class="text-4xl font-bold text-slate-800">50</h3>
-                                <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-20">
-                                    <i class="fas fa-file-signature text-6xl text-purple-600"></i>
-                                </div>
-                            </div>
-                            
-                            <!-- Widget 2: Siswa Terdaftar -->
-                            <div class="bg-white border-[1.5px] border-blue-400 rounded-2xl p-6 relative overflow-hidden shadow-sm h-32 flex flex-col justify-center">
-                                <p class="text-slate-500 text-sm font-semibold mb-1">Siswa Terdaftar</p>
-                                <h3 class="text-4xl font-bold text-slate-800" id="widgetTotalSiswa">0</h3>
-                                <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-20">
-                                    <i class="fas fa-user-group text-6xl text-blue-600"></i>
-                                </div>
-                            </div>
+Berikut adalah dua fitur canggih yang baru saja saya tanamkan ke dalam aplikasi Bapak:
 
-                            <!-- Widget 3: Sudah Selesai -->
-                            <div class="bg-white border-[1.5px] border-green-400 rounded-2xl p-6 relative overflow-hidden shadow-sm h-32 flex flex-col justify-center">
-                                <p class="text-slate-500 text-sm font-semibold mb-1">Sudah Selesai</p>
-                                <h3 class="text-4xl font-bold text-slate-800" id="widgetSelesai">0</h3>
-                                <div class="absolute right-4 top-1/2 -translate-y-1/2 opacity-20">
-                                    <i class="fas fa-check-circle text-6xl text-green-600"></i>
-                                </div>
-                            </div>
-                        </div>
+1. **Dashboard Statistik Kelas Super Lengkap:** Di menu "Beranda", tepat di bawah 3 kotak ringkasan utama, sekarang ada **Tabel Statistik Real-Time per Kelas (9.1 sampai 9.4)**. Tabel ini langsung menampilkan rincian jumlah siswa Laki-laki (L), Perempuan (P), total siswa per kelas, dan *progress* (berapa anak yang sudah selesai). Semuanya berubah otomatis tanpa perlu di-*refresh*!
+2. **Generator Soal AI + Pembaca PDF & Word:** Saya telah mengintegrasikan *library* khusus (`mammoth.js` untuk Word dan `pdf.js` untuk PDF) beserta **Gemini AI**. Bapak tinggal masuk ke Kelola Soal, klik **"Generator AI"**, masukkan file soal Bapak (PDF/Word/TXT) atau cukup *paste* soal mentah (walau belum ada pilihan ganda/jawaban). AI akan otomatis meracik soal, membuatkan opsi A, B, C, D, dan menentukan kunci jawaban yang paling tepat!
+
+Karena AI membutuhkan otak untuk berpikir, saya sudah sediakan kolom **API Key Gemini** di dalam aplikasinya (Bapak bisa mendapatkannya gratis di Google AI Studio, saya pandu di aplikasinya).
+
+Berikut adalah **KODE FINAL SEUTUHNYA**. Silakan **salin (copy) semua teks di bawah ini**, dan **timpa (replace)** seluruh isi yang ada di Blogger Bapak.
+
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ujian PKN SMP Islam Ar-Ridho</title>
+    <!-- Font dan Ikon -->
+    <link href="[https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap](https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap)" rel="stylesheet">
+    <link href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)" rel="stylesheet">
+    <!-- SweetAlert2 untuk Notifikasi -->
+    <script src="[https://cdn.jsdelivr.net/npm/sweetalert2@11](https://cdn.jsdelivr.net/npm/sweetalert2@11)"></script>
+    <!-- Library untuk membaca Word dan PDF -->
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js](https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js)"></script>
+    <script src="[https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js](https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js)"></script>
+
+    <style>
+        :root {
+            --primary: #7C3AED; --primary-hover: #6D28D9; --primary-light: #F3E8FF;
+            --secondary: #10B981; --danger: #EF4444; --dark: #1E293B;
+            --gray-100: #F3F4F6; --gray-200: #E5E7EB; --gray-500: #6B7280; --gray-700: #374151;
+            --bg-color: #F8FAFC; --card-bg: rgba(255, 255, 255, 0.95);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--gray-700); min-height: 100vh; overflow-x: hidden; }
+
+        /* UI UMUM & GLASSMORPHISM */
+        .glass-card { background: var(--card-bg); backdrop-filter: blur(10px); border-radius: 16px; border: 1px solid rgba(255,255,255,0.2); box-shadow: 0 10px 25px rgba(0,0,0,0.05); padding: 24px; }
+        .hidden { display: none !important; }
+        .btn { padding: 12px 24px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
+        .btn-success { background-color: var(--secondary); color: white; }
+        .btn-danger { background-color: var(--danger); color: white; }
+        .btn-outline { background-color: transparent; border: 2px solid var(--primary); color: var(--primary); }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--dark); font-size: 0.9rem; }
+        .input-control { width: 100%; padding: 12px 16px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 1rem; transition: border-color 0.3s; outline: none; background: white; }
+        .input-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+
+        /* HEADER LOGIN */
+        .header-login { text-align: center; margin-bottom: 30px; }
+        .header-login img { width: 80px; margin-bottom: 15px; }
+        .header-login h1 { color: var(--dark); font-size: 1.5rem; font-weight: 800; }
+        .header-login p { color: var(--gray-500); font-size: 0.9rem; }
+        
+        /* HALAMAN LOGIN (SISWA & GURU) */
+        #login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-container { max-width: 450px; width: 100%; }
+        .login-tabs { display: flex; background: var(--gray-100); padding: 5px; border-radius: 10px; margin-bottom: 25px; }
+        .tab-btn { flex: 1; padding: 10px; text-align: center; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; color: var(--gray-500); }
+        .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        /* HALAMAN UJIAN SISWA */
+        #ujian-page { max-width: 800px; margin: 0 auto; padding: 20px; padding-bottom: 80px; }
+        .header-ujian { display: flex; justify-content: space-between; align-items: center; padding-bottom: 20px; border-bottom: 1px solid var(--gray-200); margin-bottom: 20px; }
+        .identitas-siswa h3 { color: var(--dark); margin-bottom: 5px; }
+        .soal-container { font-size: 1.1rem; line-height: 1.6; color: var(--dark); margin-bottom: 30px; }
+        .opsi-list { display: flex; flex-direction: column; gap: 15px; }
+        .opsi-item { display: flex; align-items: center; padding: 15px 20px; border: 2px solid var(--gray-200); border-radius: 12px; cursor: pointer; transition: 0.2s; background: white; }
+        .opsi-item:hover { border-color: var(--primary-light); background: var(--primary-light); }
+        .opsi-item.selected { border-color: var(--primary); background: var(--primary-light); }
+        .opsi-item input { display: none; }
+        .opsi-label { font-weight: 600; margin-right: 15px; width: 25px; height: 25px; display: flex; align-items: center; justify-content: center; background: var(--gray-200); border-radius: 50%; font-size: 0.9rem; }
+        .opsi-item.selected .opsi-label { background: var(--primary); color: white; }
+        
+        .navigasi-soal { display: flex; justify-content: space-between; margin-top: 30px; }
+        .nomor-soal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 10px; margin-top: 40px; border-top: 1px solid var(--gray-200); padding-top: 20px; }
+        .btn-nomor { width: 40px; height: 40px; border-radius: 8px; border: 1px solid var(--gray-200); background: white; font-weight: 600; cursor: pointer; }
+        .btn-nomor.dijawab { background: var(--primary); color: white; border-color: var(--primary); }
+        .btn-nomor.aktif { border: 2px solid var(--dark); box-shadow: 0 0 0 2px rgba(0,0,0,0.1); }
+
+        /* DASHBOARD ADMIN (UI BARU SESUAI GAMBAR) */
+        #admin-page { display: flex; min-height: 100vh; background: #F8FAFC; }
+        .sidebar { width: 260px; background: white; border-right: 1px solid var(--gray-200); display: flex; flex-direction: column; }
+        .sidebar-header { padding: 24px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--gray-200); }
+        .sidebar-header i { color: var(--primary); font-size: 1.5rem; }
+        .sidebar-header h2 { font-size: 1.25rem; font-weight: 800; color: var(--dark); }
+        .sidebar-menu { padding: 20px 15px; flex: 1; }
+        .menu-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 8px; color: var(--gray-500); font-weight: 600; cursor: pointer; transition: 0.2s; margin-bottom: 5px; }
+        .menu-item:hover { background: var(--gray-100); color: var(--dark); }
+        .menu-item.active { background: var(--primary-light); color: var(--primary); }
+        .sidebar-footer { padding: 20px; border-top: 1px solid var(--gray-200); }
+        .user-profile { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+        .avatar { width: 40px; height: 40px; background: var(--primary-light); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1.2rem; }
+        .user-info h4 { color: var(--dark); font-size: 0.95rem; }
+        .user-info p { color: var(--gray-500); font-size: 0.8rem; }
+        
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; }
+        .page-header { margin-bottom: 30px; }
+        .page-header h1 { color: var(--dark); font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
+        .page-header p { color: var(--gray-500); }
+        
+        /* CARD STATISTIK (DASHBOARD) */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-bottom: 30px; }
+        .stat-card { background: white; border-radius: 16px; padding: 24px; border: 1px solid var(--gray-200); position: relative; overflow: hidden; }
+        .stat-card.purple { border: 2px solid #C4B5FD; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.1); }
+        .stat-card.blue { border: 2px solid #93C5FD; box-shadow: 0 4px 15px rgba(59, 130, 246, 0.1); }
+        .stat-card.green { border: 2px solid #86EFAC; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1); }
+        .stat-title { color: var(--gray-500); font-weight: 600; font-size: 0.95rem; margin-bottom: 10px; }
+        .stat-value { color: var(--dark); font-size: 2.5rem; font-weight: 800; }
+        .stat-icon { position: absolute; right: 24px; top: 50%; transform: translateY(-50%); width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+        .purple .stat-icon { background: #F3E8FF; color: #A78BFA; }
+        .blue .stat-icon { background: #EFF6FF; color: #60A5FA; }
+        .green .stat-icon { background: #ECFDF5; color: #34D399; }
+
+        /* TABEL STATISTIK KELAS */
+        .class-stats-container { background: white; border-radius: 16px; border: 1px solid var(--gray-200); padding: 24px; margin-top: 30px; }
+        .class-stats-container h3 { margin-bottom: 20px; color: var(--dark); font-weight: 700; }
+
+        /* TABEL UMUM */
+        .data-table-container { background: white; border-radius: 16px; border: 1px solid var(--gray-200); overflow: hidden; }
+        .table-toolbar { padding: 20px; border-bottom: 1px solid var(--gray-200); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 15px 20px; text-align: left; border-bottom: 1px solid var(--gray-200); }
+        th { background: #F8FAFC; color: var(--gray-500); font-weight: 600; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        td { color: var(--dark); font-size: 0.95rem; }
+        tr:last-child td { border-bottom: none; }
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; }
+        .badge-success { background: #ECFDF5; color: #10B981; }
+        .badge-warning { background: #FFFBEB; color: #F59E0B; }
+        .action-btns button { padding: 6px 10px; border: none; border-radius: 6px; cursor: pointer; color: white; font-size: 0.85rem; margin-right: 5px; }
+        .btn-edit { background: #3B82F6; }
+        .btn-delete { background: #EF4444; }
+        .btn-reset { background: #F59E0B; }
+
+        /* MODAL */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; backdrop-filter: blur(4px); }
+        .modal-content { background: white; padding: 30px; border-radius: 16px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { font-size: 1.5rem; color: var(--dark); }
+        
+        @media (max-width: 768px) {
+            #admin-page { flex-direction: column; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--gray-200); }
+            .main-content { padding: 20px; }
+            .table-toolbar { flex-direction: column; align-items: stretch; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ================= HALAMAN LOGIN ================= -->
+    <div id="login-page">
+        <div class="login-container glass-card">
+            <div class="header-login">
+                <h1>Sistem Ujian Ar-Ridho</h1>
+                <p>Ulangan Harian Pendidikan Pancasila</p>
+            </div>
+            
+            <div class="login-tabs">
+                <div class="tab-btn active" onclick="switchLogin('siswa')">Siswa</div>
+                <div class="tab-btn" onclick="switchLogin('guru')">Guru (Admin)</div>
+            </div>
+
+            <!-- Form Siswa -->
+            <div id="form-siswa">
+                <div class="input-group">
+                    <label>Pilih Kelas</label>
+                    <select id="kelas-select" class="input-control" onchange="loadSiswaList()">
+                        <option value="">-- Pilih Kelas --</option>
+                        <option value="9.1">Kelas 9.1</option>
+                        <option value="9.2">Kelas 9.2</option>
+                        <option value="9.3">Kelas 9.3</option>
+                        <option value="9.4">Kelas 9.4</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label>Pilih Nama Siswa</label>
+                    <select id="nama-select" class="input-control" disabled>
+                        <option value="">-- Pilih Nama --</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" style="width: 100%" onclick="cekDataSiswa()">Lanjut <i class="fas fa-arrow-right"></i></button>
+            </div>
+
+            <!-- Form Guru -->
+            <div id="form-guru" class="hidden">
+                <div class="input-group">
+                    <label>PIN Admin (JAYADI, S.Pd.)</label>
+                    <input type="password" id="pin-guru" class="input-control" placeholder="Masukkan PIN rahasia">
+                </div>
+                <button class="btn btn-primary" style="width: 100%" onclick="loginGuru()">Masuk Dashboard <i class="fas fa-sign-in-alt"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= HALAMAN UJIAN SISWA ================= -->
+    <div id="ujian-page" class="hidden">
+        <div class="glass-card">
+            <div class="header-ujian">
+                <div class="identitas-siswa">
+                    <h3 id="u-nama">Nama Siswa</h3>
+                    <p id="u-kelas" style="color: var(--gray-500); font-weight: 600;">Kelas 9.x | NIS: -</p>
+                </div>
+                <div id="timer" style="font-size: 1.25rem; font-weight: 800; color: var(--primary); background: var(--primary-light); padding: 8px 16px; border-radius: 8px;">
+                    00:00
+                </div>
+            </div>
+
+            <div class="soal-container">
+                <h4 style="margin-bottom: 15px; color: var(--primary);">Soal No. <span id="nomor-tampil">1</span></h4>
+                <div id="teks-soal" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 25px;">Memuat soal...</div>
+                <div class="opsi-list" id="opsi-list">
+                    <!-- Opsi digenerate via JS -->
+                </div>
+            </div>
+
+            <div class="navigasi-soal">
+                <button class="btn btn-outline" onclick="soalSebelumnya()" id="btn-prev"><i class="fas fa-chevron-left"></i> Sebelumnya</button>
+                <button class="btn btn-primary" onclick="soalSelanjutnya()" id="btn-next">Selanjutnya <i class="fas fa-chevron-right"></i></button>
+                <button class="btn btn-success hidden" onclick="kirimUjian()" id="btn-kirim"><i class="fas fa-paper-plane"></i> Kirim Jawaban</button>
+            </div>
+
+            <div class="nomor-soal-grid" id="grid-nomor">
+                <!-- Tombol nomor via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= DASHBOARD ADMIN (GURU) ================= -->
+    <div id="admin-page" class="hidden">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-shield-alt"></i>
+                <h2>AdminPanel</h2>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item active" onclick="switchAdminTab('beranda', this)">
+                    <i class="fas fa-border-all"></i> Beranda
+                </div>
+                <div class="menu-item" onclick="switchAdminTab('rekap', this)">
+                    <i class="fas fa-chart-line"></i> Rekap Nilai
+                </div>
+                <div class="menu-item" onclick="switchAdminTab('siswa', this)">
+                    <i class="fas fa-user-friends"></i> Kelola Siswa
+                </div>
+                <div class="menu-item" onclick="switchAdminTab('soal', this)">
+                    <i class="fas fa-file-signature"></i> Kelola Soal
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar">J</div>
+                    <div class="user-info">
+                        <h4>JAYADI, S.Pd.</h4>
+                        <p>Guru PKN</p>
                     </div>
-                `;
-                updateBerandaStats(state.currentAdminData);
-            } 
-            else if (state.adminTab === 'rekap') {
-                area.innerHTML = `
-                    <div class="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
-                        <div>
-                            <h1 class="text-[28px] font-black text-[#1e293b] mb-1 tracking-tight">Rekap Nilai</h1>
-                            <p class="text-slate-500 text-[15px] font-medium">Pemantauan hasil ujian secara Real-Time.</p>
-                        </div>
-                        <div class="flex gap-2 self-start md:self-auto">
-                            <button onclick="exportToCSV()" class="px-4 py-2.5 bg-green-600 text-white font-bold rounded-xl shadow-lg shadow-green-200 hover:bg-green-700 hover:-translate-y-0.5 transition-all flex items-center gap-2 text-sm">
-                                <i class="fas fa-file-excel"></i> Download CSV
-                            </button>
-                            <button onclick="window.print()" class="px-4 py-2.5 bg-slate-800 text-white font-bold rounded-xl shadow-lg shadow-slate-200 hover:bg-slate-900 hover:-translate-y-0.5 transition-all flex items-center gap-2 text-sm">
-                                <i class="fas fa-print"></i> Cetak PDF
-                            </button>
-                        </div>
-                    </div>
+                </div>
+                <button class="btn btn-danger" style="width: 100%; padding: 10px;" onclick="logoutAdmin()">
+                    <i class="fas fa-sign-out-alt"></i> Keluar
+                </button>
+            </div>
+        </div>
 
-                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 flex flex-wrap items-center gap-4">
-                        <span class="text-sm font-bold text-slate-700">Filter Kelas:</span>
-                        <select id="adminFilterKelas" onchange="applyFilter()" class="px-4 py-2.5 rounded-xl border border-slate-300 bg-slate-50 text-sm font-bold outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-200 cursor-pointer transition-all">
+        <!-- Main Content -->
+        <div class="main-content">
+            
+            <!-- Tab Beranda -->
+            <div id="tab-beranda" class="admin-tab">
+                <div class="page-header">
+                    <h1>Dashboard Guru</h1>
+                    <p>Monitoring pengerjaan Ulangan Harian PKN SMP Islam Ar-Ridho.</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card purple">
+                        <div class="stat-title">Total Soal</div>
+                        <div class="stat-value" id="stat-soal">50</div>
+                        <div class="stat-icon"><i class="fas fa-file-alt"></i></div>
+                    </div>
+                    <div class="stat-card blue">
+                        <div class="stat-title">Siswa Terdaftar</div>
+                        <div class="stat-value" id="stat-siswa">0</div>
+                        <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    </div>
+                    <div class="stat-card green">
+                        <div class="stat-title">Sudah Selesai</div>
+                        <div class="stat-value" id="stat-selesai">0</div>
+                        <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                    </div>
+                </div>
+
+                <!-- NEW: Tabel Statistik Kelas -->
+                <div class="class-stats-container">
+                    <h3>Statistik Per Kelas</h3>
+                    <div style="overflow-x: auto;">
+                        <table id="table-class-stats">
+                            <thead>
+                                <tr>
+                                    <th>Kelas</th>
+                                    <th>Total Siswa</th>
+                                    <th>Laki-Laki (L)</th>
+                                    <th>Perempuan (P)</th>
+                                    <th>Selesai Ujian</th>
+                                    <th>Belum Selesai</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Diisi via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Rekap Nilai -->
+            <div id="tab-rekap" class="admin-tab hidden">
+                <div class="page-header">
+                    <h1>Rekap Nilai Siswa</h1>
+                    <p>Hasil ujian otomatis masuk dan terkalkulasi di sini.</p>
+                </div>
+                
+                <div class="data-table-container">
+                    <div class="table-toolbar">
+                        <select class="input-control" style="width: auto;" id="filter-nilai-kelas" onchange="renderTableNilai()">
                             <option value="ALL">Semua Kelas 9</option>
                             <option value="9.1">Kelas 9.1</option>
                             <option value="9.2">Kelas 9.2</option>
                             <option value="9.3">Kelas 9.3</option>
                             <option value="9.4">Kelas 9.4</option>
                         </select>
+                        <button class="btn btn-success" onclick="downloadCSV()"><i class="fas fa-file-excel"></i> Download Excel</button>
                     </div>
+                    <div style="overflow-x: auto;">
+                        <table id="table-nilai">
+                            <thead>
+                                <tr>
+                                    <th>Nama Siswa</th>
+                                    <th>Kelas</th>
+                                    <th>NIS</th>
+                                    <th>Status</th>
+                                    <th>Nilai Akhir</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-sm whitespace-nowrap">
-                                <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 font-bold uppercase text-[11px] tracking-wider">
-                                    <tr>
-                                        <th class="px-6 py-5 text-center w-10">No</th>
-                                        <th class="px-6 py-5">Nama Lengkap</th>
-                                        <th class="px-6 py-5 text-center">Kelas</th>
-                                        <th class="px-6 py-5 text-center">Status</th>
-                                        <th class="px-6 py-5 text-center">Nilai</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="adminTableBody" class="divide-y divide-slate-100 text-slate-700">
-                                    <tr><td colspan="5" class="text-center py-10 text-slate-500 font-medium">Memuat data...</td></tr>
-                                </tbody>
-                            </table>
+            <!-- Tab Kelola Siswa -->
+            <div id="tab-siswa" class="admin-tab hidden">
+                <div class="page-header">
+                    <h1>Kelola Data Siswa</h1>
+                    <p>Atur daftar siswa, jenis kelamin, dan reset ujian jika ada kendala.</p>
+                </div>
+                
+                <div class="data-table-container">
+                    <div class="table-toolbar">
+                        <select class="input-control" style="width: auto;" id="filter-kelola-kelas" onchange="renderTableSiswa()">
+                            <option value="ALL">Semua Kelas 9</option>
+                            <option value="9.1">Kelas 9.1</option>
+                            <option value="9.2">Kelas 9.2</option>
+                            <option value="9.3">Kelas 9.3</option>
+                            <option value="9.4">Kelas 9.4</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="bukaModalSiswa()"><i class="fas fa-plus"></i> Tambah Siswa</button>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table id="table-kelola-siswa">
+                            <thead>
+                                <tr>
+                                    <th>Nama Lengkap</th>
+                                    <th>Kelas</th>
+                                    <th>NIS</th>
+                                    <th>L/P</th>
+                                    <th>Status</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Kelola Soal -->
+            <div id="tab-soal" class="admin-tab hidden">
+                <div class="page-header">
+                    <h1>Bank Soal PKN</h1>
+                    <p>Manajemen soal pilihan ganda untuk ujian.</p>
+                </div>
+                
+                <div class="data-table-container">
+                    <div class="table-toolbar">
+                        <h3 style="color: var(--dark); margin: 0;">Total: <span id="count-soal-list">0</span> Soal</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-outline" style="color: #8B5CF6; border-color: #8B5CF6;" onclick="bukaModalAIGenerator()">
+                                <i class="fas fa-robot"></i> Generator AI
+                            </button>
+                            <button class="btn btn-primary" onclick="bukaModalSoal()"><i class="fas fa-plus"></i> Tambah Manual</button>
                         </div>
                     </div>
-                `;
-                applyFilter();
-            }
-            else {
-                // Untuk Tab Kelola Siswa & Kelola Soal
-                area.innerHTML = `
-                    <div class="h-full flex flex-col items-center justify-center text-center pt-20">
-                        <div class="w-24 h-24 bg-purple-50 rounded-full flex items-center justify-center text-purple-300 mb-6 text-4xl border border-purple-100">
-                            <i class="fas fa-tools"></i>
-                        </div>
-                        <h2 class="text-2xl font-bold text-slate-800 mb-2">Fitur Segera Hadir</h2>
-                        <p class="text-slate-500 max-w-sm">Menu manajemen ini sedang dalam tahap pengembangan dan akan segera tersedia pada pembaruan berikutnya.</p>
+                    <div style="overflow-x: auto;">
+                        <table id="table-kelola-soal">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Pertanyaan</th>
+                                    <th>Kunci Jawaban</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
                     </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- MODAL GENERATOR AI -->
+    <div id="modal-ai" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-robot" style="color: #8B5CF6;"></i> Generator Soal AI</h2>
+                <button class="btn btn-outline" style="border:none; padding:5px;" onclick="tutupModal('modal-ai')"><i class="fas fa-times"></i></button>
+            </div>
+            <div style="margin-bottom: 20px; padding: 15px; background: var(--primary-light); border-radius: 8px; color: var(--primary); font-size: 0.9rem;">
+                Upload file PDF/Word (.docx) berisi soal mentah (walau tanpa opsi jawaban). AI akan membaca teksnya, meracik opsi A-D, merekomendasikan kunci jawaban, dan langsung menyimpannya ke database!
+            </div>
+            
+            <div class="input-group">
+                <label>API Key Gemini Anda (Gratis dari Google AI Studio)</label>
+                <input type="password" id="ai-api-key" class="input-control" placeholder="AIzaSy...">
+                <small style="color: var(--gray-500); display: block; margin-top: 5px;">*Disimpan lokal di browser Bapak.</small>
+            </div>
+            
+            <div class="input-group">
+                <label>Upload File (PDF / DOCX / TXT)</label>
+                <input type="file" id="ai-file-input" class="input-control" accept=".pdf, .docx, .txt" onchange="bacaFileUpload(event)">
+            </div>
+            
+            <div style="text-align: center; margin: 10px 0; font-weight: bold; color: var(--gray-500);">ATAU</div>
+            
+            <div class="input-group">
+                <label>Paste Teks Soal / Materi Mentah</label>
+                <textarea id="ai-teks-mentah" class="input-control" rows="5" placeholder="Paste materi atau soal mentah di sini..."></textarea>
+            </div>
+
+            <button class="btn" style="width: 100%; background: #8B5CF6; color: white;" onclick="prosesGeneratorAI()">
+                <i class="fas fa-magic"></i> Generate & Simpan Otomatis
+            </button>
+        </div>
+    </div>
+
+    <!-- Modals lainnya (Konfirmasi Siswa, Form Siswa, Form Soal) -->
+    <div id="modal-konfirmasi" class="modal-overlay hidden">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <i class="fas fa-user-circle" style="font-size: 4rem; color: var(--primary); margin-bottom: 15px;"></i>
+            <h2 style="margin-bottom: 20px; color: var(--dark);">Konfirmasi Data</h2>
+            <div style="text-align: left; background: var(--gray-100); padding: 15px; border-radius: 8px; margin-bottom: 25px;">
+                <p><strong>Nama:</strong> <span id="k-nama"></span></p>
+                <p><strong>Kelas:</strong> <span id="k-kelas"></span></p>
+                <p><strong>NIS:</strong> <span id="k-nis"></span></p>
+                <p><strong>L/P:</strong> <span id="k-jk"></span></p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-outline" style="flex: 1;" onclick="tutupModal('modal-konfirmasi')">Batal</button>
+                <button class="btn btn-primary" style="flex: 1;" onclick="mulaiUjian()">Mulai Ujian</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK (Modular V9) -->
+    <script type="module">
+        import { initializeApp } from "[https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js](https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js)";
+        import { getFirestore, collection, onSnapshot, doc, getDoc, updateDoc, setDoc, deleteDoc } from "[https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js](https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js)";
+
+        // MENGGUNAKAN KONFIGURASI FIREBASE BAPAK JAYADI
+        const firebaseConfig = {
+            apiKey: "AIzaSyDExMRbUfrN-R8mKVznYCVpng4K6F8iaSg",
+            authDomain: "uh-pkn-kelas-9.firebaseapp.com",
+            projectId: "uh-pkn-kelas-9",
+            storageBucket: "uh-pkn-kelas-9.firebasestorage.app",
+            messagingSenderId: "468330303384",
+            appId: "1:468330303384:web:c5ed6f5b821ca1d58ae5ed",
+            measurementId: "G-5B951533XB"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // GLOBAL VARIABLES
+        let usersData = [];
+        let questionsData = [];
+        let currentUser = null;
+        
+        // VARIABEL STATE UJIAN SISWA
+        let soalAcakSiswa = [];
+        let indeksSoalSaatIni = 0;
+        let jawabanSiswa = {}; // Format: { id_soal: "a" }
+
+        // MENDENGARKAN PERUBAHAN DATABASE SECARA REAL-TIME (Tanpa Delay)
+        onSnapshot(collection(db, "users"), (snapshot) => {
+            usersData = [];
+            snapshot.forEach(doc => {
+                usersData.push({ id: doc.id, ...doc.data() });
+            });
+            // Update UI Admin secara realtime
+            if(!document.getElementById('admin-page').classList.contains('hidden')){
+                updateDashboardStats();
+                renderTableNilai();
+                renderTableSiswa();
+            }
+        });
+
+        onSnapshot(collection(db, "questions"), (snapshot) => {
+            questionsData = [];
+            snapshot.forEach(doc => {
+                questionsData.push({ id: doc.id, ...doc.data() });
+            });
+            if(!document.getElementById('admin-page').classList.contains('hidden')){
+                document.getElementById('stat-soal').innerText = questionsData.length;
+                document.getElementById('count-soal-list').innerText = questionsData.length;
+                renderTableSoal();
+            }
+        });
+
+        // 1. SISTEM LOGIN SISWA
+        window.switchLogin = function(tipe) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('form-siswa').classList.add('hidden');
+            document.getElementById('form-guru').classList.add('hidden');
+            
+            if(tipe === 'siswa') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('form-siswa').classList.remove('hidden');
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('form-guru').classList.remove('hidden');
+            }
+        }
+
+        window.loadSiswaList = function() {
+            const kelas = document.getElementById('kelas-select').value;
+            const selectNama = document.getElementById('nama-select');
+            selectNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
+            
+            if(kelas) {
+                const siswaKelas = usersData.filter(u => u.kelas === kelas).sort((a,b) => a.nama.localeCompare(b.nama));
+                siswaKelas.forEach(s => {
+                    let opt = document.createElement('option');
+                    opt.value = s.id;
+                    opt.textContent = s.nama;
+                    selectNama.appendChild(opt);
+                });
+                selectNama.disabled = false;
+            } else {
+                selectNama.disabled = true;
+            }
+        }
+
+        window.cekDataSiswa = function() {
+            const idSiswa = document.getElementById('nama-select').value;
+            if(!idSiswa) return Swal.fire('Error', 'Pilih kelas dan nama terlebih dahulu', 'error');
+
+            const siswa = usersData.find(u => u.id === idSiswa);
+            if(siswa.status === 'selesai') {
+                return Swal.fire('Informasi', 'Anda sudah menyelesaikan ujian ini.', 'info');
+            }
+
+            currentUser = siswa;
+            document.getElementById('k-nama').innerText = siswa.nama;
+            document.getElementById('k-kelas').innerText = siswa.kelas;
+            document.getElementById('k-nis').innerText = siswa.nis;
+            document.getElementById('k-jk').innerText = siswa.jk === 'L' ? 'Laki-Laki' : 'Perempuan';
+            
+            document.getElementById('modal-konfirmasi').classList.remove('hidden');
+        }
+
+        window.tutupModal = function(id) { document.getElementById(id).classList.add('hidden'); }
+
+        // 2. LOGIKA UJIAN (ACAK & AUTO-RESUME)
+        window.mulaiUjian = function() {
+            document.getElementById('modal-konfirmasi').classList.add('hidden');
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('ujian-page').classList.remove('hidden');
+            
+            document.getElementById('u-nama').innerText = currentUser.nama;
+            document.getElementById('u-kelas').innerText = `Kelas ${currentUser.kelas} \vert{} NIS:${currentUser.nis}`;
+
+            // CEK AUTO-RESUME DARI LOCAL STORAGE JIKA HP MATI
+            const savedSession = localStorage.getItem('ujian_sesi_' + currentUser.id);
+            if(savedSession) {
+                const sesiData = JSON.parse(savedSession);
+                soalAcakSiswa = sesiData.soal;
+                jawabanSiswa = sesiData.jawaban;
+                indeksSoalSaatIni = sesiData.lastIndex || 0;
+            } else {
+                // Buat acakan baru
+                soalAcakSiswa = acakArray([...questionsData]).map(s => {
+                    return {
+                        ...s,
+                        opsiAcak: acakArray([
+                            { key: 'a', teks: s.a }, { key: 'b', teks: s.b },
+                            { key: 'c', teks: s.c }, { key: 'd', teks: s.d }
+                        ])
+                    }
+                });
+                jawabanSiswa = {};
+                indeksSoalSaatIni = 0;
+                simpanSesiLokal(); // Simpan awal
+            }
+            
+            renderGridNomor();
+            tampilkanSoal(indeksSoalSaatIni);
+        }
+
+        function acakArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function simpanSesiLokal() {
+            localStorage.setItem('ujian_sesi_' + currentUser.id, JSON.stringify({
+                soal: soalAcakSiswa,
+                jawaban: jawabanSiswa,
+                lastIndex: indeksSoalSaatIni
+            }));
+        }
+
+        window.tampilkanSoal = function(index) {
+            indeksSoalSaatIni = index;
+            simpanSesiLokal(); // Update sesi tiap pindah soal
+
+            const soal = soalAcakSiswa[index];
+            document.getElementById('nomor-tampil').innerText = index + 1;
+            document.getElementById('teks-soal').innerText = soal.soal;
+            
+            const listOpsi = document.getElementById('opsi-list');
+            listOpsi.innerHTML = '';
+            
+            const huruf = ['A', 'B', 'C', 'D'];
+            soal.opsiAcak.forEach((ops, idx) => {
+                const isSelected = jawabanSiswa[soal.id] === ops.key;
+                const div = document.createElement('div');
+                div.className = `opsi-item ${isSelected ? 'selected' : ''}`;
+                div.onclick = () => pilihJawaban(soal.id, ops.key);
+                div.innerHTML = `
+                    <div class="opsi-label">${huruf[idx]}</div>
+                    <div>${ops.teks}</div>
                 `;
+                listOpsi.appendChild(div);
+            });
+
+            // Navigasi Button
+            document.getElementById('btn-prev').classList.toggle('hidden', index === 0);
+            document.getElementById('btn-next').classList.toggle('hidden', index === soalAcakSiswa.length - 1);
+            document.getElementById('btn-kirim').classList.toggle('hidden', index !== soalAcakSiswa.length - 1);
+
+            // Update Grid Aktif
+            document.querySelectorAll('.btn-nomor').forEach((btn, i) => {
+                btn.classList.toggle('aktif', i === index);
+            });
+        }
+
+        window.pilihJawaban = function(idSoal, keyJawaban) {
+            jawabanSiswa[idSoal] = keyJawaban;
+            simpanSesiLokal(); // Simpan jawaban ke memori HP
+            tampilkanSoal(indeksSoalSaatIni); // Re-render opsi
+            renderGridNomor(); // Update warna grid
+        }
+
+        window.soalSelanjutnya = function() { if(indeksSoalSaatIni < soalAcakSiswa.length - 1) tampilkanSoal(indeksSoalSaatIni + 1); }
+        window.soalSebelumnya = function() { if(indeksSoalSaatIni > 0) tampilkanSoal(indeksSoalSaatIni - 1); }
+
+        function renderGridNomor() {
+            const grid = document.getElementById('grid-nomor');
+            grid.innerHTML = '';
+            soalAcakSiswa.forEach((soal, i) => {
+                const btn = document.createElement('button');
+                btn.className = `btn-nomor ${jawabanSiswa[soal.id] ? 'dijawab' : ''}`;
+                btn.innerText = i + 1;
+                btn.onclick = () => tampilkanSoal(i);
+                grid.appendChild(btn);
+            });
+        }
+
+        window.kirimUjian = async function() {
+            const totalDijawab = Object.keys(jawabanSiswa).length;
+            if(totalDijawab < soalAcakSiswa.length) {
+                const konfirm = await Swal.fire({
+                    title: 'Belum Selesai!', text: `Anda baru menjawab ${totalDijawab} dari${soalAcakSiswa.length} soal. Yakin kirim?`,
+                    icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Kirim', cancelButtonText: 'Lanjutkan Ujian'
+                });
+                if(!konfirm.isConfirmed) return;
+            } else {
+                const konfirm2 = await Swal.fire({
+                    title: 'Kirim Jawaban?', text: 'Pastikan semua jawaban sudah benar.',
+                    icon: 'question', showCancelButton: true, confirmButtonText: 'Kirim Sekarang'
+                });
+                if(!konfirm2.isConfirmed) return;
+            }
+
+            Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+
+            // Hitung Nilai (Benar * 2 untuk 50 soal = max 100)
+            let benar = 0;
+            for(let idSoal in jawabanSiswa) {
+                const soalAsli = questionsData.find(s => s.id === idSoal);
+                if(soalAsli && soalAsli.jawaban === jawabanSiswa[idSoal]) benar++;
+            }
+            const nilaiAkhir = Math.round((benar / soalAcakSiswa.length) * 100);
+
+            try {
+                // Update ke Firestore
+                await updateDoc(doc(db, "users", currentUser.id), {
+                    status: 'selesai', nilai: nilaiAkhir, jawaban: jawabanSiswa, waktu_selesai: new Date().toISOString()
+                });
+                
+                // Hapus Sesi Lokal agar tidak resume
+                localStorage.removeItem('ujian_sesi_' + currentUser.id);
+
+                Swal.fire('Berhasil!', `Ujian selesai. Nilai Anda: ${nilaiAkhir}`, 'success').then(() => {
+                    window.location.reload();
+                });
+            } catch(e) {
+                Swal.fire('Error', 'Gagal mengirim. Cek koneksi internet Anda!', 'error');
             }
         }
 
-        window.fetchAdminData = () => {
-            if (isDemoMode) {
-                state.currentAdminData = state.allStudents;
-                updateAdminView();
-                return;
-            }
-
-            if(state.unsubscribeAdmin) state.unsubscribeAdmin();
-            state.unsubscribeAdmin = onSnapshot(query(studentsRef), (snapshot) => {
-                let dataSiswa = [];
-                snapshot.forEach(doc => dataSiswa.push(doc.data()));
-                state.currentAdminData = dataSiswa;
-                updateAdminView();
-            });
-        };
-
-        function updateAdminView() {
-            if(state.adminTab === 'beranda') {
-                updateBerandaStats(state.currentAdminData);
-            } else if(state.adminTab === 'rekap') {
-                applyFilter();
+        // 3. SISTEM ADMIN GURU
+        window.loginGuru = function() {
+            const pin = document.getElementById('pin-guru').value;
+            if(pin === '202099') {
+                document.getElementById('login-page').classList.add('hidden');
+                document.getElementById('admin-page').classList.remove('hidden');
+                updateDashboardStats(); // Langsung render
+            } else {
+                Swal.fire('Error', 'PIN salah!', 'error');
             }
         }
+        
+        window.logoutAdmin = function() { window.location.reload(); }
 
-        function updateBerandaStats(data) {
-            const elTotal = document.getElementById('widgetTotalSiswa');
-            const elSelesai = document.getElementById('widgetSelesai');
-            if(elTotal && elSelesai && data) {
-                elTotal.innerText = data.length; // Mengambil angka real dari database (173 anak kelas 9)
-                const selesaiCount = data.filter(s => s.status_ujian === true).length;
-                elSelesai.innerText = selesaiCount;
-            }
+        window.switchAdminTab = function(tabName, el) {
+            document.querySelectorAll('.admin-tab').forEach(t => t.classList.add('hidden'));
+            document.querySelectorAll('.sidebar-menu .menu-item').forEach(m => m.classList.remove('active'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            el.classList.add('active');
         }
 
-        window.applyFilter = () => {
-            const filterEl = document.getElementById('adminFilterKelas');
-            const tbody = document.getElementById('adminTableBody');
-            if(!filterEl || !tbody || !state.currentAdminData) return;
+        function updateDashboardStats() {
+            document.getElementById('stat-siswa').innerText = usersData.length;
+            const selesai = usersData.filter(u => u.status === 'selesai').length;
+            document.getElementById('stat-selesai').innerText = selesai;
 
-            const filterKls = filterEl.value;
-            let data = state.currentAdminData;
-            
-            if(filterKls !== 'ALL') data = data.filter(s => s.kelas === filterKls);
-            
-            // Urutkan berdasarkan kelas, lalu nama
-            data.sort((a, b) => {
-                if(a.kelas !== b.kelas) return a.kelas.localeCompare(b.kelas);
-                return a.nama.localeCompare(b.nama);
-            });
-            
-            renderAdminTable(data);
-        };
-
-        window.exportToCSV = () => {
-            const filterEl = document.getElementById('adminFilterKelas');
-            const filterKls = filterEl ? filterEl.value : 'ALL';
-            let data = state.currentAdminData || [];
-            
-            if(filterKls !== 'ALL') data = data.filter(s => s.kelas === filterKls);
-
-            if(data.length === 0) {
-                alert("Tidak ada data untuk di-download.");
-                return;
-            }
-
-            const filename = filterKls === 'ALL' ? 'Rekap_Nilai_Semua_Kelas_9.csv' : `Rekap_Nilai_Kelas_${filterKls}.csv`;
-
-            let csvContent = "No,NIS,NISN,Nama Lengkap,Jenis Kelamin,Kelas,Status Ujian,Nilai\n";
-            
-            data.forEach((s, index) => {
-                const status = s.status_ujian ? "Selesai" : "Belum";
-                const nilai = s.status_ujian ? s.nilai : "0";
-                csvContent += `${index + 1},="${s.nis}",="${s.nisn}","${s.nama}",${s.jk},${s.kelas},${status},${nilai}\n`;
+            // Kalkulasi Statistik Kelas
+            let statKelas = {};
+            usersData.forEach(u => {
+                if(!statKelas[u.kelas]) statKelas[u.kelas] = { L: 0, P: 0, total: 0, selesai: 0 };
+                statKelas[u.kelas].total++;
+                if(u.jk === 'L') statKelas[u.kelas].L++;
+                if(u.jk === 'P') statKelas[u.kelas].P++;
+                if(u.status === 'selesai') statKelas[u.kelas].selesai++;
             });
 
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const tbody = document.querySelector('#table-class-stats tbody');
+            tbody.innerHTML = '';
+            Object.keys(statKelas).sort().forEach(kls => {
+                const s = statKelas[kls];
+                const blm = s.total - s.selesai;
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-weight:bold; color:var(--primary);">${kls}</td>
+                        <td>${s.total} Siswa</td>
+                        <td>${s.L}</td>
+                        <td>${s.P}</td>
+                        <td><span class="badge badge-success">${s.selesai} Selesai</span></td>
+                        <td><span class="badge badge-warning">${blm} Belum</span></td>
+                    </tr>
+                `;
+            });
+        }
+
+        window.renderTableNilai = function() {
+            const filterKelas = document.getElementById('filter-nilai-kelas').value;
+            let list = filterKelas === 'ALL' ? usersData : usersData.filter(u => u.kelas === filterKelas);
+            list.sort((a,b) => a.nama.localeCompare(b.nama));
+
+            const tbody = document.querySelector('#table-nilai tbody');
+            tbody.innerHTML = '';
+            list.forEach(u => {
+                let badge = u.status === 'selesai' ? `<span class="badge badge-success">Selesai</span>` : `<span class="badge badge-warning">Belum</span>`;
+                let nilai = u.status === 'selesai' ? `<strong style="color:var(--primary); font-size:1.1rem;">${u.nilai}</strong>` : '-';
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${u.nama}</td><td>${u.kelas}</td><td>${u.nis}</td>
+                        <td>${badge}</td><td>${nilai}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        window.downloadCSV = function() {
+            const filterKelas = document.getElementById('filter-nilai-kelas').value;
+            let list = filterKelas === 'ALL' ? usersData : usersData.filter(u => u.kelas === filterKelas);
+            list.sort((a,b) => a.nama.localeCompare(b.nama));
+
+            let csvContent = "data:text/csv;charset=utf-8,Nama Lengkap,Kelas,NIS,Status,Nilai\n";
+            list.forEach(u => {
+                let status = u.status === 'selesai' ? "Selesai" : "Belum";
+                let nilai = u.status === 'selesai' ? u.nilai : "";
+                csvContent += `${u.nama},${u.kelas},${u.nis},${status},${nilai}\n`;
+            });
+            const encodedUri = encodeURI(csvContent);
             const link = document.createElement("a");
-            const url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", filename);
-            link.style.visibility = 'hidden';
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Rekap_Nilai_PKN_${filterKelas}.csv`);
             document.body.appendChild(link);
             link.click();
-            document.body.removeChild(link);
-        };
-
-        function renderAdminTable(data) {
-            const tbody = document.getElementById('adminTableBody');
-            if(!tbody) return;
-
-            let html = '';
-            if(data.length === 0) {
-                html = `<tr><td colspan="5" class="text-center py-10 text-slate-500 font-medium">Belum ada data siswa.</td></tr>`;
-            } else {
-                data.forEach((s, idx) => {
-                    const statusBadge = s.status_ujian 
-                        ? `<span class="bg-green-100 text-green-700 border border-green-200 px-3 py-1 rounded-lg text-[10px] font-bold tracking-wide uppercase">Selesai</span>` 
-                        : `<span class="bg-slate-100 text-slate-500 border border-slate-200 px-3 py-1 rounded-lg text-[10px] font-bold tracking-wide uppercase">Belum</span>`;
-                    
-                    const nilaiFmt = s.status_ujian ? `<span class="font-black text-[#7e22ce] text-lg">${s.nilai}</span>` : '<span class="text-slate-300 font-bold">-</span>';
-                    
-                    html += `
-                        <tr class="hover:bg-slate-50 transition-colors duration-150">
-                            <td class="px-6 py-4 text-center font-medium">${idx + 1}</td>
-                            <td class="px-6 py-4">
-                                <div class="font-bold text-slate-800">${s.nama}</div>
-                                <div class="text-[11px] text-slate-500 font-mono mt-0.5">NIS: ${s.nis}</div>
-                            </td>
-                            <td class="px-6 py-4 text-center font-bold text-slate-600">${s.kelas}</td>
-                            <td class="px-6 py-4 text-center">${statusBadge}</td>
-                            <td class="px-6 py-4 text-center">${nilaiFmt}</td>
-                        </tr>
-                    `;
-                });
-            }
-            tbody.innerHTML = html;
         }
 
-        window.adminLogout = async () => {
-            state.isAdmin = false;
-            state.adminTab = 'beranda';
-            window.location.reload();
-        };
+        // KELOLA SISWA (RESET & DELETE)
+        window.renderTableSiswa = function() {
+            const filterKelas = document.getElementById('filter-kelola-kelas').value;
+            let list = filterKelas === 'ALL' ? usersData : usersData.filter(u => u.kelas === filterKelas);
+            list.sort((a,b) => a.nama.localeCompare(b.nama));
 
-        // ==========================================
-        // 10. INISIALISASI SAAT HALAMAN DIMUAT
-        // ==========================================
-        window.onload = async () => {
-            if (!isDemoMode) {
-                try { await signInAnonymously(auth); } catch(e) {}
+            const tbody = document.querySelector('#table-kelola-siswa tbody');
+            tbody.innerHTML = '';
+            list.forEach(u => {
+                let statusTxt = u.status === 'selesai' ? 'Selesai' : 'Belum';
+                let btnReset = u.status === 'selesai' ? `<button class="btn-reset" onclick="resetUjian('${u.id}')"><i class="fas fa-undo"></i> Reset</button>` : '';
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${u.nama}</td><td>${u.kelas}</td><td>${u.nis}</td><td>${u.jk}</td>
+                        <td>${statusTxt}</td>
+                        <td class="action-btns">
+                            ${btnReset}
+                            <button class="btn-delete" onclick="hapusSiswa('${u.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        window.resetUjian = async function(id) {
+            if(confirm('Yakin reset ujian siswa ini? Data nilainya akan hilang dan dia bisa ujian ulang.')) {
+                await updateDoc(doc(db, "users", id), { status: 'belum', nilai: 0, jawaban: {} });
+                Swal.fire('Berhasil', 'Ujian telah direset.', 'success');
             }
+        }
+        window.hapusSiswa = async function(id) {
+            if(confirm('Yakin hapus data siswa ini dari sistem?')) {
+                await deleteDoc(doc(db, "users", id));
+            }
+        }
+
+        // KELOLA SOAL (HAPUS)
+        window.renderTableSoal = function() {
+            const tbody = document.querySelector('#table-kelola-soal tbody');
+            tbody.innerHTML = '';
+            questionsData.forEach((q, i) => {
+                let ansText = q[q.jawaban] || '-';
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${i+1}</td>
+                        <td style="max-width: 300px;">${q.soal}</td>
+                        <td style="color:var(--secondary); font-weight:bold;">${q.jawaban.toUpperCase()}.${ansText}</td>
+                        <td class="action-btns">
+                            <button class="btn-delete" onclick="hapusSoal('${q.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+        window.hapusSoal = async function(id) {
+            if(confirm('Hapus soal ini?')) await deleteDoc(doc(db, "questions", id));
+        }
+
+        // 4. FITUR GENERATOR SOAL AI (PDF/WORD/TEXT)
+        window.bukaModalAIGenerator = function() {
+            // Ambil API key yang tersimpan (jika ada)
+            const savedKey = localStorage.getItem('gemini_api_key');
+            if(savedKey) document.getElementById('ai-api-key').value = savedKey;
             
-            // Setup DB Dummy & Render Pertama
-            await autoSetupDatabase();
-        };
+            document.getElementById('ai-teks-mentah').value = '';
+            document.getElementById('modal-ai').classList.remove('hidden');
+        }
+
+        window.bacaFileUpload = async function(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            
+            document.getElementById('ai-teks-mentah').value = "Sedang mengekstrak teks dari file...";
+            
+            try {
+                if(file.name.endsWith('.txt')) {
+                    const text = await file.text();
+                    document.getElementById('ai-teks-mentah').value = text;
+                } 
+                else if(file.name.endsWith('.docx') || file.name.endsWith('.doc')) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const result = await mammoth.extractRawText({arrayBuffer: arrayBuffer});
+                    document.getElementById('ai-teks-mentah').value = result.value;
+                }
+                else if(file.name.endsWith('.pdf')) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+                    let fullText = "";
+                    for(let i = 1; i <= pdf.numPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items.map(item => item.str).join(" ");
+                        fullText += pageText + "\n";
+                    }
+                    document.getElementById('ai-teks-mentah').value = fullText;
+                }
+            } catch(err) {
+                Swal.fire('Error File', 'Gagal membaca isi file. Pastikan format file benar atau gunakan Paste Teks.', 'error');
+                document.getElementById('ai-teks-mentah').value = "";
+            }
+        }
+
+        window.prosesGeneratorAI = async function() {
+            const apiKey = document.getElementById('ai-api-key').value.trim();
+            const teksMentah = document.getElementById('ai-teks-mentah').value.trim();
+            
+            if(!apiKey) return Swal.fire('Error', 'API Key Gemini wajib diisi!', 'error');
+            if(!teksMentah) return Swal.fire('Error', 'Masukkan atau Upload teks/soal mentah terlebih dahulu!', 'error');
+
+            // Simpan API key
+            localStorage.setItem('gemini_api_key', apiKey);
+
+            Swal.fire({ title: 'AI Sedang Bekerja...', text: 'Menganalisis teks dan membuat soal...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+
+            const prompt = `Anda adalah asisten guru pembuat soal. 
+            Berikut materi/soal mentahnya: 
+            """${teksMentah}"""
+            
+            Tugas Anda:
+            1. Ekstrak menjadi soal pilihan ganda. 
+            2. Buatkan opsi jawaban a, b, c, d jika belum ada, atau rapikan jika sudah ada.
+            3. Analisis dan tentukan Kunci Jawaban yang benar (huruf a/b/c/d).
+            
+            OUTPUT WAJIB ARRAY JSON MURNI seperti ini (tanpa awalan \`\`\`json):
+            [
+              {"soal": "Teks pertanyaan?", "a": "Opsi A", "b": "Opsi B", "c": "Opsi C", "d": "Opsi D", "jawaban": "a"}
+            ]`;
+
+            try {
+                const response = await fetch(`[https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=$){apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: { temperature: 0.2 }
+                    })
+                });
+
+                const data = await response.json();
+                if(!data.candidates) throw new Error("API Key salah atau limit harian habis.");
+                
+                let responsTeks = data.candidates[0].content.parts[0].text;
+                // Bersihkan markdown json jika ada
+                responsTeks = responsTeks.replace(/```json/g, '').replace(/```/g, '').trim();
+                
+                const arraySoal = JSON.parse(responsTeks);
+                
+                // Simpan ke Firestore
+                let berhasil = 0;
+                for(let item of arraySoal) {
+                    const idBaru = 'soal_' + Date.now() + Math.floor(Math.random()*1000);
+                    await setDoc(doc(db, "questions", idBaru), item);
+                    berhasil++;
+                }
+
+                tutupModal('modal-ai');
+                Swal.fire('Berhasil!', `${berhasil} Soal berhasil di-generate AI dan masuk ke Database.`, 'success');
+
+            } catch (err) {
+                console.error(err);
+                Swal.fire('Error AI', 'Terjadi kesalahan saat memproses. Pastikan Format Teks dan API Key Valid. Atau coba gunakan prompt yang lebih spesifik.', 'error');
+            }
+        }
     </script>
 </body>
 </html>
