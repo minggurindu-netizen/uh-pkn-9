@@ -413,9 +413,8 @@
             
             <div style="margin-bottom: 20px; padding: 15px; background: var(--primary-light); border-radius: 8px; color: var(--primary); font-size: 0.9rem;">
                 <b>Sistem AI Otomatis Telah Aktif!</b> Upload file PDF/Word (.docx) atau paste soal mentah. AI akan membaca teksnya, meracik opsi A-D, dan mencari kunci jawabannya.
+                <br><br><span style="color: #EF4444; font-weight: bold;">Tips Penting:</span> Jika PDF terlalu panjang, AI berpotensi error karena kepenuhan. Mohon upload sebagian (misal: 10-20 soal sekali upload).
             </div>
-            
-            <!-- KOLOM API KEY SUDAH DIHAPUS TOTAL -->
             
             <div class="input-group">
                 <label>Upload File (PDF / DOCX / TXT)</label>
@@ -458,7 +457,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, getDoc, updateDoc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
-        // Konfigurasi Database Pak Jayadi
         const firebaseConfig = {
             apiKey: "AIzaSyDExMRbUfrN-R8mKVznYCVpng4K6F8iaSg",
             authDomain: "uh-pkn-kelas-9.firebaseapp.com",
@@ -480,7 +478,6 @@
             let indeksSoalSaatIni = 0;
             let jawabanSiswa = {}; 
 
-            // Listener Firebase
             onSnapshot(collection(db, "users"), (snapshot) => {
                 usersData = [];
                 snapshot.forEach(doc => {
@@ -505,7 +502,6 @@
                 }
             });
 
-            // Global Window Functions
             window.switchLogin = function(tipe) {
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                 document.getElementById('form-siswa').classList.add('hidden');
@@ -559,7 +555,7 @@
                 document.getElementById('login-page').classList.add('hidden');
                 document.getElementById('ujian-page').classList.remove('hidden');
                 document.getElementById('u-nama').innerText = currentUser.nama;
-                document.getElementById('u-kelas').innerText = `Kelas ${currentUser.kelas} \vert{} NIS:${currentUser.nis}`;
+                document.getElementById('u-kelas').innerText = `Kelas ${currentUser.kelas} | NIS: ${currentUser.nis}`;
 
                 const savedSession = localStorage.getItem('ujian_sesi_' + currentUser.id);
                 if(savedSession) {
@@ -653,7 +649,7 @@
                 const totalDijawab = Object.keys(jawabanSiswa).length;
                 if(totalDijawab < soalAcakSiswa.length) {
                     const konfirm = await Swal.fire({
-                        title: 'Belum Selesai!', text: `Anda baru menjawab ${totalDijawab} dari${soalAcakSiswa.length} soal. Yakin kirim?`,
+                        title: 'Belum Selesai!', text: `Anda baru menjawab ${totalDijawab} dari ${soalAcakSiswa.length} soal. Yakin kirim?`,
                         icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Kirim', cancelButtonText: 'Lanjutkan Ujian'
                     });
                     if(!konfirm.isConfirmed) return;
@@ -772,7 +768,6 @@
                 link.click();
             };
 
-            // LOGIKA UPLOAD SISWA (CSV)
             window.renderTableSiswa = function() {
                 const filterKelas = document.getElementById('filter-kelola-kelas').value;
                 let list = filterKelas === 'ALL' ? usersData : usersData.filter(u => u.kelas === filterKelas);
@@ -869,7 +864,7 @@
                 if(confirm('Hapus soal ini?')) await deleteDoc(doc(db, "questions", id));
             };
 
-            // LOGIKA GENERATOR AI (API KEY SUDAH OTOMATIS)
+            // LOGIKA GENERATOR AI YANG DIPERBARUI (ANTI-ERROR)
             window.bukaModalAIGenerator = function() {
                 document.getElementById('ai-teks-mentah').value = '';
                 document.getElementById('modal-ai').classList.remove('hidden');
@@ -909,15 +904,15 @@
             };
 
             window.prosesGeneratorAI = async function() {
-                // API KEY BAPAK JAYADI SUDAH TERTANAM OTOMATIS DI SINI!
                 const apiKey = "AIzaSyBQ6KInIm35AvTUs6S32pQza5Q1Kae2sCI";
                 const teksMentah = document.getElementById('ai-teks-mentah').value.trim();
                 
                 if(!teksMentah) return Swal.fire('Error', 'Masukkan atau Upload teks/soal mentah terlebih dahulu!', 'error');
 
-                Swal.fire({ title: 'AI Sedang Bekerja...', text: 'Menganalisis teks dan membuat soal...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+                Swal.fire({ title: 'AI Sedang Berpikir...', text: 'Menganalisis materi dan mencari kunci jawaban...', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
 
-                const prompt = `Anda adalah asisten guru pembuat soal.\nBerikut materi/soal mentahnya:\n"""${teksMentah}"""\n\nTugas Anda:\n1. Ekstrak menjadi soal pilihan ganda.\n2. Buatkan opsi jawaban a, b, c, d jika belum ada, atau rapikan jika sudah ada.\n3. Analisis dan tentukan Kunci Jawaban yang benar (huruf a/b/c/d).\n\nOUTPUT WAJIB ARRAY JSON MURNI seperti ini (tanpa awalan \`\`\`json):\n[\n  {"soal": "Teks pertanyaan?", "a": "Opsi A", "b": "Opsi B", "c": "Opsi C", "d": "Opsi D", "jawaban": "a"}\n]`;
+                // Prompt yang jauh lebih ketat agar AI tidak mengeluarkan basa-basi
+                const prompt = `Buatkan soal pilihan ganda dari materi berikut:\n\n${teksMentah}\n\nATURAN MUTLAK:\n1. Keluarkan HANYA format JSON Array.\n2. TIDAK BOLEH ADA TEKS ATAU KATA-KATA LAIN di luar struktur JSON.\n3. Format wajib persis seperti ini:\n[{"soal": "Tanya?", "a": "OpsiA", "b": "OpsiB", "c": "OpsiC", "d": "OpsiD", "jawaban": "a"}]`;
 
                 try {
                     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
@@ -925,23 +920,37 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             contents: [{ parts: [{ text: prompt }] }],
-                            generationConfig: { temperature: 0.2 }
+                            generationConfig: { temperature: 0.1 } // Turunkan temperature agar stabil dan patuh aturan
                         })
                     });
 
+                    if (!response.ok) throw new Error("Gagal terhubung ke server AI.");
+                    
                     const data = await response.json();
                     if(!data.candidates) throw new Error("Limit harian habis.");
                     
                     let responsTeks = data.candidates[0].content.parts[0].text;
-                    responsTeks = responsTeks.replace(/```json/g, '').replace(/```/g, '').trim();
                     
+                    // Filter Cerdas: Mencari awal dan akhir kurung siku array agar kebal basa-basi AI
+                    const startIndex = responsTeks.indexOf('[');
+                    const endIndex = responsTeks.lastIndexOf(']');
+                    
+                    if(startIndex === -1 || endIndex === -1) {
+                        throw new Error("AI membalas dengan format yang salah.");
+                    }
+                    
+                    // Hanya potong bagian Array JSON-nya saja
+                    responsTeks = responsTeks.substring(startIndex, endIndex + 1);
                     const arraySoal = JSON.parse(responsTeks);
                     
                     let berhasil = 0;
                     for(let item of arraySoal) {
-                        const idBaru = 'soal_' + Date.now() + Math.floor(Math.random()*1000);
-                        await setDoc(doc(db, "questions", idBaru), item);
-                        berhasil++;
+                        // Pastikan komponen soal lengkap sebelum masuk database
+                        if(item.soal && item.a && item.b && item.c && item.d && item.jawaban) {
+                            const idBaru = 'soal_' + Date.now() + Math.floor(Math.random()*1000);
+                            await setDoc(doc(db, "questions", idBaru), item);
+                            berhasil++;
+                        }
                     }
 
                     document.getElementById('modal-ai').classList.add('hidden');
@@ -949,7 +958,7 @@
 
                 } catch (err) {
                     console.error(err);
-                    Swal.fire('Error AI', 'Terjadi kesalahan saat memproses materi. Pastikan materi mencukupi.', 'error');
+                    Swal.fire('Error AI', `Gagal meracik soal. Kemungkinan teks materi terlalu panjang. Cobalah mengupload sebagian-sebagian.`, 'error');
                 }
             };
         } catch (error) {
