@@ -218,7 +218,7 @@
         </div>
     </div>
 
-    <!-- MODAL KONFIRMASI (TERKUNCI DI TENGAH LAYAR) -->
+    <!-- MODAL KONFIRMASI -->
     <div id="modal-konfirm" class="modal-overlay hidden">
         <div class="modal-content" style="text-align: center;">
             <div style="background: #ECFDF5; width: 75px; height: 75px; border-radius: 22px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
@@ -246,43 +246,7 @@
         </div>
     </div>
 
-    <!-- MODAL PASTE EXCEL -->
-    <div id="modal-paste" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                <h2 id="m-title" style="font-weight: 800;">Paste Data</h2>
-                <button class="btn btn-outline" style="border:none; padding:8px; width:auto;" onclick="tutupModal('modal-paste')"><i class="fas fa-times"></i></button>
-            </div>
-            <div style="background: #FEF3C7; padding: 15px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 20px; border: 1px solid #FCD34D;">
-                <b style="color: #D97706;">Format Tabel Excel:</b><br><code id="m-format" style="color: var(--dark); font-weight: 800; display: block; margin-top: 5px;"></code>
-            </div>
-            <input type="hidden" id="m-type">
-            <textarea id="m-text" class="input-control" rows="8" placeholder="Paste (Ctrl+V) tabel dari Excel di sini..."></textarea>
-            <button class="btn btn-primary" style="margin-top: 15px;" onclick="simpanPaste()"><i class="fas fa-save"></i> Simpan Data</button>
-        </div>
-    </div>
-
-    <!-- MODAL AI -->
-    <div id="modal-ai" class="modal-overlay hidden">
-        <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="font-weight: 800;"><i class="fas fa-robot" style="color: var(--primary);"></i> AI Generator</h2>
-                <button class="btn btn-outline" style="border:none; padding:8px; width:auto;" onclick="tutupModal('modal-ai')"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="input-group">
-                <label>Upload File (PDF / DOCX)</label>
-                <input type="file" id="ai-file-input" class="input-control" accept=".pdf, .docx, .txt" onchange="bacaFileUpload(event)">
-            </div>
-            <div style="text-align: center; font-weight: 800; color: var(--gray-500); margin: 15px 0;">ATAU</div>
-            <div class="input-group">
-                <label>Paste Teks Materi</label>
-                <textarea id="ai-teks-mentah" class="input-control" rows="5" placeholder="Paste teks materi di sini..."></textarea>
-            </div>
-            <button class="btn btn-primary" onclick="prosesGeneratorAI()"><i class="fas fa-magic"></i> Buat Soal Otomatis</button>
-        </div>
-    </div>
-
-    <!-- SCRIPT UTAMA & FIREBASE (OFFLINE FIRST / TANPA LOADING DB UNTUK MUNCULKAN NAMA) -->
+    <!-- SCRIPT UTAMA & FIREBASE (OFFLINE FIRST) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
         import { getFirestore, collection, onSnapshot, doc, updateDoc, setDoc, deleteDoc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
@@ -297,14 +261,12 @@
         const DB_USERS = "siswa_pkn_final";
         const DB_SOAL = "soal_pkn_final";
 
-        // ==============================================================================
-        // MASTER DATA OFFLINE (NAMA DAN SOAL LANGSUNG MUNCUL DETIK ITU JUGA!)
-        // ==============================================================================
         let users = [];
         let questions = [];
         let userNow = null;
         let soalSiswa = [], idxSoal = 0, jawaban = {};
 
+        // DATA MASTER LOKAL (LANGSUNG TAMPIL 0 DETIK)
         const dataSiswaString = "ABIDZAR AL GHIFARI LUBIS|9.1|242507001|0112250701|L^AISHA RIZKYA ZHAFIRA|9.1|242507185|0118468729|P^ALDIAN FAIZ ABIMANYU|9.1|242507049|0115521932|L^AN NISA AULIA RAHMAH|9.1|242507051|03113035206|P^ASSYIPA ALDAWIYAH|9.1|242507140|3126598859|P^ATARA NAWAWINA ALAYA|9.1|242507006|3115132886|P^DANISH ALDRIC KANDELA|9.1|242507053|0129682086|L^ELVINA RAMADHANI|9.1|242507011|0128031712|P^FAKHRI AL YASIN|9.1|242507144|0125950149|L^HAIKAL YUSUF MUTAQIN|9.1|242507146|0126738383|L^HELMAWATI NISPI|9.1|242507148|0127732474|P^KALILA AZZAHRA AGSYA|9.1|242507150|0123215234|P^KARIN PUTRI RAHMANIAR|9.1|242507151|0123810952|P^MEDINA RAYANI PUTRI|9.1|242507154|0111262830|P^MUHAMAD FIKRI HAIKAL|9.1|242507067|3115858704|L^MUHAMAD KURNIAWAN|9.1|242507110|3128561717|L^MUHAMAD RISKI|9.1|242507163|0119272535|L^MUHAMAD RIZKY ALFARIZI|9.1|242507156|0114707555|L^MUHAMAD YAHYA SEPTIAN|9.1|242507023|3114407011|L^MUHAMMAD AMMAR AZZIKRA|9.1|242507026|0121453887|L^MUHAMMAD AZZAM ZAIDDAN|9.1|242507113|0127804343|L^MUHAMMAD FADIL ALFARIZKY|9.1|242507066|0125048100|L^MUHAMMAD IMAM RIYADHUSSOLIHIN|9.1|242507029|0121991684|L^MUHAMMAD NICKY PRATAMA|9.1|242507074|0112208538|L^MULYANA BADAR MUHTAR|9.1|242507167|0126632131|L^NAJLAA KIRANA PUTRI|9.1|242507116|0126757694|P^NARENDRA DARVESH PRADITYA|9.1|242507117|0129767780|L^NAZWA ZAKIYAH|9.1|242507031|3122953563|P^NOVITA DWI LESTARI|9.1|242507032|3128551310|P^RAFA FAEYZA ADITYA|9.1|242507123|0124575918|L^RAFI IMADUL BILAD|9.1|242507081|0118347648|L^RIDHONINO SETIAWAN|9.1|242507174|0115176085|L^RIYAN AZZARI DALIMUNTE|9.1|242507126|0124959392|L^SIFA RAMADANI|9.1|242507129|0114585043|P^SILVIA HIDAYAT|9.1|242507130|0115912357|P^SITI SILVIAWATI|9.1|242507086|3120214186|P^SITI WINDI AZAHIRA|9.1|242507087|0116017127|P^SITI ZAHIRA|9.1|242507088|0129243631|P^SYLA RAHMAΝΙΑ|9.1|242507186|0122849032|P^VIOLA ZULFIANI|9.1|242507089|0117682754|P^VISKA ARIANI|9.1|242507090|3125102794|P^WILDAN NURULLOH|9.1|242507046|3112799899|L^ZIDAN ALGIFARI SURYAMAN|9.1|242507179|0112922469|L^AFRINA RAFANIA RHAMDANI|9.2|242507093|0123145389|P^AL ZAHIRA SRI WIJAYA|9.2|242507094|0112458312|P^ALFAN ANDRIAN|9.2|242507050|3110372642|L^ARSYAVIN WIDAN SAPUTRA|9.2|242507005|3114044196|L^ARYA NAILUL KHALIL|9.2|242507139|0119108501|L^AURORA MIKHAYLA RAMADANTI|9.2|242507052|3126814449|P^AZZAHRA WIDYASIH PUTRI|9.2|242507141|0121057775|P^BUNGA KEYSHA DARMAWAN|9.2|242507008|3128932716|P^DENDY ALFAREZ PUTRA WIDODO|9.2|242507054|0124462929|L^EGI|9.2|242507010|3114633046|L^FAHMI PUTRA RIFA'I|9.2|242507056|3111616100|L^FAIRUZ FUADI SAPUTRA|9.2|242507101|3114479502|L^FAJAR ADHITAMA|9.2|242507102|3125296816|L^FARASKA SURYA FADILAH|9.2|242507145|0127713764|L^FARSHA FAIZI SAPUTRA|9.2|242507057|0113281236|L^HASBI ALGANI|9.2|242507147|0117447040|L^IBRAHIM DZAKI CHANDRA|9.2|242507104|0111135296|L^INTAN SYIFA MUFADHILAH|9.2|242507149|0129554291|P^IRVAN MAULANA|9.2|242507060|0116127084|L^JERRY AHMAD AL-FARIZZI|9.2|242507016|0121692888|L^KALILA RIFDA|9.2|242507017|0126563139|P^KHANZA CHAERUNNISA|9.2|242507063|3122278981|P^MUHAMAD ALVIN MULYADI|9.2|242507073|0127635435|L^MUHAMAD DHARIN DIMYATI|9.2|242507021|0117756964|L^MUHAMAD RAFI FAHRUROHMAN|9.2|242507111|3115697782|L^MUHAMMAD AZZMI KHAIRAN|9.2|242507114|0114059284|L^MUHAMMAD ENO KURNIAWAN|9.2|242507159|3127311018|L^MUHAMMAD FAHRY FIQRIANI|9.2|242507161|0122039029|L^MUHAMMAD IBNU SABIL|9.2|242507028|3129677731|L^MUHAMMAD RENALDY SYAHRILLAH|9.2|242507076|0121473107|L^MUHAMMAD RIFYAN|9.2|242507162|0119702922|L^NAJWATUL LATIFAH|9.2|242507187|0102357258|P^NAWA AURA WAHYUDI|9.2|242507119|3117784761|P^NUGIH PRATAMA|9.2|242507078|0118972393|L^NUR SHAFA KAMILA|9.2|242507080|0115974381|P^PUTRI CAHYA YULIA|9.2|242507169|0116845427|P^RAFIF NAUFAL FADHILAH|9.2|242507170|0127658437|L^ROFI ALKHAYIS PUTRA YOLANDA|9.2|242507127|3125609025|L^SHEREN AZKIA CALISTA|9.2|242507085|0127368315|P^SITI QISWAH|9.2|242507041|0113065360|P^ULFAH HAKIMAH AKBAR|9.2|242507044|0129472451|P^YASMIN ADZKIA|9.2|242507131|3115175343|P^YUNITA PERMATA SARI|9.2|242507133|0113300370|P^ZAHRAH ZAAFARANI|9.2|242507092|0127178677|P^ACHDAN YUSUF KRISTIANTO|9.3|242507002|3118256582|L^ADELIA ALYA PUTRI|9.3|242507003|0128183889|P^AFRAM MAHAWIRA|9.3|242507047|0128502377|L^ALFIAN SYAHPUTRA|9.3|242507095|3120024158|L^ALIKA KHOIRUNNISA|9.3|242507138|0116206407|P^BALQIS UFAIRAH|9.3|242507007|0123010248|P^CALLISTA NEYSA SAFARI|9.3|242507009|0121170697|P^DHENA ZAHRA RAMADHANI|9.3|242507098|0128640046|P^FAHRI NURHAKIM|9.3|242507100|0116919283|L^FATIMAH RAHMA|9.3|242507013|0129629537|P^FIKRI SURYA PRATAMA RAMADHAN|9.3|242507014|0117318247|L^GEMA ARVI RAMADHAN|9.3|242507015|0111856130|L^HILMA AYUNINDIA PUTRI|9.3|242507103|0125846934|P^KENZA ALGIYASA RAMADHAN|9.3|252608188|0114001833|L^LAURA KIRANA SYIFAN|9.3|242507064|0114668414|P^M. RAMLAN|9.3|242507107|0107534944|L^MAURA SILVIANA DEVI|9.3|242507153|0129560342|P^MUHAMAD HASBI AL-HADORI|9.3|242507069|3118528446|L^MUHAMAD RAMA HAIKAL ANDRIAN|9.3|242507155|3122869484|L^MUHAMAD SYAGHILUL KHAIR|9.3|242507157|3128263561|L^MUHAMMAD AGHA ALDZAKWAN|9.3|242507071|3127683602|L^MUHAMMAD ALIF AHDAN|9.3|242507072|0118702008|L^MUHAMMAD GALEN HAMIZAN FAIQ|9.3|242507027|3120581901|L^MUHAMMAD MAHAMERU|9.3|242507030|0115155912|L^MUHAMMAD RAFI AL ZAKI|9.3|242507075|0125695290|L^MUHAMMAD SALMAN ALPARIZZI|9.3|242507164|0113012488|L^NUR AKBAR|9.3|242507079|0114829364|L^PRADIPTA DAMAR ATMAJA|9.3|242507121|0124241649|L^RAFA ALDIAN SIREGAR|9.3|242507034|0125010329|L^RAHMA FITRIANI|9.3|242507035|0128054159|P^RAISSA RAWNIE RIANTA|9.3|242507082|0125692386|P^RAVAEL ARIFIAN|9.3|242507083|3127004840|L^REYHANI KURNIA RAMADHANI|9.3|242507172|0127614774|P^SABRINA SOFIA FIRDAUS|9.3|242507128|3123791401|P^SASKIA SHAFARANI|9.3|242507040|31108930891|P^SHAFA RIZKIKA RAMADHANI|9.3|242507084|3118689729|P^TSANI LATIFA|9.3|242507043|3119726769|P^WAHYU RIFTIANSYAH CAHYO PRAYOG|9.3|242507091|0121650332|L^YASMIN NABILA RAMADHANI|9.3|242507132|0116646191|P^ZAIN GIBRAN|9.3|242507134|0122321920|L^ZARA ALIFAH NOVIANTI|9.3|242507135|0115864404|P^ZASKIA OKTAVIANI|9.3|242507136|0117852452|P^ZEIN ABDULLAH SOPYAN|9.3|242507178|3120378578|L^ADISTYA SAHIRA NASUTION|9.4|242507137|0114272306|P^AHTAR MAULANA SANJAYA|9.4|242507048|3113568980|L^ANANDA CHIARA CHANA LUCITA HAR|9.4|242507004|3113858725|P^ANDHIKA MAULANA RIZKY|9.4|242507096|3129608907|L^ANNALISA PUTRI ANGGRAENI|9.4|242507184|0118448564|P^DESHINTA MAHARANI|9.4|242507055|0119756570|P^DHIA AYU SYARAFANA|9.4|242507142|0128579453|P^DINDA RIZKY LESTARI|9.4|242507099|0114364305|P^FAHMI NURUL DZIHNI|9.4|242507012|0111449123|L^FAJAR RAMADHAN|9.4|242507143|0107745175|L^IKRIMA AZZAHRA|9.4|242507058|3122354991|P^INDRIYANA|9.4|242507059|0126291785|P^JOE HANDY VICKY ATMAJA|9.4|242507061|0144020622|L^KENZIE EKO SADUBI|9.4|242507018|0116692650|L^KHADIZAH PUTRI FAUZIAH|9.4|242507062|0114934071|P^MAULANA ABDUL HADI|9.4|242507152|0111138804|L^MUHAMAD ARYA PRATAMA|9.4|242507019|0126737439|L^MUHAMAD DANU PERMAΝΑ|9.4|242507020|0124559999|L^MUHAMAD GISMA APRIATNA|9.4|242507068|0128155135|L^MUHAMAD ILHAM FIQRIANSYAH|9.4|242507070|3122395422|L^MUHAMAD RIFAT SULAEMAN|9.4|242507077|0126156847|L^MUHAMAD YUSUF GHAZALI SUTISNA|9.4|242507024|0118598035|L^MUHAMMAD ABIAN PRATAMA PUTRA|9.4|242507025|0129777548|L^MUHAMMAD ANWARUDIN|9.4|242507112|3129727489|L^MUHAMMAD ARKA SAPUTRA|9.4|242507065|0123775509|L^MUHAMMAD AZKA ADYARIZKY|9.4|242507158|3114586617|L^MUHAMMAD FACHRI TIRTAYASA|9.4|242507160|3128358398|L^MUHAMMAD SYATHIR|9.4|242507182|0121665902|L^MUHAMMAD TIBRIZIK MUKODAM|9.4|242507165|0127611686|L^MUHAMMAD VICKY AKBAR|9.4|242507166|0123762074|L^NUFFAH JASMINE HAURA KHANSA|9.4|242507033|3118668179|P^NURHILMA NAFILA|9.4|242507168|3125724996|P^OCTA NUR'AENI|9.4|242507120|0112620301|P^PUTRI AYUDIA INKAN|9.4|242507122|0128792685|P^RAIF AL YASIR|9.4|242507036|0128822909|L^RAISA ALKAUTSAR|9.4|242507037|3124118938|P^RAYHAN HERMANSYAH|9.4|242507124|0114866515|L^REZKY AJI SAPUTRA|9.4|242507173|0116362683|L^SAEPUDIN|9.4|242507038|3125354904|L^SALWA ALFINA HUSNIYAH|9.4|242507039|0121847853|P^SITI AYRA|9.4|242507176|3127820485|P^SITI AZZAHRA BATUBARA|9.4|242507177|0115727627|P^SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P";
         dataSiswaString.split('^').forEach(s => {
             const p = s.split('|');
@@ -318,7 +280,7 @@
         });
 
         // ==============================================================================
-        // MENDENGARKAN STATUS NILAI DARI DATABASE (TIDAK MENGHAPUS DATA OFFLINE)
+        // SINKRONISASI KE FIREBASE (Update Nilai & Soal Tambahan) Tanpa Merusak Offline
         // ==============================================================================
         onSnapshot(collection(db, DB_USERS), (snapshot) => {
             snapshot.forEach(d => {
@@ -328,10 +290,9 @@
                     users[idx].status = fbData.status || 'belum';
                     users[idx].nilai = fbData.nilai || 0;
                 } else if (fbData.nama) {
-                    users.push({ id: d.id, ...fbData }); // Tambahan siswa dari Excel manual guru
+                    users.push({ id: d.id, ...fbData });
                 }
             });
-            // Update tabel admin jika sedang dibuka
             if(!document.getElementById('admin-page').classList.contains('hidden')){ updateDash(); renderNilai(); renderSiswa(); }
         });
 
@@ -340,15 +301,14 @@
                 const fbData = d.data();
                 const idx = questions.findIndex(q => q.id === d.id);
                 if (idx === -1 && fbData.soal) {
-                    questions.push({ id: d.id, ...fbData }); // Tambahan soal dari AI / Manual Excel guru
+                    questions.push({ id: d.id, ...fbData });
                 }
             });
             if(!document.getElementById('admin-page').classList.contains('hidden')){ document.getElementById('s-soal-count').innerText = questions.length; renderSoal(); }
         });
 
-
         // ==========================
-        // LOGIN & KONFIRMASI SISWA (TANPA LOADING)
+        // LOGIN & KONFIRMASI SISWA
         // ==========================
         window.switchTab = (t) => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -376,7 +336,7 @@
             if(!id) return Swal.fire('Tunggu!', 'Silakan pilih nama Anda terlebih dahulu.', 'warning');
             
             userNow = users.find(u => u.id === id);
-            if(userNow.status === 'selesai') return Swal.fire('Tuntas', 'Anda sudah menyelesaikan ujian ini.', 'info');
+            if(userNow.status === 'selesai') return Swal.fire('Selesai', 'Anda sudah mengumpulkan ujian ini.', 'info');
             
             document.getElementById('k-nama').innerText = userNow.nama; 
             document.getElementById('k-kelas').innerText = userNow.kelas; 
@@ -387,7 +347,7 @@
         window.tutupModal = (id) => document.getElementById(id).classList.add('hidden');
 
         // ==========================
-        // LOGIKA UJIAN KHUSUS HP (1 SOAL PER HALAMAN, ANTI RESET)
+        // LOGIKA UJIAN KHUSUS HP
         // ==========================
         window.startUjian = () => {
             document.getElementById('modal-konfirm').classList.add('hidden'); 
@@ -435,21 +395,64 @@
         
         window.navigasi = (d) => tampilSoal(idxSoal + d);
         
+        // ==========================================
+        // FUNGSI KIRIM UJIAN (Validasi & Super Cepat)
+        // ==========================================
         window.kirimUjian = async () => {
-            if(!confirm('Kumpulkan ujian sekarang? Pastikan semua soal sudah dijawab.')) return;
+            // 1. Cek apakah ada soal yang belum dijawab
+            let belumDijawab = [];
+            for (let i = 0; i < soalSiswa.length; i++) {
+                if (!jawaban[soalSiswa[i].id]) belumDijawab.push(i + 1);
+            }
+            
+            // 2. Tampilkan Pop-Up Merah jika belum lengkap
+            if (belumDijawab.length > 0) {
+                return Swal.fire({
+                    icon: 'warning',
+                    title: 'Masih Ada yang Kosong!',
+                    html: `Anda belum menjawab <b>${belumDijawab.length} soal</b>.<br><br>Silakan periksa kembali nomor:<br><b style="color:var(--danger)">${belumDijawab.join(', ')}</b>`,
+                    confirmButtonText: 'Kembali Mengerjakan'
+                });
+            }
+
+            // 3. Jika Lengkap, Konfirmasi Kirim
+            const konfirm = await Swal.fire({
+                title: 'Kirim Jawaban?',
+                text: "Pastikan semua jawaban sudah benar, Anda tidak bisa mengulangnya lagi.",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: 'var(--secondary)',
+                cancelButtonColor: 'var(--danger)',
+                confirmButtonText: 'Ya, Kirim Sekarang!',
+                cancelButtonText: 'Batal'
+            });
+
+            if (!konfirm.isConfirmed) return;
+
+            // 4. Proses Simpan Cepat (Anti Muter-Muter)
             Swal.fire({ title: 'Menyimpan Jawaban...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             
-            let benar = 0; 
-            for(let k in jawaban) { const a = questions.find(x => x.id === k); if(a && a.jawaban === jawaban[k]) benar++; }
-            const nilai = Math.round((benar / soalSiswa.length) * 100) || 0;
-            
-            // Simpan ke Firebase
-            await setDoc(doc(db, DB_USERS, userNow.id), { 
-                nama: userNow.nama, kelas: userNow.kelas, nis: userNow.nis, nisn: userNow.nisn, jk: userNow.jk, status: 'selesai', nilai: nilai, jawaban: jawaban 
-            }, { merge: true });
+            try {
+                let benar = 0; 
+                for(let k in jawaban) { 
+                    const a = questions.find(x => x.id === k); 
+                    if(a && a.jawaban === jawaban[k]) benar++; 
+                }
+                const nilai = Math.round((benar / soalSiswa.length) * 100) || 0;
+                
+                // Simpan ke Firebase Database
+                const docRef = doc(db, DB_USERS, userNow.id);
+                await setDoc(docRef, { 
+                    status: 'selesai', nilai: nilai, jawaban: jawaban 
+                }, { merge: true });
 
-            localStorage.removeItem('ujian_bersih_100persen_' + userNow.id);
-            Swal.fire('Berhasil!', 'Ujian Selesai. Jawaban Anda telah tersimpan di server.', 'success').then(() => window.location.reload());
+                localStorage.removeItem('ujian_bersih_100persen_' + userNow.id);
+                Swal.fire('Berhasil!', `Ujian Selesai. Nilai Anda: ${nilai}`, 'success').then(() => window.location.reload());
+                
+            } catch (error) {
+                console.error("Gagal Kirim:", error);
+                Swal.fire('Koneksi Terputus', 'Gagal mengirim ke server. Pastikan internet Anda stabil lalu tekan Kirim Ujian lagi.', 'error');
+            }
         };
 
         // ==========================
