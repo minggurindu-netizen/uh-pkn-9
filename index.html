@@ -19,15 +19,18 @@
         .form-select, .form-input { width: 100%; padding: 16px 20px; border: 2px solid #E2E8F0; border-radius: 14px; font-weight: 600; font-size: 0.95rem; color: #334155; transition: 0.2s; outline: none; background: #F8FAFC; appearance: none; }
         .form-select:focus, .form-input:focus { border-color: #8B5CF6; background: #ffffff; box-shadow: 0 0 0 4px #EDE9FE; }
         
+        /* Opsi Jawaban Styling */
         .option-card { display: flex; align-items: flex-start; padding: 18px 20px; border: 2px solid #E2E8F0; border-radius: 16px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; background: white; }
         .option-card:hover { border-color: #C4B5FD; background: #F5F3FF; }
         .option-card.selected { border-color: #8B5CF6; background: #F5F3FF; box-shadow: 0 4px 15px rgba(139,92,246,0.1); }
         .option-badge { min-width: 32px; height: 32px; border-radius: 10px; background: #F1F5F9; color: #64748B; display: flex; align-items: center; justify-content: center; font-weight: 800; margin-right: 15px; flex-shrink: 0; transition: 0.2s; }
         .option-card.selected .option-badge { background: #8B5CF6; color: white; }
         
+        /* Tombol Utama */
         .btn-main { background: #8B5CF6; color: white; padding: 16px 24px; border-radius: 14px; font-weight: 700; transition: 0.2s; text-align: center; cursor: pointer; border: none; width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; }
         .btn-main:hover { background: #7C3AED; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(139,92,246,0.2); }
         .btn-main:active { transform: translateY(0); }
+        .btn-main:disabled { background: #CBD5E1; cursor: not-allowed; transform: none; box-shadow: none; }
         
         /* Admin UI */
         .sidebar { background: #1E293B; color: white; height: 100vh; position: fixed; width: 260px; z-index: 50; }
@@ -42,16 +45,14 @@
         @media (max-width: 768px) {
             .sidebar { width: 100%; height: auto; position: relative; }
             .admin-content { margin-left: 0; padding: 15px; }
-            .hide-mobile { display: none; }
         }
     </style>
 </head>
 <body>
 
     <script>
-        // DATA SISWA 173 ANAK KELAS 9 (Format: NAMA|KELAS|NIS|NISN|JK)
-        const RAW_STUDENTS = `
-ABIDZAR AL GHIFARI LUBIS|9.1|242507001|0112250701|L
+        // DATA SISWA 173 ANAK KELAS 9 (Sesuai File PDF Bapak - NAMA|KELAS|NIS|NISN|JK)
+        const RAW_STUDENTS = `ABIDZAR AL GHIFARI LUBIS|9.1|242507001|0112250701|L
 AISHA RIZKYA ZHAFIRA|9.1|242507185|0118468729|P
 ALDIAN FAIZ ABIMANYU|9.1|242507049|0115521932|L
 AN NISA AULIA RAHMAH|9.1|242507051|03113035206|P
@@ -226,8 +227,7 @@ SITI AZZAHRA BATUBARA|9.4|242507177|0115727627|P
 SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
 
         // DATA 50 SOAL (Format: ID|SOAL|A|B|C|D|JAWABAN)
-        const RAW_QUESTIONS = `
-1|Analisis hubungan antara Pancasila dan Pembukaan UUD NRI Tahun 1945: (1) Pancasila berkedudukan di atas konstitusi sebagai norma dasar. (2) Pembukaan UUD 1945 dapat diubah sewaktu-waktu. (3) Pembukaan UUD 1945 memuat rumusan Pancasila.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b
+        const RAW_QUESTIONS = `1|Analisis hubungan antara Pancasila dan Pembukaan UUD NRI Tahun 1945: (1) Pancasila berkedudukan di atas konstitusi sebagai norma dasar. (2) Pembukaan UUD 1945 dapat diubah sewaktu-waktu. (3) Pembukaan UUD 1945 memuat rumusan Pancasila.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b
 2|Karakteristik hubungan Pancasila dengan Bhinneka Tunggal Ika: (1) Sila ketiga meletakkan dasar kebangsaan. (2) Keberagaman harus diseragamkan. (3) Pancasila menjamin hak yang setara bagi setiap warga.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b
 3|Implementasi semangat Pancasila dalam kehidupan bernegara: (1) Mengutamakan musyawarah mufakat. (2) Memperlakukan orang lain secara adil. (3) Memaksakan kehendak kelompok mayoritas.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
 4|Analisis pandangan para ahli mengenai konsep hak dan kewajiban: (1) Notonegoro menyatakan hak adalah kekuasaan menerima. (2) John Salmond mengelompokkan hak kekebalan. (3) Kewajiban warga negara bersifat opsional.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
@@ -278,25 +278,25 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
 49|Kebebasan pendapat tidak memerlukan batasan moral karena dijamin undang-undang.|Benar|Salah|-|-|b
 50|Peran menjaga NKRI bagi siswa dimulai dari disiplin dan menghormati teman.|Benar|Salah|-|-|a`;
 
-        // Parsing Data Murni di Awal (Bypass Loading)
-        let localUsers = [];
+        let LOCAL_USERS = [];
         RAW_STUDENTS.trim().split('\n').forEach(line => {
+            if(!line.trim()) return;
             const [nama, kelas, nis, nisn, jk] = line.split('|');
-            localUsers.push({ id: `siswa_${nis}`, nama, kelas, nis, nisn, jk, status: 'belum', nilai: 0, jawaban: {} });
+            LOCAL_USERS.push({ id: `siswa_${nis}`, nama, kelas, nis, nisn, jk, status: 'belum', nilai: 0, jawaban: {} });
         });
 
-        let localQuestions = [];
+        let LOCAL_QUESTIONS = [];
         RAW_QUESTIONS.trim().split('\n').forEach(line => {
+            if(!line.trim()) return;
             const [id, soal, a, b, c, d, jawaban] = line.split('|');
-            localQuestions.push({ id: `soal_${id}`, soal, a, b, c, d, jawaban: jawaban.toLowerCase() });
+            LOCAL_QUESTIONS.push({ id: `soal_${id}`, soal, a, b, c, d, jawaban: jawaban.toLowerCase() });
         });
-
     </script>
 
-    <!-- HALAMAN LOGIN (DI TENGAH LAYAR) -->
-    <div id="login-page" class="fixed inset-0 bg-slate-50 flex items-center justify-center p-4 z-10">
-        <div class="glass-panel w-full max-w-[400px] p-6 relative">
-            <div class="text-center mb-6">
+    <!-- HALAMAN LOGIN -->
+    <div id="login-page" class="fixed inset-0 bg-slate-50 flex items-center justify-center p-4 z-10 overflow-y-auto">
+        <div class="glass-panel w-full max-w-[400px] p-6 relative my-auto">
+            <div class="text-center mb-6 mt-2">
                 <div class="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3"><i class="fas fa-book-open"></i></div>
                 <h1 class="text-xl font-extrabold text-slate-800">Ujian Ar-Ridho</h1>
                 <p class="text-slate-500 font-medium text-sm">Pendidikan Pancasila Kelas 9</p>
@@ -335,16 +335,17 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
         </div>
     </div>
 
-    <!-- Modal Konfirmasi Ujian (Tengah Layar Sempurna - Tidak Bergeser) -->
-    <div id="modal-konfirmasi" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[1000] hidden items-center justify-center p-4">
+    <!-- Modal Konfirmasi Ujian -->
+    <div id="modal-konfirmasi" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
         <div class="bg-white p-6 rounded-3xl w-full max-w-sm text-center shadow-2xl relative mx-auto">
             <div class="w-16 h-16 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4"><i class="fas fa-id-badge"></i></div>
             <h2 class="mb-5 font-extrabold text-lg text-slate-800">Konfirmasi Data Diri</h2>
             <div class="text-left bg-slate-50 p-4 rounded-2xl mb-6 border border-slate-200">
-                <div class="flex justify-between mb-2 border-b border-slate-200 pb-2"><span class="text-slate-500 font-bold text-xs">NAMA</span><span id="konf-nama" class="font-extrabold text-slate-800 text-sm"></span></div>
+                <div class="flex justify-between mb-2 border-b border-slate-200 pb-2"><span class="text-slate-500 font-bold text-xs">NAMA</span><span id="konf-nama" class="font-extrabold text-slate-800 text-sm text-right"></span></div>
                 <div class="flex justify-between mb-2 border-b border-slate-200 pb-2"><span class="text-slate-500 font-bold text-xs">KELAS</span><span id="konf-kelas" class="font-extrabold text-slate-800 text-sm"></span></div>
                 <div class="flex justify-between mb-2 border-b border-slate-200 pb-2"><span class="text-slate-500 font-bold text-xs">NIS</span><span id="konf-nis" class="font-extrabold text-slate-800 text-sm"></span></div>
-                <div class="flex justify-between"><span class="text-slate-500 font-bold text-xs">NISN</span><span id="konf-nisn" class="font-extrabold text-slate-800 text-sm"></span></div>
+                <div class="flex justify-between mb-2 border-b border-slate-200 pb-2"><span class="text-slate-500 font-bold text-xs">NISN</span><span id="konf-nisn" class="font-extrabold text-slate-800 text-sm"></span></div>
+                <div class="flex justify-between"><span class="text-slate-500 font-bold text-xs">L/P</span><span id="konf-jk" class="font-extrabold text-slate-800 text-sm"></span></div>
             </div>
             <div class="flex gap-3">
                 <button class="flex-1 py-3 border-2 border-slate-200 text-slate-600 font-bold rounded-xl text-sm" onclick="tutupModal('modal-konfirmasi')">Batal</button>
@@ -354,13 +355,16 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
     </div>
 
     <!-- HALAMAN UJIAN (MOBILE FRIENDLY - NO GRID) -->
-    <div id="ujian-page" class="hidden min-h-screen bg-slate-50 pb-24">
+    <div id="ujian-page" class="hidden min-h-screen bg-slate-50 pb-[100px]">
         <!-- Header Sticky -->
         <div class="bg-white border-b border-slate-200 p-4 sticky top-0 z-40 shadow-sm">
             <div class="flex justify-between items-center max-w-[700px] mx-auto">
-                <div>
-                    <h3 id="info-nama" class="font-extrabold text-slate-800 text-base uppercase truncate max-w-[200px]">NAMA SISWA</h3>
-                    <p id="info-kelas" class="text-slate-500 text-xs font-bold">Kelas • NIS</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center font-bold text-purple-600"><i class="fas fa-user-graduate"></i></div>
+                    <div>
+                        <h3 id="info-nama" class="font-extrabold text-slate-800 text-sm uppercase truncate max-w-[180px] md:max-w-md">NAMA SISWA</h3>
+                        <p id="info-kelas" class="text-slate-500 text-xs font-bold">Kelas • NIS</p>
+                    </div>
                 </div>
                 <div class="bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-full font-bold text-[10px] flex items-center gap-1.5 border border-emerald-100"><i class="fas fa-wifi"></i> <span>ONLINE</span></div>
             </div>
@@ -368,8 +372,8 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
 
         <div class="max-w-[700px] mx-auto p-4 mt-2">
             <!-- Area Soal -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 mb-4 relative">
-                <div class="absolute -top-3 left-5 bg-slate-800 text-white px-3 py-1 rounded-lg font-bold text-xs shadow-md">SOAL NO. <span id="info-nomor">1</span></div>
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 relative min-h-[300px]">
+                <div class="absolute -top-3 left-5 bg-slate-800 text-white px-3 py-1 rounded-lg font-bold text-xs shadow-md">SOAL NO. <span id="info-nomor">1 / 50</span></div>
                 
                 <div id="teks-pertanyaan" class="text-base font-semibold text-slate-800 leading-relaxed mb-6 mt-4 whitespace-pre-line">
                     Memuat pertanyaan...
@@ -380,7 +384,7 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
             </div>
         </div>
 
-        <!-- Tombol Navigasi Bawah (Fixed Bottom) -->
+        <!-- Tombol Navigasi Bawah (Fixed Bottom - NO GRID) -->
         <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 z-40 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
             <div class="max-w-[700px] mx-auto flex gap-3">
                 <button class="flex-1 bg-slate-100 text-slate-600 font-bold py-3.5 rounded-xl hover:bg-slate-200 transition text-sm disabled:opacity-50" onclick="pindahSoal(-1)" id="tombol-prev">
@@ -400,8 +404,8 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
     <div id="admin-page" class="hidden">
         <div class="sidebar">
             <div class="p-6 border-b border-slate-700 flex items-center gap-4">
-                <i class="fas fa-shield-halved text-purple-400 text-3xl"></i>
-                <div><h2 class="font-extrabold text-xl">AdminPanel</h2><p class="text-xs text-slate-400">Ar-Ridho</p></div>
+                <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center text-white"><i class="fas fa-shield-halved text-xl"></i></div>
+                <div><h2 class="font-extrabold text-lg leading-tight">AdminPanel</h2><p class="text-[10px] text-slate-400">SMP Islam Ar-Ridho</p></div>
             </div>
             <div class="p-4 flex-1">
                 <div class="sidebar-menu active" onclick="bukaTabAdmin('dashboard', this)"><i class="fas fa-chart-pie w-6"></i> Dashboard</div>
@@ -410,7 +414,7 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
                 <div class="sidebar-menu" onclick="bukaTabAdmin('soal', this)"><i class="fas fa-file-signature w-6"></i> Bank Soal</div>
             </div>
             <div class="p-5 border-t border-slate-700">
-                <button class="btn-main !bg-transparent !border-2 !border-red-500 !text-red-500" onclick="window.location.reload()"><i class="fas fa-sign-out-alt"></i> Keluar</button>
+                <button class="btn-main !bg-slate-800 !text-red-400 hover:!bg-slate-700" onclick="window.location.reload()"><i class="fas fa-sign-out-alt"></i> Keluar</button>
             </div>
         </div>
 
@@ -420,8 +424,8 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
                 <h1 class="text-3xl font-extrabold text-slate-800 mb-2">Ringkasan Ujian</h1>
                 <p class="text-slate-500 font-medium mb-8">Pendidikan Pancasila Kelas 9</p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><p class="text-slate-500 font-bold text-xs uppercase mb-2">Total Soal Aktif</p><h2 class="text-4xl font-black text-purple-600" id="stat-soal">50</h2></div>
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><p class="text-slate-500 font-bold text-xs uppercase mb-2">Siswa Terdaftar</p><h2 class="text-4xl font-black text-blue-500" id="stat-siswa">173</h2></div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><p class="text-slate-500 font-bold text-xs uppercase mb-2">Total Soal</p><h2 class="text-4xl font-black text-purple-600" id="stat-soal">0</h2></div>
+                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><p class="text-slate-500 font-bold text-xs uppercase mb-2">Siswa Terdaftar</p><h2 class="text-4xl font-black text-blue-500" id="stat-siswa">0</h2></div>
                     <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><p class="text-slate-500 font-bold text-xs uppercase mb-2">Selesai Ujian</p><h2 class="text-4xl font-black text-emerald-500" id="stat-selesai">0</h2></div>
                 </div>
                 <h2 class="text-xl font-extrabold mb-4 text-slate-800">Kehadiran Kelas</h2>
@@ -433,18 +437,18 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
             <!-- Rekap Nilai -->
             <div id="tab-rekap" class="tab-konten hidden">
                 <h1 class="text-3xl font-extrabold text-slate-800 mb-8">Rekapitulasi Nilai</h1>
-                <div class="flex gap-4 mb-6 bg-white p-4 rounded-xl border border-slate-200 w-max">
+                <div class="flex flex-wrap gap-4 mb-6 bg-white p-4 rounded-xl border border-slate-200 w-max">
                     <select id="filter-rekap" class="form-select !w-auto !py-2.5" onchange="renderTabelRekap()"><option value="ALL">Semua Kelas 9</option><option value="9.1">9.1</option><option value="9.2">9.2</option><option value="9.3">9.3</option><option value="9.4">9.4</option></select>
                     <button class="btn-main !bg-emerald-500 !w-auto !py-2.5" onclick="downloadExcel()"><i class="fas fa-file-excel"></i> Download Excel</button>
                 </div>
                 <div class="overflow-x-auto rounded-xl border border-slate-200">
-                    <table id="tabel-rekap"><thead><tr><th>Nama Lengkap</th><th>Kelas</th><th>NIS/NISN</th><th>Jenis Kelamin</th><th>Status</th><th>Nilai</th></tr></thead><tbody></tbody></table>
+                    <table id="tabel-rekap"><thead><tr><th>Nama Lengkap</th><th>Kelas</th><th>NIS/NISN</th><th>Status</th><th>Nilai</th></tr></thead><tbody></tbody></table>
                 </div>
             </div>
 
             <!-- Kelola Siswa -->
             <div id="tab-siswa" class="tab-konten hidden">
-                <div class="flex justify-between items-center mb-8">
+                <div class="flex flex-wrap justify-between items-center mb-8 gap-4">
                     <h1 class="text-3xl font-extrabold text-slate-800">Kelola Siswa</h1>
                     <button class="btn-main !w-auto !py-2.5" onclick="bukaModalPaste('siswa')"><i class="fas fa-paste"></i> Tambah / Paste Siswa</button>
                 </div>
@@ -458,7 +462,7 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
 
             <!-- Kelola Soal -->
             <div id="tab-soal" class="tab-konten hidden">
-                <div class="flex justify-between items-center mb-8">
+                <div class="flex flex-wrap justify-between items-center mb-8 gap-4">
                     <h1 class="text-3xl font-extrabold text-slate-800">Bank Soal Ujian</h1>
                     <div class="flex gap-3">
                         <button class="btn-main !bg-white !text-purple-600 !border-2 !border-purple-600 !w-auto !py-2.5" onclick="bukaModalAI()"><i class="fas fa-robot"></i> Generator AI</button>
@@ -496,7 +500,7 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
                 <button class="text-slate-400 hover:text-red-500 text-2xl" onclick="tutupModal('modal-ai')"><i class="fas fa-times"></i></button>
             </div>
             <div class="bg-purple-50 border border-purple-200 p-4 rounded-xl mb-6 text-purple-800 text-sm">
-                <b>Sistem AI Telah Aktif!</b> Upload PDF/Word materi Bapak, dan AI otomatis mengekstraknya menjadi Soal Pilihan Ganda.
+                <b>API Key Terhubung!</b> Upload PDF/Word materi Bapak, dan AI otomatis mengekstraknya menjadi Soal Pilihan Ganda.
             </div>
             <div class="mb-6">
                 <label class="block font-bold text-slate-700 mb-2 text-sm">Upload File (PDF / Word / TXT)</label>
@@ -513,7 +517,7 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
         const app = initializeApp({
             apiKey: "AIzaSyDExMRbUfrN-R8mKVznYCVpng4K6F8iaSg", authDomain: "uh-pkn-kelas-9.firebaseapp.com",
@@ -524,17 +528,21 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
 
         let dbSiswa = [], dbSoal = [];
         let sessionUser = null, sessionSoal = [], sessionIndex = 0, sessionJawaban = {};
+        
+        // PENTING: Kunci Memori LocalStorage Baru agar error lama di HP anak otomatis diabaikan
+        const MEMORY_VERSION = 'V3_Final_PKN_'; 
 
-        // SINKRONISASI & AUTO-HEALING (Memastikan data tidak undefined)
+        // AUTO-HEALING & SINKRONISASI DATABASE 
+        // Jika database kosong ATAU berisi error (undefined), otomatis timpa dengan LOCAL_USERS & LOCAL_QUESTIONS
         onSnapshot(collection(db, "users"), (snap) => {
             dbSiswa = []; snap.forEach(d => dbSiswa.push({ id: d.id, ...d.data() }));
             
-            // Jika kosong, pakai data lokal yang sudah ditanam
+            // Cek apakah data siswa kosong
             if(dbSiswa.length === 0) {
                 const batch = writeBatch(db);
-                localUsers.forEach(u => batch.set(doc(db, "users", u.id), u));
+                LOCAL_USERS.forEach(u => batch.set(doc(db, "users", u.id), u));
                 batch.commit();
-                dbSiswa = localUsers;
+                dbSiswa = LOCAL_USERS;
             }
             if(!document.getElementById('admin-page').classList.contains('hidden')) { updateDashboardAdmin(); renderTabelRekap(); renderTabelSiswa(); }
         });
@@ -542,19 +550,21 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
         onSnapshot(collection(db, "questions"), (snap) => {
             dbSoal = []; snap.forEach(d => dbSoal.push({ id: d.id, ...d.data() }));
             
-            // Jika kosong atau error, pakai data lokal 50 Soal PKN
+            // Cek apakah soal kosong ATAU cacat (undefined text) akibat error masa lalu
             const isCorrupted = dbSoal.some(s => !s.soal || s.soal === "undefined" || !s.a);
+            
             if(dbSoal.length === 0 || isCorrupted) {
+                // Hapus data cacat (jika ada) dan timpa dengan data murni
                 if(isCorrupted) dbSoal.forEach(s => deleteDoc(doc(db, "questions", s.id)));
                 const batch = writeBatch(db);
-                localQuestions.forEach(q => batch.set(doc(db, "questions", q.id), q));
+                LOCAL_QUESTIONS.forEach(q => batch.set(doc(db, "questions", q.id), q));
                 batch.commit();
-                dbSoal = localQuestions;
+                dbSoal = LOCAL_QUESTIONS;
             }
             if(!document.getElementById('admin-page').classList.contains('hidden')) { document.getElementById('stat-soal').innerText = dbSoal.length; renderTabelSoal(); }
         });
 
-        // FUNGSI LOGIN
+        // ==================== FUNGSI LOGIN SISWA & GURU ====================
         window.gantiTab = (tab) => {
             document.getElementById('tab-btn-siswa').className = tab === 'siswa' ? "flex-1 py-2 font-bold rounded-lg bg-white text-purple-600 shadow-sm transition text-sm" : "flex-1 py-2 font-bold rounded-lg text-slate-500 hover:text-slate-700 transition text-sm";
             document.getElementById('tab-btn-guru').className = tab === 'guru' ? "flex-1 py-2 font-bold rounded-lg bg-white text-purple-600 shadow-sm transition text-sm" : "flex-1 py-2 font-bold rounded-lg text-slate-500 hover:text-slate-700 transition text-sm";
@@ -567,8 +577,7 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
             const selNama = document.getElementById('sel-nama');
             selNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
             if(kls) {
-                // Memastikan menggunakan dbSiswa atau fallback ke localUsers jika internet ngelag
-                const dataDipakai = dbSiswa.length > 0 ? dbSiswa : localUsers;
+                const dataDipakai = dbSiswa.length > 0 ? dbSiswa : LOCAL_USERS; // Fallback jika internet delay
                 dataDipakai.filter(s => s.kelas === kls).sort((a,b) => a.nama.localeCompare(b.nama)).forEach(s => {
                     selNama.innerHTML += `<option value="${s.id}">${s.nama}</option>`;
                 });
@@ -579,7 +588,7 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
         window.verifikasiSiswa = () => {
             const id = document.getElementById('sel-nama').value;
             if(!id) return Swal.fire('Oops!', 'Silakan pilih nama Anda terlebih dahulu.', 'warning');
-            const dataDipakai = dbSiswa.length > 0 ? dbSiswa : localUsers;
+            const dataDipakai = dbSiswa.length > 0 ? dbSiswa : LOCAL_USERS;
             sessionUser = dataDipakai.find(s => s.id === id);
             
             if(sessionUser.status === 'selesai') return Swal.fire('Selesai', 'Anda telah menyelesaikan ujian ini.', 'info');
@@ -588,6 +597,7 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
             document.getElementById('konf-kelas').innerText = sessionUser.kelas;
             document.getElementById('konf-nis').innerText = sessionUser.nis;
             document.getElementById('konf-nisn').innerText = sessionUser.nisn;
+            document.getElementById('konf-jk').innerText = sessionUser.jk === 'L' ? 'Laki-laki' : 'Perempuan';
             document.getElementById('modal-konfirmasi').classList.remove('hidden');
             document.getElementById('modal-konfirmasi').classList.add('flex');
         };
@@ -597,7 +607,7 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
             document.getElementById(id).classList.remove('flex');
         };
 
-        // FUNGSI UJIAN (ANTI NYONTEK, ANTI RESET, TANPA GRID NUMBER)
+        // ==================== FUNGSI UJIAN (ANTI NYONTEK & ANTI RESET) ====================
         window.mulaiMengerjakan = () => {
             tutupModal('modal-konfirmasi');
             document.getElementById('login-page').classList.remove('flex');
@@ -607,38 +617,41 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
             document.getElementById('info-nama').innerText = sessionUser.nama;
             document.getElementById('info-kelas').innerText = `Kelas ${sessionUser.kelas} • NIS: ${sessionUser.nis}`;
 
-            // Cek Memori Lokal (Anti-Reset)
-            const memori = localStorage.getItem('sisa_ujian_' + sessionUser.id);
+            // Cek Memori Lokal (Anti-Reset). Menggunakan KEY BARU agar error lama hilang!
+            const memori = localStorage.getItem(MEMORY_VERSION + sessionUser.id);
             if (memori) {
                 const dataMemori = JSON.parse(memori);
-                if(dataMemori.soal && dataMemori.soal.length > 0 && dataMemori.soal[0].soal) {
+                // Validasi ketat memori: Pastikan tidak undefined!
+                if(dataMemori.soal && dataMemori.soal.length > 0 && dataMemori.soal[0].soal && dataMemori.soal[0].soal !== 'undefined') {
                     sessionSoal = dataMemori.soal; sessionJawaban = dataMemori.jawaban; sessionIndex = dataMemori.index;
-                } else localStorage.removeItem('sisa_ujian_' + sessionUser.id);
+                } else {
+                    localStorage.removeItem(MEMORY_VERSION + sessionUser.id); // Buang jika corrupt
+                }
             } 
             
             if (!memori || sessionSoal.length === 0) {
                 // ACAK URUTAN SOAL, TAPI OPSI (A,B,C,D) TETAP DI TEMPATNYA!
-                const dataSoalDipakai = dbSoal.length > 0 ? dbSoal : localQuestions;
+                const dataSoalDipakai = dbSoal.length > 0 ? dbSoal : LOCAL_QUESTIONS;
                 sessionSoal = [...dataSoalDipakai].sort(() => Math.random() - 0.5).map(q => ({
                     id: q.id, soal: q.soal, jawabanKunci: q.jawaban,
-                    opsiTersusun: [ {huruf: 'a', teks: q.a}, {huruf: 'b', teks: q.b}, {huruf: 'c', teks: q.c}, {huruf: 'd', teks: q.d} ]
+                    opsiTetap: [ {huruf: 'a', teks: q.a}, {huruf: 'b', teks: q.b}, {huruf: 'c', teks: q.c}, {huruf: 'd', teks: q.d} ]
                 }));
                 sessionJawaban = {}; sessionIndex = 0;
             }
             tampilkanSoalLayar(sessionIndex);
         };
 
-        function simpanKeMemoriLokal() { localStorage.setItem('sisa_ujian_' + sessionUser.id, JSON.stringify({ soal: sessionSoal, jawaban: sessionJawaban, index: sessionIndex })); }
+        function simpanKeMemoriLokal() { localStorage.setItem(MEMORY_VERSION + sessionUser.id, JSON.stringify({ soal: sessionSoal, jawaban: sessionJawaban, index: sessionIndex })); }
 
         window.tampilkanSoalLayar = (index) => {
             sessionIndex = index; simpanKeMemoriLokal();
             const q = sessionSoal[index];
-            document.getElementById('info-nomor').innerText = index + 1 + " / " + sessionSoal.length;
+            document.getElementById('info-nomor').innerText = `${index + 1} / ${sessionSoal.length}`;
             document.getElementById('teks-pertanyaan').innerText = q.soal;
 
             const wadahOpsi = document.getElementById('area-opsi'); wadahOpsi.innerHTML = '';
-            q.opsiTersusun.forEach((opsi) => {
-                if(!opsi.teks || opsi.teks.trim() === '-' || opsi.teks === 'undefined') return; // Sembunyikan opsi kosong (untuk Benar/Salah)
+            q.opsiTetap.forEach((opsi) => {
+                if(!opsi.teks || opsi.teks.trim() === '-' || opsi.teks === 'undefined') return; // Skip untuk opsi kosong (Benar/Salah)
                 const div = document.createElement('div');
                 div.className = `option-card ${sessionJawaban[q.id] === opsi.huruf ? 'selected' : ''}`;
                 div.onclick = () => { sessionJawaban[q.id] = opsi.huruf; simpanKeMemoriLokal(); tampilkanSoalLayar(sessionIndex); };
@@ -646,6 +659,7 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
                 wadahOpsi.appendChild(div);
             });
 
+            // Logika Tombol Next/Prev/Kirim
             document.getElementById('tombol-prev').disabled = (index === 0);
             document.getElementById('tombol-next').classList.toggle('hidden', index === sessionSoal.length - 1);
             document.getElementById('tombol-kirim').classList.toggle('hidden', index !== sessionSoal.length - 1);
@@ -670,12 +684,12 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
 
             try {
                 await updateDoc(doc(db, "users", sessionUser.id), { status: 'selesai', nilai: nilaiAkhir, jawaban: sessionJawaban });
-                localStorage.removeItem('sisa_ujian_' + sessionUser.id);
+                localStorage.removeItem(MEMORY_VERSION + sessionUser.id);
                 Swal.fire('Ujian Selesai!', `Jawaban tersimpan.\nNilai Anda: ${nilaiAkhir}`, 'success').then(() => window.location.reload());
             } catch(e) { Swal.fire('Gagal', 'Koneksi internet terputus. Coba lagi.', 'error'); }
         };
 
-        // ADMIN GURU
+        // ==================== ADMIN GURU ====================
         window.masukDashboardGuru = () => {
             if(document.getElementById('pin-admin').value === '202099') {
                 document.getElementById('login-page').classList.remove('flex');
@@ -705,7 +719,7 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
             const tbody = document.querySelector('#tabel-statistik tbody'); tbody.innerHTML = '';
             Object.keys(dataKelas).sort().forEach(kls => {
                 const d = dataKelas[kls];
-                tbody.innerHTML += `<tr><td class="font-bold text-purple-600">${kls}</td><td>${d.total}</td><td>${d.L}</td><td>${d.P}</td><td><span class="badge badge-success">${d.selesai}</span></td><td><span class="badge badge-warning">${d.total - d.selesai}</span></td></tr>`;
+                tbody.innerHTML += `<tr><td class="font-bold text-purple-600">${kls}</td><td>${d.total}</td><td>${d.L}</td><td>${d.P}</td><td><span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold">${d.selesai}</span></td><td><span class="px-2 py-1 bg-amber-100 text-amber-700 rounded-lg text-xs font-bold">${d.total - d.selesai}</span></td></tr>`;
             });
         }
 
@@ -715,7 +729,7 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
             const tbody = document.querySelector('#tabel-rekap tbody'); tbody.innerHTML = '';
             dataFiltered.sort((a,b) => a.nama.localeCompare(b.nama)).forEach(s => {
                 const status = s.status === 'selesai' ? '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-md text-xs font-bold">Selesai</span>' : '<span class="px-2 py-1 bg-amber-100 text-amber-700 rounded-md text-xs font-bold">Belum</span>';
-                tbody.innerHTML += `<tr><td><strong class="text-slate-800">${s.nama}</strong></td><td>${s.kelas}</td><td>${s.nis}<br><span class="text-xs text-slate-400">${s.nisn}</span></td><td>${s.jk}</td><td>${status}</td><td><strong class="text-purple-600 text-lg">${s.status === 'selesai' ? s.nilai : '-'}</strong></td></tr>`;
+                tbody.innerHTML += `<tr><td><strong class="text-slate-800">${s.nama}</strong></td><td>${s.kelas}</td><td>${s.nis}<br><span class="text-xs text-slate-400">${s.nisn}</span></td><td>${status}</td><td><strong class="text-purple-600 text-lg">${s.status === 'selesai' ? s.nilai : '-'}</strong></td></tr>`;
             });
         };
 
@@ -733,7 +747,7 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
             const tbody = document.querySelector('#tabel-siswa tbody'); tbody.innerHTML = '';
             dataFiltered.sort((a,b) => a.nama.localeCompare(b.nama)).forEach(s => {
                 const btnReset = s.status === 'selesai' ? `<button class="bg-amber-500 text-white p-2 rounded-md hover:bg-amber-600 mr-2" onclick="resetSiswa('${s.id}')" title="Reset Ujian"><i class="fas fa-undo"></i></button>` : '';
-                tbody.innerHTML += `<tr><td><strong class="text-slate-800">${s.nama}</strong></td><td>${s.kelas}</td><td>${s.nis}</td><td>${s.jk}</td><td>${s.status}</td><td class="whitespace-nowrap">${btnReset} <button class="bg-red-500 text-white p-2 rounded-md hover:bg-red-600" onclick="hapusDokumen('users','${s.id}')" title="Hapus Siswa"><i class="fas fa-trash"></i></button></td></tr>`;
+                tbody.innerHTML += `<tr><td><strong class="text-slate-800">${s.nama}</strong></td><td>${s.kelas}</td><td>${s.nis}<br><span class="text-xs text-slate-400">${s.nisn}</span></td><td>${s.jk}</td><td>${s.status}</td><td class="whitespace-nowrap">${btnReset} <button class="bg-red-500 text-white p-2 rounded-md hover:bg-red-600" onclick="hapusDokumen('users','${s.id}')" title="Hapus Siswa"><i class="fas fa-trash"></i></button></td></tr>`;
             });
         };
 
@@ -748,7 +762,7 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
 
         window.hapusDokumen = async (koleksi, id) => { if(confirm('Yakin hapus permanen?')) await deleteDoc(doc(db, koleksi, id)); };
 
-        // PASTE EXCEL
+        // ==================== PASTE EXCEL ====================
         window.bukaModalPaste = (jenis) => {
             document.getElementById('paste-jenis').value = jenis; document.getElementById('paste-input').value = '';
             if(jenis === 'siswa') {
@@ -786,14 +800,14 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
             } catch(e) { Swal.fire('Error', 'Format kolom salah.', 'error'); }
         };
 
-        // GENERATOR AI (API KEY JAYADI)
+        // ==================== GENERATOR AI (PDF/WORD/TEXT) ====================
         window.bukaModalAI = () => {
             document.getElementById('ai-teks').value = ''; 
             const modal = document.getElementById('modal-ai'); modal.classList.remove('hidden'); modal.classList.add('flex');
         };
 
         window.bacaFileUntukAI = async (e) => {
-            const file = e.target.files[0]; if(!file) return; document.getElementById('ai-teks').value = "⏳ Mengekstrak teks...";
+            const file = e.target.files[0]; if(!file) return; document.getElementById('ai-teks').value = "⏳ Mengekstrak teks dari dokumen...";
             try {
                 if(file.name.endsWith('.txt')) document.getElementById('ai-teks').value = await file.text();
                 else if(file.name.endsWith('.docx')) { const buf = await file.arrayBuffer(); const res = await mammoth.extractRawText({arrayBuffer: buf}); document.getElementById('ai-teks').value = res.value; }
@@ -805,9 +819,9 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
             const API_KEY_JAYADI = "AIzaSyBQ6KInIm35AvTUs6S32pQza5Q1Kae2sCI";
             const teksMateri = document.getElementById('ai-teks').value.trim();
             if(!teksMateri) return Swal.fire('Kosong', 'Masukkan materi!', 'warning');
-            Swal.fire({ title: 'AI Meracik Soal...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            Swal.fire({ title: 'AI Meracik Soal...', text: 'Tunggu sebentar, mesin sedang berpikir...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-            const instruksi = `Buatkan soal pilihan ganda dari teks ini:\n"${teksMateri}"\nATURAN MUTLAK:\n1. HANYA KELUARKAN JSON ARRAY.\n[{"soal":"Tanya?","a":"OpsiA","b":"OpsiB","c":"OpsiC","d":"OpsiD","jawaban":"a"}]`;
+            const instruksi = `Buatkan soal pilihan ganda dari teks ini:\n"${teksMateri}"\nATURAN MUTLAK:\n1. HANYA KELUARKAN JSON ARRAY murni.\n[{"soal":"Tanya?","a":"OpsiA","b":"OpsiB","c":"OpsiC","d":"OpsiD","jawaban":"a"}]`;
             try {
                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY_JAYADI}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: instruksi }] }], generationConfig: { temperature: 0.2 } }) });
                 if(!response.ok) throw new Error("Gagal Koneksi API");
@@ -822,7 +836,7 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
                 }
                 await batch.commit();
                 tutupModal('modal-ai'); Swal.fire('Sempurna!', `${jumlahSukses} Soal AI berhasil ditambahkan.`, 'success');
-            } catch (err) { Swal.fire('Error AI', 'Teks terlalu panjang. Kurangi isinya.', 'error'); }
+            } catch (err) { Swal.fire('Error AI', 'Teks terlalu panjang atau format jawaban AI meleset. Coba potong teks menjadi lebih sedikit.', 'error'); }
         };
     </script>
 </body>
