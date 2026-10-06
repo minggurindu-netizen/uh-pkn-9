@@ -3,521 +3,284 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ujian PKN - SMP Islam Ar-Ridho</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Ujian PKN SMP Islam Ar-Ridho</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.21/mammoth.browser.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; color: #1E293B; -webkit-tap-highlight-color: transparent; }
-        .glass-panel { background: #ffffff; border-radius: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.06); border: 1px solid rgba(0,0,0,0.05); }
+        :root { --primary: #8B5CF6; --primary-hover: #7C3AED; --primary-light: #F5F3FF; --secondary: #10B981; --danger: #EF4444; --dark: #1E293B; --gray-100: #F3F4F6; --gray-200: #E5E7EB; --gray-500: #6B7280; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: #F8FAFC; color: #374151; min-height: 100vh; overflow-x: hidden; }
         
-        .form-select, .form-input { width: 100%; padding: 16px 20px; border: 2px solid #E2E8F0; border-radius: 14px; font-weight: 600; font-size: 0.95rem; color: #334155; transition: 0.2s; outline: none; background: #F8FAFC; appearance: none; }
-        .form-select:focus, .form-input:focus { border-color: #8B5CF6; background: #ffffff; box-shadow: 0 0 0 4px #EDE9FE; }
+        .glass-card { background: white; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 24px; width: 100%; max-width: 450px; margin: 20px auto; }
+        .hidden { display: none !important; }
         
-        /* Opsi Jawaban Styling */
-        .option-card { display: flex; align-items: flex-start; padding: 18px 20px; border: 2px solid #E2E8F0; border-radius: 16px; margin-bottom: 12px; cursor: pointer; transition: 0.2s; background: white; }
-        .option-card:hover { border-color: #C4B5FD; background: #F5F3FF; }
-        .option-card.selected { border-color: #8B5CF6; background: #F5F3FF; box-shadow: 0 4px 15px rgba(139,92,246,0.1); }
-        .option-badge { min-width: 32px; height: 32px; border-radius: 10px; background: #F1F5F9; color: #64748B; display: flex; align-items: center; justify-content: center; font-weight: 800; margin-right: 15px; flex-shrink: 0; transition: 0.2s; }
-        .option-card.selected .option-badge { background: #8B5CF6; color: white; }
+        .btn { padding: 14px 20px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-size: 1rem; width: 100%; }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-success { background-color: var(--secondary); color: white; }
+        .btn-outline { background-color: white; border: 2px solid var(--gray-200); color: var(--dark); }
+        .btn-danger { background-color: var(--danger); color: white; width: auto; padding: 8px 12px; border-radius: 8px;}
         
-        /* Tombol Utama */
-        .btn-main { background: #8B5CF6; color: white; padding: 16px 24px; border-radius: 14px; font-weight: 700; transition: 0.2s; text-align: center; cursor: pointer; border: none; width: 100%; display: flex; justify-content: center; align-items: center; gap: 8px; }
-        .btn-main:hover { background: #7C3AED; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(139,92,246,0.2); }
-        .btn-main:active { transform: translateY(0); }
-        .btn-main:disabled { background: #CBD5E1; cursor: not-allowed; transform: none; box-shadow: none; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.9rem; color: var(--dark); }
+        .input-control { width: 100%; padding: 14px 16px; border: 2px solid var(--gray-200); border-radius: 12px; font-size: 1rem; outline: none; background: #FAFAFA; transition: 0.2s; }
+        .input-control:focus { border-color: var(--primary); background: white; }
         
-        /* Admin UI */
-        .sidebar { background: #1E293B; color: white; height: 100vh; position: fixed; width: 260px; z-index: 50; }
-        .sidebar-menu { display: flex; align-items: center; gap: 15px; padding: 15px 20px; color: #94A3B8; font-weight: 600; cursor: pointer; border-left: 4px solid transparent; transition: 0.2s; }
-        .sidebar-menu:hover, .sidebar-menu.active { background: #334155; color: white; border-left-color: #8B5CF6; }
-        .admin-content { margin-left: 260px; padding: 30px; min-height: 100vh; }
+        #login-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 15px; }
+        .login-tabs { display: flex; background: var(--gray-100); padding: 6px; border-radius: 14px; margin-bottom: 25px; }
+        .tab-btn { flex: 1; padding: 12px; text-align: center; border-radius: 10px; cursor: pointer; font-weight: 700; color: var(--gray-500); transition: 0.2s; }
+        .tab-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+
+        #ujian-page { max-width: 800px; margin: 0 auto; padding: 15px; padding-bottom: 30px; }
+        .header-ujian { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 20px; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); margin-bottom: 20px; }
         
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; }
-        th { background: #F8FAFC; padding: 15px; text-align: left; font-size: 0.85rem; color: #64748B; text-transform: uppercase; border-bottom: 1px solid #E2E8F0; }
-        td { padding: 15px; border-bottom: 1px solid #E2E8F0; font-size: 0.95rem; font-weight: 500; }
+        .soal-card { background: white; padding: 25px 20px; border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .badge-soal { background: var(--dark); color: white; padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 0.85rem; display: inline-block; margin-bottom: 20px; }
         
-        @media (max-width: 768px) {
-            .sidebar { width: 100%; height: auto; position: relative; }
-            .admin-content { margin-left: 0; padding: 15px; }
+        .opsi-item { display: flex; align-items: flex-start; padding: 16px 18px; border: 2px solid var(--gray-200); border-radius: 14px; cursor: pointer; margin-bottom: 12px; transition: 0.2s; background: white; }
+        .opsi-item.selected { border-color: var(--primary); background: var(--primary-light); }
+        .opsi-label { font-weight: 800; margin-right: 15px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; background: var(--gray-200); border-radius: 50%; font-size: 0.95rem; color: var(--dark); flex-shrink: 0; }
+        .opsi-item.selected .opsi-label { background: var(--primary); color: white; }
+        .opsi-text { font-size: 1rem; line-height: 1.5; color: var(--dark); font-weight: 500; margin-top: 3px; }
+        
+        .nav-buttons { display: flex; gap: 12px; margin-top: 30px; }
+        
+        #admin-page { display: flex; min-height: 100vh; background: #F8FAFC; }
+        .sidebar { width: 260px; background: white; border-right: 1px solid var(--gray-200); display: flex; flex-direction: column; }
+        .sidebar-menu { padding: 20px 15px; flex: 1; }
+        .menu-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 12px; cursor: pointer; margin-bottom: 5px; font-weight: 700; color: var(--gray-500); }
+        .menu-item.active { background: var(--primary-light); color: var(--primary); }
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+        
+        .table-container { background: white; border-radius: 16px; border: 1px solid var(--gray-200); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th, td { padding: 16px 20px; text-align: left; border-bottom: 1px solid var(--gray-200); }
+        th { background: #F8FAFC; color: var(--gray-500); font-weight: 800; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 23, 42, 0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(5px); }
+        .modal-content { background: white; padding: 30px; border-radius: 24px; width: 100%; max-width: 420px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); }
+
+        @media (max-width: 768px) { 
+            #admin-page { flex-direction: column; } 
+            .sidebar { width: 100%; border-bottom: 1px solid var(--gray-200); } 
+            .main-content { padding: 15px; } 
+            .header-ujian { flex-direction: column; gap: 10px; text-align: center; }
+            #teks-soal { font-size: 1.1rem !important; }
         }
     </style>
 </head>
 <body>
 
-    <script>
-        // DATA SISWA 173 ANAK KELAS 9 (Sesuai File PDF Bapak - NAMA|KELAS|NIS|NISN|JK)
-        const RAW_STUDENTS = `ABIDZAR AL GHIFARI LUBIS|9.1|242507001|0112250701|L
-AISHA RIZKYA ZHAFIRA|9.1|242507185|0118468729|P
-ALDIAN FAIZ ABIMANYU|9.1|242507049|0115521932|L
-AN NISA AULIA RAHMAH|9.1|242507051|03113035206|P
-ASSYIPA ALDAWIYAH|9.1|242507140|3126598859|P
-ATARA NAWAWINA ALAYA|9.1|242507006|3115132886|P
-DANISH ALDRIC KANDELA|9.1|242507053|0129682086|L
-ELVINA RAMADHANI|9.1|242507011|0128031712|P
-FAKHRI AL YASIN|9.1|242507144|0125950149|L
-HAIKAL YUSUF MUTAQIN|9.1|242507146|0126738383|L
-HELMAWATI NISPI|9.1|242507148|0127732474|P
-KALILA AZZAHRA AGSYA|9.1|242507150|0123215234|P
-KARIN PUTRI RAHMANIAR|9.1|242507151|0123810952|P
-MEDINA RAYANI PUTRI|9.1|242507154|0111262830|P
-MUHAMAD FIKRI HAIKAL|9.1|242507067|3115858704|L
-MUHAMAD KURNIAWAN|9.1|242507110|3128561717|L
-MUHAMAD RISKI|9.1|242507163|0119272535|L
-MUHAMAD RIZKY ALFARIZI|9.1|242507156|0114707555|L
-MUHAMAD YAHYA SEPTIAN|9.1|242507023|3114407011|L
-MUHAMMAD AMMAR AZZIKRA|9.1|242507026|0121453887|L
-MUHAMMAD AZZAM ZAIDDAN|9.1|242507113|0127804343|L
-MUHAMMAD FADIL ALFARIZKY|9.1|242507066|0125048100|L
-MUHAMMAD IMAM RIYADHUSSOLIHIN|9.1|242507029|0121991684|L
-MUHAMMAD NICKY PRATAMA|9.1|242507074|0112208538|L
-MULYANA BADAR MUHTAR|9.1|242507167|0126632131|L
-NAJLAA KIRANA PUTRI|9.1|242507116|0126757694|P
-NARENDRA DARVESH PRADITYA|9.1|242507117|0129767780|L
-NAZWA ZAKIYAH|9.1|242507031|3122953563|P
-NOVITA DWI LESTARI|9.1|242507032|3128551310|P
-RAFA FAEYZA ADITYA|9.1|242507123|0124575918|L
-RAFI IMADUL BILAD|9.1|242507081|0118347648|L
-RIDHONINO SETIAWAN|9.1|242507174|0115176085|L
-RIYAN AZZARI DALIMUNTE|9.1|242507126|0124959392|L
-SIFA RAMADANI|9.1|242507129|0114585043|P
-SILVIA HIDAYAT|9.1|242507130|0115912357|P
-SITI SILVIAWATI|9.1|242507086|3120214186|P
-SITI WINDI AZAHIRA|9.1|242507087|0116017127|P
-SITI ZAHIRA|9.1|242507088|0129243631|P
-SYLA RAHMANIA|9.1|242507186|0122849032|P
-VIOLA ZULFIANI|9.1|242507089|0117682754|P
-VISKA ARIANI|9.1|242507090|3125102794|P
-WILDAN NURULLOH|9.1|242507046|3112799899|L
-ZIDAN ALGIFARI SURYAMAN|9.1|242507179|0112922469|L
-AFRINA RAFANIA RHAMDANI|9.2|242507093|0123145389|P
-AL ZAHIRA SRI WIJAYA|9.2|242507094|0112458312|P
-ALFAN ANDRIAN|9.2|242507050|3110372642|L
-ARSYAVIN WIDAN SAPUTRA|9.2|242507005|3114044196|L
-ARYA NAILUL KHALIL|9.2|242507139|0119108501|L
-AURORA MIKHAYLA RAMADANTI|9.2|242507052|3126814449|P
-AZZAHRA WIDYASIH PUTRI|9.2|242507141|0121057775|P
-BUNGA KEYSHA DARMAWAN|9.2|242507008|3128932716|P
-DENDY ALFAREZ PUTRA WIDODO|9.2|242507054|0124462929|L
-EGI|9.2|242507010|3114633046|L
-FAHMI PUTRA RIFA'I|9.2|242507056|3111616100|L
-FAIRUZ FUADI SAPUTRA|9.2|242507101|3114479502|L
-FAJAR ADHITAMA|9.2|242507102|3125296816|L
-FARASKA SURYA FADILAH|9.2|242507145|0127713764|L
-FARSHA FAIZI SAPUTRA|9.2|242507057|0113281236|L
-HASBI ALGANI|9.2|242507147|0117447040|L
-IBRAHIM DZAKI CHANDRA|9.2|242507104|0111135296|L
-INTAN SYIFA MUFADHILAH|9.2|242507149|0129554291|P
-IRVAN MAULANA|9.2|242507060|0116127084|L
-JERRY AHMAD AL-FARIZZI|9.2|242507016|0121692888|L
-KALILA RIFDA|9.2|242507017|0126563139|P
-KHANZA CHAERUNNISA|9.2|242507063|3122278981|P
-MUHAMAD ALVIN MULYADI|9.2|242507073|0127635435|L
-MUHAMAD DHARIN DIMYATI|9.2|242507021|0117756964|L
-MUHAMAD RAFI FAHRUROHMAN|9.2|242507111|3115697782|L
-MUHAMMAD AZZMI KHAIRAN|9.2|242507114|0114059284|L
-MUHAMMAD ENO KURNIAWAN|9.2|242507159|3127311018|L
-MUHAMMAD FAHRY FIQRIANI|9.2|242507161|0122039029|L
-MUHAMMAD IBNU SABIL|9.2|242507028|3129677731|L
-MUHAMMAD RENALDY SYAHRILLAH|9.2|242507076|0121473107|L
-MUHAMMAD RIFYAN|9.2|242507162|0119702922|L
-NAJWATUL LATIFAH|9.2|242507187|0102357258|P
-NAWA AURA WAHYUDI|9.2|242507119|3117784761|P
-NUGIH PRATAMA|9.2|242507078|0118972393|L
-NUR SHAFA KAMILA|9.2|242507080|0115974381|P
-PUTRI CAHYA YULIA|9.2|242507169|0116845427|P
-RAFIF NAUFAL FADHILAH|9.2|242507170|0127658437|L
-ROFI ALKHAYIS PUTRA YOLANDA|9.2|242507127|3125609025|L
-SHEREN AZKIA CALISTA|9.2|242507085|0127368315|P
-SITI QISWAH|9.2|242507041|0113065360|P
-ULFAH HAKIMAH AKBAR|9.2|242507044|0129472451|P
-YASMIN ADZKIA|9.2|242507131|3115175343|P
-YUNITA PERMATA SARI|9.2|242507133|0113300370|P
-ZAHRAH ZAAFARANI|9.2|242507092|0127178677|P
-ACHDAN YUSUF KRISTIANTO|9.3|242507002|3118256582|L
-ADELIA ALYA PUTRI|9.3|242507003|0128183889|P
-AFRAM MAHAWIRA|9.3|242507047|0128502377|L
-ALFIAN SYAHPUTRA|9.3|242507095|3120024158|L
-ALIKA KHOIRUNNISA|9.3|242507138|0116206407|P
-BALQIS UFAIRAH|9.3|242507007|0123010248|P
-CALLISTA NEYSA SAFARI|9.3|242507009|0121170697|P
-DHENA ZAHRA RAMADHANI|9.3|242507098|0128640046|P
-FAHRI NURHAKIM|9.3|242507100|0116919283|L
-FATIMAH RAHMA|9.3|242507013|0129629537|P
-FIKRI SURYA PRATAMA RAMADHAN|9.3|242507014|0117318247|L
-GEMA ARVI RAMADHAN|9.3|242507015|0111856130|L
-HILMA AYUNINDIA PUTRI|9.3|242507103|0125846934|P
-KENZA ALGIYASA RAMADHAN|9.3|252608188|0114001833|L
-LAURA KIRANA SYIFAN|9.3|242507064|0114668414|P
-M. RAMLAN|9.3|242507107|0107534944|L
-MAURA SILVIANA DEVI|9.3|242507153|0129560342|P
-MUHAMAD HASBI AL-HADORI|9.3|242507069|3118528446|L
-MUHAMAD RAMA HAIKAL ANDRIAN|9.3|242507155|3122869484|L
-MUHAMAD SYAGHILUL KHAIR|9.3|242507157|3128263561|L
-MUHAMMAD AGHA ALDZAKWAN|9.3|242507071|3127683602|L
-MUHAMMAD ALIF AHDAN|9.3|242507072|0118702008|L
-MUHAMMAD GALEN HAMIZAN FAIQ|9.3|242507027|3120581901|L
-MUHAMMAD MAHAMERU|9.3|242507030|0115155912|L
-MUHAMMAD RAFI AL ZAKI|9.3|242507075|0125695290|L
-MUHAMMAD SALMAN ALPARIZZI|9.3|242507164|0113012488|L
-NUR AKBAR|9.3|242507079|0114829364|L
-PRADIPTA DAMAR ATMAJA|9.3|242507121|0124241649|L
-RAFA ALDIAN SIREGAR|9.3|242507034|0125010329|L
-RAHMA FITRIANI|9.3|242507035|0128054159|P
-RAISSA RAWNIE RIANTA|9.3|242507082|0125692386|P
-RAVAEL ARIFIAN|9.3|242507083|3127004840|L
-REYHANI KURNIA RAMADHANI|9.3|242507172|0127614774|P
-SABRINA SOFIA FIRDAUS|9.3|242507128|3123791401|P
-SASKIA SHAFARANI|9.3|242507040|31108930891|P
-SHAFA RIZKIKA RAMADHANI|9.3|242507084|3118689729|P
-TSANI LATIFA|9.3|242507043|3119726769|P
-WAHYU RIFTIANSYAH CAHYO PRAYOG|9.3|242507091|0121650332|L
-YASMIN NABILA RAMADHANI|9.3|242507132|0116646191|P
-ZAIN GIBRAN|9.3|242507134|0122321920|L
-ZARA ALIFAH NOVIANTI|9.3|242507135|0115864404|P
-ZASKIA OKTAVIANI|9.3|242507136|0117852452|P
-ZEIN ABDULLAH SOPYAN|9.3|242507178|3120378578|L
-ADISTYA SAHIRA NASUTION|9.4|242507137|0114272306|P
-AHTAR MAULANA SANJAYA|9.4|242507048|3113568980|L
-ANANDA CHIARA CHANA LUCITA HAR|9.4|242507004|3113858725|P
-ANDHIKA MAULANA RIZKY|9.4|242507096|3129608907|L
-ANNALISA PUTRI ANGGRAENI|9.4|242507184|0118448564|P
-DESHINTA MAHARANI|9.4|242507055|0119756570|P
-DHIA AYU SYARAFANA|9.4|242507142|0128579453|P
-DINDA RIZKY LESTARI|9.4|242507099|0114364305|P
-FAHMI NURUL DZIHNI|9.4|242507012|0111449123|L
-FAJAR RAMADHAN|9.4|242507143|0107745175|L
-IKRIMA AZZAHRA|9.4|242507058|3122354991|P
-INDRIYANA|9.4|242507059|0126291785|P
-JOE HANDY VICKY ATMAJA|9.4|242507061|0144020622|L
-KENZIE EKO SADUBI|9.4|242507018|0116692650|L
-KHADIZAH PUTRI FAUZIAH|9.4|242507062|0114934071|P
-MAULANA ABDUL HADI|9.4|242507152|0111138804|L
-MUHAMAD ARYA PRATAMA|9.4|242507019|0126737439|L
-MUHAMAD DANU PERMANA|9.4|242507020|0124559999|L
-MUHAMAD GISMA APRIATNA|9.4|242507068|0128155135|L
-MUHAMAD ILHAM FIQRIANSYAH|9.4|242507070|3122395422|L
-MUHAMAD RIFAT SULAEMAN|9.4|242507077|0126156847|L
-MUHAMAD YUSUF GHAZALI SUTISNA|9.4|242507024|0118598035|L
-MUHAMMAD ABIAN PRATAMA PUTRA|9.4|242507025|0129777548|L
-MUHAMMAD ANWARUDIN|9.4|242507112|3129727489|L
-MUHAMMAD ARKA SAPUTRA|9.4|242507065|0123775509|L
-MUHAMMAD AZKA ADYARIZKY|9.4|242507158|3114586617|L
-MUHAMMAD FACHRI TIRTAYASA|9.4|242507160|3128358398|L
-MUHAMMAD SYATHIR|9.4|242507182|0121665902|L
-MUHAMMAD TIBRIZIK MUKODAM|9.4|242507165|0127611686|L
-MUHAMMAD VICKY AKBAR|9.4|242507166|0123762074|L
-NUFFAH JASMINE HAURA KHANSA|9.4|242507033|3118668179|P
-NURHILMA NAFILA|9.4|242507168|3125724996|P
-OCTA NUR'AENI|9.4|242507120|0112620301|P
-PUTRI AYUDIA INKAN|9.4|242507122|0128792685|P
-RAIF AL YASIR|9.4|242507036|0128822909|L
-RAISA ALKAUTSAR|9.4|242507037|3124118938|P
-RAYHAN HERMANSYAH|9.4|242507124|0114866515|L
-REZKY AJI SAPUTRA|9.4|242507173|0116362683|L
-SAEPUDIN|9.4|242507038|3125354904|L
-SALWA ALFINA HUSNIYAH|9.4|242507039|0121847853|P
-SITI AYRA|9.4|242507176|3127820485|P
-SITI AZZAHRA BATUBARA|9.4|242507177|0115727627|P
-SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
-
-        // DATA 50 SOAL (Format: ID|SOAL|A|B|C|D|JAWABAN)
-        const RAW_QUESTIONS = `1|Analisis hubungan antara Pancasila dan Pembukaan UUD NRI Tahun 1945: (1) Pancasila berkedudukan di atas konstitusi sebagai norma dasar. (2) Pembukaan UUD 1945 dapat diubah sewaktu-waktu. (3) Pembukaan UUD 1945 memuat rumusan Pancasila.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b
-2|Karakteristik hubungan Pancasila dengan Bhinneka Tunggal Ika: (1) Sila ketiga meletakkan dasar kebangsaan. (2) Keberagaman harus diseragamkan. (3) Pancasila menjamin hak yang setara bagi setiap warga.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b
-3|Implementasi semangat Pancasila dalam kehidupan bernegara: (1) Mengutamakan musyawarah mufakat. (2) Memperlakukan orang lain secara adil. (3) Memaksakan kehendak kelompok mayoritas.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
-4|Analisis pandangan para ahli mengenai konsep hak dan kewajiban: (1) Notonegoro menyatakan hak adalah kekuasaan menerima. (2) John Salmond mengelompokkan hak kekebalan. (3) Kewajiban warga negara bersifat opsional.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
-5|Pengaturan hak dan kewajiban warga negara dalam UUD 1945: (1) Hak atas pekerjaan diatur Pasal 27 ayat 2. (2) Hak berserikat diatur Pasal 28E. (3) Warga negara dibebaskan dari kewajiban hukum.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
-6|Peran lembaga penegak hukum dalam sistem peradilan di Indonesia: (1) Polri memelihara keamanan. (2) Kejaksaan melaksanakan penuntutan perkara pidana. (3) Hakim bertindak sebagai penasihat hukum terdakwa.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
-7|Hakikat kemerdekaan berpendapat sebagai hak asasi manusia: (1) Tolok ukur negara demokrasi. (2) Dapat dilaksanakan sebebas-bebasnya tanpa batas. (3) Harus diimbangi kewajiban menghormati hak orang lain.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b
-8|Ketentuan hukum penyampaian pendapat di muka umum (UU No 9/1998): (1) Dilarang di istana kepresidenan dan tempat ibadah. (2) Diwujudkan melalui unjuk rasa atau pawai. (3) Diizinkan malam hari tanpa batasan waktu.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
-9|Prinsip keterbukaan informasi publik (UU No 14/2008): (1) Menjamin hak warga mengetahui kebijakan publik. (2) Mendorong partisipasi aktif masyarakat. (3) Menutupi dokumen negara dari pengawasan.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
-10|Karakteristik tradisi dan kearifan lokal di Indonesia: (1) Tradisi diwariskan turun-temurun. (2) Kearifan lokal memuat budi pekerti luhur. (3) Tradisi bersifat statis mutlak dan tidak beradaptasi.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
-11|Analisis nilai filosofis kearifan lokal nusantara: (1) Tri Hita Karana mengajarkan keharmonisan. (2) Ajining diri saka lathi menekankan pentingnya etika. (3) Lojor teu meunang dipotong mendorong eksploitasi hutan.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
-12|Ruang lingkup objek pemajuan kebudayaan (UU No 5/2017): (1) Tradisi lisan dan upacara adat. (2) Permainan rakyat dan olahraga tradisional. (3) Industri manufaktur mesin berat.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
-13|Analisis tantangan demografi Indonesia (Sensus 2020): (1) Bonus demografi ditandai dominasi usia produktif. (2) Sebaran penduduk merata di pulau terluar. (3) Peningkatan kualitas SDM sangat krusial.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b
-14|Wujud cita-cita bangsa dan sistem pertahanan NKRI: (1) Membentuk masyarakat adil makmur. (2) Menerapkan Sishankamrata. (3) Mengisolasi diri dari kerja sama internasional.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
-15|Peran aktif peserta didik menjaga keutuhan wilayah NKRI: (1) Belajar tekun. (2) Menjaga kerukunan dan menghindari intoleransi. (3) Melakukan tindakan anarkis di ruang publik.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a
-16|Pendapat yang menyatakan hubungan Pancasila dan UUD 1945 ibarat roh dan jasad dikemukakan oleh...|Prof. Dr. Notonegoro|Jimly Asshiddiqie|Yudi Latif|Moh. Hatta|a
-17|Alasan utama Pembukaan UUD 1945 tidak boleh diubah oleh MPR adalah karena memuat...|Aturan peralihan sistem|Rumusan dasar negara dan tujuan NKRI|Rincian pasal penyelenggaraan negara|Jadwal pelaksanaan pemilu|b
-18|Menurut Prof. Dr. Notonegoro, hak diartikan sebagai...|Kepentingan yang dilindungi hukum|Beban memberikan sesuatu|Kekuasaan menerima sesuatu yang semestinya|Izin mutlak dari penguasa|c
-19|Pasal UUD 1945 yang tegas menjamin kebebasan memeluk agama dan beribadat adalah...|Pasal 27 ayat (1)|Pasal 28D ayat (1)|Pasal 29 ayat (2)|Pasal 31 ayat (1)|c
-20|Perilaku keseimbangan antara hak dan kewajiban di sekolah adalah...|Menuntut fasilitas tanpa merawat|Mendapat pelajaran & menaati tata tertib|Meminta guru mengulang tanpa perhatikan|Mengabaikan kebersihan demi nilai|b
-21|Lembaga peradilan di bawah MA untuk mengadili perkara perdata dan pidana umum adalah...|Peradilan TUN|Peradilan Agama|Peradilan Militer|Peradilan Umum|d
-22|Berdasarkan UU No 2 Tahun 2002, tugas utama Polri adalah...|Menguji UU terhadap UUD|Memelihara keamanan & ketertiban hukum|Menjatuhkan vonis persidangan|Melaksanakan penuntutan perkara|b
-23|Undang-undang yang khusus mengatur kemerdekaan menyampaikan pendapat di muka umum adalah...|UU No 9 Tahun 1998|UU No 39 Tahun 1999|UU No 14 Tahun 2008|UU No 5 Tahun 2017|a
-24|Lokasi yang dilarang mutlak untuk dijadikan tempat unjuk rasa adalah...|Alun-alun dan jalan protokol|Istana kepresidenan dan tempat ibadah|Depan gedung DPRD|Lapangan terbuka umum|b
-25|Aplikasi resmi pemerintah untuk layanan pengaduan online masyarakat adalah...|PeduliLindungi|JKN Mobile|LAPOR!|JDIH Nasional|c
-26|Abercrombie mendefinisikan tradisi sebagai...|Keputusan politik parlemen|Kebiasaan diwariskan antargenerasi|Aturan tertulis bersanksi|Perilaku adopsi budaya asing|b
-27|Kearifan lokal Bali tentang keharmonisan manusia, Tuhan, dan alam disebut...|Tri Hita Karana|Sad Rasa|Tat Twam Asi|Tri Kaya Parisudha|a
-28|Pesan utama filosofi Baduy 'Gunung teu meunang dilebur' adalah...|Membangun kawasan industri pegunungan|Kewajiban menjaga kelestarian alam|Larangan mukim di dataran rendah|Memanfaatkan hutan sebebasnya|b
-29|Undang-undang tentang Pemajuan Kebudayaan adalah...|UU No 11 Tahun 2008|UU No 9 Tahun 1998|UU No 5 Tahun 2017|UU No 14 Tahun 2008|c
-30|Kondisi struktur penduduk didominasi kelompok usia produktif disebut...|Urbanisasi penduduk|Bonus demografi|Transisi demografi|Kepadatan agraris|b
-31|Wujud cita-cita nasional dalam Pembukaan UUD 1945 tercantum pada...|Alinea pertama|Alinea kedua|Alinea ketiga|Alinea keempat|b
-32|Sistem pertahanan keamanan yang bersifat semesta dikenal dengan...|Hansip|Sishankamrata|Wajib militer|Bela negara aktif|b
-33|Pasal 28F UUD 1945 memberikan jaminan perlindungan untuk...|Memilih pekerjaan layak|Berkomunikasi & memperoleh informasi|Memeluk agama|Mendapat pengajaran dasar|b
-34|Peran pers nasional di Indonesia diatur dalam...|UU No 40 Tahun 1999 tentang Pers|UU No 39 Tahun 1999 tentang HAM|UU No 14 Tahun 2008 tentang KIP|UU No 9 Tahun 1998|a
-35|Komitmen pelajar dalam menjaga NKRI diwujudkan melalui sikap...|Membentuk kelompok eksklusif|Menaati tata tertib & toleransi|Aksi protes anarkis|Mengabaikan upacara bendera|b
-36|Hubungan Pancasila dan UUD 1945 ibarat roh dan jasad yang tak terpisahkan.|Benar|Salah|-|-|a
-37|Pembukaan UUD 1945 dapat diamendemen sewaktu-waktu oleh MPR.|Benar|Salah|-|-|b
-38|Menurut Notonegoro, kewajiban adalah beban memberikan sesuatu secara mutlak.|Benar|Salah|-|-|a
-39|HAM di Indonesia bersifat mutlak tanpa batas dan bebas tanpa peduli hak orang lain.|Benar|Salah|-|-|b
-40|Peradilan militer mengadili tindak pidana yang dilakukan oleh militer.|Benar|Salah|-|-|a
-41|Demonstrasi diperbolehkan di lingkungan istana kepresidenan pada malam hari.|Benar|Salah|-|-|b
-42|Keterbukaan informasi publik diatur melalui UU No 14 Tahun 2008.|Benar|Salah|-|-|a
-43|Tradisi budaya lokal bersifat statis dan tidak berguna bagi masyarakat modern.|Benar|Salah|-|-|b
-44|Satu Tungku Tiga Batu adalah wujud kearifan lokal kerukunan di Fakfak.|Benar|Salah|-|-|a
-45|Sensus 2020: sebagian besar penduduk Indonesia terkonsentrasi di luar Pulau Jawa.|Benar|Salah|-|-|b
-46|Bonus demografi memberi keuntungan jika SDM didukung pendidikan dan kesehatan.|Benar|Salah|-|-|a
-47|Pasal 33 UUD 1945: bumi, air, kekayaan alam dikuasai negara untuk kemakmuran rakyat.|Benar|Salah|-|-|a
-48|Bullying di sekolah adalah bentuk pelanggaran hak asasi manusia.|Benar|Salah|-|-|a
-49|Kebebasan pendapat tidak memerlukan batasan moral karena dijamin undang-undang.|Benar|Salah|-|-|b
-50|Peran menjaga NKRI bagi siswa dimulai dari disiplin dan menghormati teman.|Benar|Salah|-|-|a`;
-
-        let LOCAL_USERS = [];
-        RAW_STUDENTS.trim().split('\n').forEach(line => {
-            if(!line.trim()) return;
-            const [nama, kelas, nis, nisn, jk] = line.split('|');
-            LOCAL_USERS.push({ id: `siswa_${nis}`, nama, kelas, nis, nisn, jk, status: 'belum', nilai: 0, jawaban: {} });
-        });
-
-        let LOCAL_QUESTIONS = [];
-        RAW_QUESTIONS.trim().split('\n').forEach(line => {
-            if(!line.trim()) return;
-            const [id, soal, a, b, c, d, jawaban] = line.split('|');
-            LOCAL_QUESTIONS.push({ id: `soal_${id}`, soal, a, b, c, d, jawaban: jawaban.toLowerCase() });
-        });
-    </script>
+    <!-- SCREEN LOADING REPAIR (Tampil Jika Database Rusak) -->
+    <div id="loading-overlay" class="modal-overlay hidden" style="z-index: 9999; flex-direction: column; text-align: center;">
+        <i class="fas fa-tools fa-spin" style="font-size: 4rem; color: white; margin-bottom: 20px;"></i>
+        <h2 style="color: white; font-weight: 800; font-size: 1.5rem; margin-bottom: 10px;">Menyinkronkan Server...</h2>
+        <p style="color: rgba(255,255,255,0.8); font-weight: 500;">Memperbaiki dan memuat 50 Soal murni. Jangan tutup halaman ini.</p>
+    </div>
 
     <!-- HALAMAN LOGIN -->
-    <div id="login-page" class="fixed inset-0 bg-slate-50 flex items-center justify-center p-4 z-10 overflow-y-auto">
-        <div class="glass-panel w-full max-w-[400px] p-6 relative my-auto">
-            <div class="text-center mb-6 mt-2">
-                <div class="w-14 h-14 bg-purple-100 text-purple-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-3"><i class="fas fa-book-open"></i></div>
-                <h1 class="text-xl font-extrabold text-slate-800">Ujian Ar-Ridho</h1>
-                <p class="text-slate-500 font-medium text-sm">Pendidikan Pancasila Kelas 9</p>
+    <div id="login-page">
+        <div class="glass-card">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <div style="background: var(--primary-light); width: 65px; height: 65px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                    <i class="fas fa-graduation-cap" style="font-size: 30px; color: var(--primary);"></i>
+                </div>
+                <h1 style="color: var(--dark); font-size: 1.5rem; font-weight: 800; margin-bottom: 5px;">Ujian Ar-Ridho</h1>
+                <p style="color: var(--gray-500); font-size: 0.95rem; font-weight: 600;">Pendidikan Pancasila Kelas 9</p>
             </div>
             
-            <div class="flex bg-slate-100 p-1.5 rounded-xl mb-6">
-                <button class="flex-1 py-2 font-bold rounded-lg bg-white text-purple-600 shadow-sm transition text-sm" id="tab-btn-siswa" onclick="gantiTab('siswa')">Siswa</button>
-                <button class="flex-1 py-2 font-bold rounded-lg text-slate-500 hover:text-slate-700 transition text-sm" id="tab-btn-guru" onclick="gantiTab('guru')">Guru (Admin)</button>
+            <div class="login-tabs">
+                <div class="tab-btn active" onclick="switchTab('siswa')">Siswa</div>
+                <div class="tab-btn" onclick="switchTab('guru')">Guru (Admin)</div>
             </div>
             
             <div id="form-siswa">
-                <div class="mb-4">
-                    <label class="block font-bold text-slate-700 mb-2 text-sm">Pilih Kelas</label>
-                    <select id="sel-kelas" class="form-select !py-3" onchange="muatNamaSiswa()">
+                <div class="input-group">
+                    <label>Pilih Kelas</label>
+                    <select id="kelas-select" class="input-control" onchange="loadNama()">
                         <option value="">-- Pilih Kelas --</option>
                         <option value="9.1">Kelas 9.1</option><option value="9.2">Kelas 9.2</option>
                         <option value="9.3">Kelas 9.3</option><option value="9.4">Kelas 9.4</option>
                     </select>
                 </div>
-                <div class="mb-6">
-                    <label class="block font-bold text-slate-700 mb-2 text-sm">Pilih Nama Lengkap</label>
-                    <select id="sel-nama" class="form-select !py-3" disabled>
-                        <option value="">-- Pilih Nama --</option>
-                    </select>
+                <div class="input-group">
+                    <label>Pilih Nama Lengkap</label>
+                    <select id="nama-select" class="input-control" disabled><option value="">-- Pilih Nama --</option></select>
                 </div>
-                <button class="btn-main" onclick="verifikasiSiswa()">Lanjut <i class="fas fa-arrow-right"></i></button>
+                <button class="btn btn-primary" onclick="cekSiswa()">Masuk Ujian <i class="fas fa-arrow-right"></i></button>
             </div>
 
             <div id="form-guru" class="hidden">
-                <div class="mb-6">
-                    <label class="block font-bold text-slate-700 mb-2 text-sm">PIN Akses Guru</label>
-                    <input type="password" id="pin-admin" class="form-input !py-3" placeholder="Masukkan PIN 202099">
+                <div class="input-group">
+                    <label>PIN Khusus Admin</label>
+                    <input type="password" id="pin-guru" class="input-control" placeholder="Masukkan PIN 202099">
                 </div>
-                <button class="btn-main" onclick="masukDashboardGuru()">Masuk Dashboard <i class="fas fa-unlock"></i></button>
+                <button class="btn btn-primary" onclick="loginGuru()">Masuk Dashboard</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Konfirmasi Ujian -->
-    <div id="modal-konfirmasi" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden items-center justify-center p-4">
-        <div class="bg-white p-6 rounded-3xl w-full max-w-sm text-center shadow-2xl relative mx-auto">
-            <div class="w-16 h-16 bg-purple-50 text-purple-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4"><i class="fas fa-id-badge"></i></div>
-            <h2 class="mb-5 font-extrabold text-lg text-slate-800">Konfirmasi Data Diri</h2>
-            <div class="text-left bg-slate-50 p-4 rounded-2xl mb-6 border border-slate-200">
-                <div class="flex justify-between mb-2 border-b border-slate-200 pb-2"><span class="text-slate-500 font-bold text-xs">NAMA</span><span id="konf-nama" class="font-extrabold text-slate-800 text-sm text-right"></span></div>
-                <div class="flex justify-between mb-2 border-b border-slate-200 pb-2"><span class="text-slate-500 font-bold text-xs">KELAS</span><span id="konf-kelas" class="font-extrabold text-slate-800 text-sm"></span></div>
-                <div class="flex justify-between mb-2 border-b border-slate-200 pb-2"><span class="text-slate-500 font-bold text-xs">NIS</span><span id="konf-nis" class="font-extrabold text-slate-800 text-sm"></span></div>
-                <div class="flex justify-between mb-2 border-b border-slate-200 pb-2"><span class="text-slate-500 font-bold text-xs">NISN</span><span id="konf-nisn" class="font-extrabold text-slate-800 text-sm"></span></div>
-                <div class="flex justify-between"><span class="text-slate-500 font-bold text-xs">L/P</span><span id="konf-jk" class="font-extrabold text-slate-800 text-sm"></span></div>
+    <!-- HALAMAN UJIAN (MOBILE FRIENDLY - 1 SOAL PER LAYAR) -->
+    <div id="ujian-page" class="hidden">
+        <div class="header-ujian">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="background: var(--primary-light); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-user" style="color: var(--primary); font-size: 20px;"></i>
+                </div>
+                <div>
+                    <h3 id="u-nama" style="color: var(--dark); font-size: 1.1rem; text-transform: uppercase; font-weight: 800;">Nama Siswa</h3>
+                    <p id="u-kelas" style="color: var(--gray-500); font-size: 0.85rem; font-weight: 600;">Kelas 9.x • NIS: -</p>
+                </div>
             </div>
-            <div class="flex gap-3">
-                <button class="flex-1 py-3 border-2 border-slate-200 text-slate-600 font-bold rounded-xl text-sm" onclick="tutupModal('modal-konfirmasi')">Batal</button>
-                <button class="flex-1 py-3 bg-purple-600 text-white font-bold rounded-xl text-sm shadow-lg shadow-purple-200" onclick="mulaiMengerjakan()">Mulai Ujian <i class="fas fa-play ml-1"></i></button>
+            <div style="background: #ECFDF5; color: #059669; padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 0.85rem; display: flex; align-items: center; gap: 6px;">
+                <i class="fas fa-wifi"></i> ONLINE
+            </div>
+        </div>
+
+        <div class="soal-card">
+            <div class="badge-soal">
+                SOAL NO. <span id="nomor-tampil">1</span> DARI <span id="total-soal">50</span>
+            </div>
+            
+            <div id="teks-soal" style="font-size: 1.2rem; font-weight: 700; line-height: 1.6; margin-bottom: 25px; color: var(--dark);">Memuat soal...</div>
+            
+            <div id="opsi-list"></div>
+            
+            <!-- TOMBOL NAVIGASI DI BAWAH (MOBILE) -->
+            <div class="nav-buttons">
+                <button class="btn btn-outline" onclick="navigasi(-1)" id="btn-prev"><i class="fas fa-arrow-left"></i> Sebelumnya</button>
+                <button class="btn btn-primary" onclick="navigasi(1)" id="btn-next">Selanjutnya <i class="fas fa-arrow-right"></i></button>
+                <button class="btn btn-success hidden" onclick="kirimUjian()" id="btn-kirim"><i class="fas fa-paper-plane"></i> Kirim Ujian</button>
             </div>
         </div>
     </div>
 
-    <!-- HALAMAN UJIAN (MOBILE FRIENDLY - NO GRID) -->
-    <div id="ujian-page" class="hidden min-h-screen bg-slate-50 pb-[100px]">
-        <!-- Header Sticky -->
-        <div class="bg-white border-b border-slate-200 p-4 sticky top-0 z-40 shadow-sm">
-            <div class="flex justify-between items-center max-w-[700px] mx-auto">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center font-bold text-purple-600"><i class="fas fa-user-graduate"></i></div>
-                    <div>
-                        <h3 id="info-nama" class="font-extrabold text-slate-800 text-sm uppercase truncate max-w-[180px] md:max-w-md">NAMA SISWA</h3>
-                        <p id="info-kelas" class="text-slate-500 text-xs font-bold">Kelas • NIS</p>
-                    </div>
-                </div>
-                <div class="bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-full font-bold text-[10px] flex items-center gap-1.5 border border-emerald-100"><i class="fas fa-wifi"></i> <span>ONLINE</span></div>
-            </div>
-        </div>
-
-        <div class="max-w-[700px] mx-auto p-4 mt-2">
-            <!-- Area Soal -->
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-5 relative min-h-[300px]">
-                <div class="absolute -top-3 left-5 bg-slate-800 text-white px-3 py-1 rounded-lg font-bold text-xs shadow-md">SOAL NO. <span id="info-nomor">1 / 50</span></div>
-                
-                <div id="teks-pertanyaan" class="text-base font-semibold text-slate-800 leading-relaxed mb-6 mt-4 whitespace-pre-line">
-                    Memuat pertanyaan...
-                </div>
-                <div id="area-opsi" class="flex flex-col gap-3">
-                    <!-- Opsi Jawaban -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Tombol Navigasi Bawah (Fixed Bottom - NO GRID) -->
-        <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 p-4 z-40 shadow-[0_-10px_20px_rgba(0,0,0,0.05)]">
-            <div class="max-w-[700px] mx-auto flex gap-3">
-                <button class="flex-1 bg-slate-100 text-slate-600 font-bold py-3.5 rounded-xl hover:bg-slate-200 transition text-sm disabled:opacity-50" onclick="pindahSoal(-1)" id="tombol-prev">
-                    <i class="fas fa-arrow-left mr-1"></i> Sebelumnya
-                </button>
-                <button class="flex-1 bg-purple-600 text-white font-bold py-3.5 rounded-xl hover:bg-purple-700 shadow-lg shadow-purple-200 transition text-sm" onclick="pindahSoal(1)" id="tombol-next">
-                    Selanjutnya <i class="fas fa-arrow-right ml-1"></i>
-                </button>
-                <button class="flex-1 bg-emerald-500 text-white font-bold py-3.5 rounded-xl hover:bg-emerald-600 shadow-lg shadow-emerald-200 transition text-sm hidden" onclick="kumpulUjian()" id="tombol-kirim">
-                    Kirim Jawaban <i class="fas fa-check-circle ml-1"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- HALAMAN ADMIN (GURU) -->
+    <!-- DASHBOARD GURU -->
     <div id="admin-page" class="hidden">
         <div class="sidebar">
-            <div class="p-6 border-b border-slate-700 flex items-center gap-4">
-                <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center text-white"><i class="fas fa-shield-halved text-xl"></i></div>
-                <div><h2 class="font-extrabold text-lg leading-tight">AdminPanel</h2><p class="text-[10px] text-slate-400">SMP Islam Ar-Ridho</p></div>
+            <div style="padding: 24px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-shield-alt" style="color: var(--primary); font-size: 24px;"></i>
+                <h2 style="font-size: 1.3rem; font-weight: 800; color: var(--dark);">AdminPanel</h2>
             </div>
-            <div class="p-4 flex-1">
-                <div class="sidebar-menu active" onclick="bukaTabAdmin('dashboard', this)"><i class="fas fa-chart-pie w-6"></i> Dashboard</div>
-                <div class="sidebar-menu" onclick="bukaTabAdmin('rekap', this)"><i class="fas fa-clipboard-list w-6"></i> Rekap Nilai</div>
-                <div class="sidebar-menu" onclick="bukaTabAdmin('siswa', this)"><i class="fas fa-user-graduate w-6"></i> Kelola Siswa</div>
-                <div class="sidebar-menu" onclick="bukaTabAdmin('soal', this)"><i class="fas fa-file-signature w-6"></i> Bank Soal</div>
+            <div class="sidebar-menu">
+                <div class="menu-item active" onclick="bukaMenu('rekap', this)"><i class="fas fa-chart-bar"></i> Rekap Nilai Akhir</div>
+                <div class="menu-item" onclick="bukaMenu('siswa', this)"><i class="fas fa-users"></i> Kelola Data Siswa</div>
+                <div class="menu-item" onclick="bukaMenu('soal', this)"><i class="fas fa-file-alt"></i> Bank Soal PKN</div>
             </div>
-            <div class="p-5 border-t border-slate-700">
-                <button class="btn-main !bg-slate-800 !text-red-400 hover:!bg-slate-700" onclick="window.location.reload()"><i class="fas fa-sign-out-alt"></i> Keluar</button>
-            </div>
+            <div style="padding: 20px; border-top: 1px solid var(--gray-200);"><button class="btn btn-outline" style="border: 2px solid var(--danger); color: var(--danger);" onclick="window.location.reload()"><i class="fas fa-sign-out-alt"></i> Keluar</button></div>
         </div>
 
-        <div class="admin-content">
-            <!-- Dashboard -->
-            <div id="tab-dashboard" class="tab-konten">
-                <h1 class="text-3xl font-extrabold text-slate-800 mb-2">Ringkasan Ujian</h1>
-                <p class="text-slate-500 font-medium mb-8">Pendidikan Pancasila Kelas 9</p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><p class="text-slate-500 font-bold text-xs uppercase mb-2">Total Soal</p><h2 class="text-4xl font-black text-purple-600" id="stat-soal">0</h2></div>
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><p class="text-slate-500 font-bold text-xs uppercase mb-2">Siswa Terdaftar</p><h2 class="text-4xl font-black text-blue-500" id="stat-siswa">0</h2></div>
-                    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><p class="text-slate-500 font-bold text-xs uppercase mb-2">Selesai Ujian</p><h2 class="text-4xl font-black text-emerald-500" id="stat-selesai">0</h2></div>
-                </div>
-                <h2 class="text-xl font-extrabold mb-4 text-slate-800">Kehadiran Kelas</h2>
-                <div class="overflow-x-auto rounded-xl border border-slate-200">
-                    <table id="tabel-statistik"><thead><tr><th>Kelas</th><th>Total</th><th>Laki-Laki</th><th>Perempuan</th><th>Selesai</th><th>Belum</th></tr></thead><tbody></tbody></table>
-                </div>
-            </div>
-
+        <div class="main-content">
             <!-- Rekap Nilai -->
-            <div id="tab-rekap" class="tab-konten hidden">
-                <h1 class="text-3xl font-extrabold text-slate-800 mb-8">Rekapitulasi Nilai</h1>
-                <div class="flex flex-wrap gap-4 mb-6 bg-white p-4 rounded-xl border border-slate-200 w-max">
-                    <select id="filter-rekap" class="form-select !w-auto !py-2.5" onchange="renderTabelRekap()"><option value="ALL">Semua Kelas 9</option><option value="9.1">9.1</option><option value="9.2">9.2</option><option value="9.3">9.3</option><option value="9.4">9.4</option></select>
-                    <button class="btn-main !bg-emerald-500 !w-auto !py-2.5" onclick="downloadExcel()"><i class="fas fa-file-excel"></i> Download Excel</button>
+            <div id="menu-rekap" class="admin-menu">
+                <h1 style="margin-bottom: 25px; color: var(--dark); font-weight: 800;">Rekap Nilai Akhir</h1>
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+                    <select id="f-nilai" class="input-control" style="width: 200px;" onchange="renderNilai()"><option value="ALL">Semua Kelas 9</option><option value="9.1">9.1</option><option value="9.2">9.2</option><option value="9.3">9.3</option><option value="9.4">9.4</option></select>
+                    <button class="btn btn-success" style="width: auto;" onclick="downloadExcel()"><i class="fas fa-file-excel"></i> Download Excel</button>
                 </div>
-                <div class="overflow-x-auto rounded-xl border border-slate-200">
-                    <table id="tabel-rekap"><thead><tr><th>Nama Lengkap</th><th>Kelas</th><th>NIS/NISN</th><th>Status</th><th>Nilai</th></tr></thead><tbody></tbody></table>
+                <div class="table-container">
+                    <table id="tbl-nilai"><thead><tr><th>Nama Lengkap</th><th>Kelas</th><th>NIS</th><th>Status</th><th>Nilai Akhir</th></tr></thead><tbody></tbody></table>
                 </div>
             </div>
 
             <!-- Kelola Siswa -->
-            <div id="tab-siswa" class="tab-konten hidden">
-                <div class="flex flex-wrap justify-between items-center mb-8 gap-4">
-                    <h1 class="text-3xl font-extrabold text-slate-800">Kelola Siswa</h1>
-                    <button class="btn-main !w-auto !py-2.5" onclick="bukaModalPaste('siswa')"><i class="fas fa-paste"></i> Tambah / Paste Siswa</button>
+            <div id="menu-siswa" class="admin-menu hidden">
+                <h1 style="margin-bottom: 25px; color: var(--dark); font-weight: 800;">Kelola Data Siswa</h1>
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+                    <select id="f-siswa" class="input-control" style="width: 200px;" onchange="renderSiswa()"><option value="ALL">Semua Kelas 9</option><option value="9.1">9.1</option><option value="9.2">9.2</option><option value="9.3">9.3</option><option value="9.4">9.4</option></select>
+                    <button class="btn btn-primary" style="width: auto;" onclick="bukaModalPaste('siswa')"><i class="fas fa-paste"></i> Paste Data Siswa</button>
                 </div>
-                <div class="mb-6 bg-white p-4 rounded-xl border border-slate-200 w-max">
-                    <select id="filter-siswa" class="form-select !w-auto !py-2.5" onchange="renderTabelSiswa()"><option value="ALL">Semua Kelas 9</option><option value="9.1">9.1</option><option value="9.2">9.2</option><option value="9.3">9.3</option><option value="9.4">9.4</option></select>
-                </div>
-                <div class="overflow-x-auto rounded-xl border border-slate-200">
-                    <table id="tabel-siswa"><thead><tr><th>Nama Lengkap</th><th>Kelas</th><th>NIS/NISN</th><th>L/P</th><th>Status</th><th>Aksi</th></tr></thead><tbody></tbody></table>
+                <div class="table-container">
+                    <table id="tbl-siswa"><thead><tr><th>Nama Lengkap</th><th>Kelas</th><th>NIS</th><th>NISN</th><th>L/P</th><th>Status</th><th>Aksi</th></tr></thead><tbody></tbody></table>
                 </div>
             </div>
 
             <!-- Kelola Soal -->
-            <div id="tab-soal" class="tab-konten hidden">
-                <div class="flex flex-wrap justify-between items-center mb-8 gap-4">
-                    <h1 class="text-3xl font-extrabold text-slate-800">Bank Soal Ujian</h1>
-                    <div class="flex gap-3">
-                        <button class="btn-main !bg-white !text-purple-600 !border-2 !border-purple-600 !w-auto !py-2.5" onclick="bukaModalAI()"><i class="fas fa-robot"></i> Generator AI</button>
-                        <button class="btn-main !w-auto !py-2.5" onclick="bukaModalPaste('soal')"><i class="fas fa-paste"></i> Paste dari Excel</button>
-                    </div>
+            <div id="menu-soal" class="admin-menu hidden">
+                <h1 style="margin-bottom: 25px; color: var(--dark); font-weight: 800;">Bank Soal PKN <span id="s-soal" style="font-size: 1rem; background: var(--primary); color: white; padding: 4px 10px; border-radius: 12px; vertical-align: middle; margin-left: 10px;">0</span></h1>
+                <div style="display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 20px;">
+                    <button class="btn btn-outline" style="width: auto; color: var(--primary); border-color: var(--primary);" onclick="bukaModalAI()"><i class="fas fa-robot"></i> AI Generator Soal</button>
+                    <button class="btn btn-primary" style="width: auto;" onclick="bukaModalPaste('soal')"><i class="fas fa-paste"></i> Paste Soal Manual</button>
                 </div>
-                <div class="overflow-x-auto rounded-xl border border-slate-200">
-                    <table id="tabel-soal"><thead><tr><th style="width: 50px;">No</th><th>Pertanyaan</th><th style="width: 150px;">Kunci</th><th style="width: 100px;">Aksi</th></tr></thead><tbody></tbody></table>
+                <div class="table-container">
+                    <table id="tbl-soal"><thead><tr><th>No</th><th>Pertanyaan</th><th>Kunci Jawaban</th><th>Aksi</th></tr></thead><tbody></tbody></table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal Paste Excel -->
-    <div id="modal-paste" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[1000] hidden items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-3xl w-full max-w-2xl shadow-2xl relative">
-            <div class="flex justify-between items-center mb-6">
-                <h2 id="paste-title" class="font-extrabold text-xl text-slate-800">Paste Data</h2>
-                <button class="text-slate-400 hover:text-red-500 text-2xl" onclick="tutupModal('modal-paste')"><i class="fas fa-times"></i></button>
+    <!-- MODAL KONFIRMASI (TENGAH LAYAR - TERKUNCI) -->
+    <div id="modal-konfirm" class="modal-overlay hidden">
+        <div class="modal-content" style="text-align: center;">
+            <div style="background: #ECFDF5; width: 75px; height: 75px; border-radius: 22px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                <i class="fas fa-check-circle" style="font-size: 35px; color: #059669;"></i>
             </div>
-            <div class="bg-amber-50 border border-amber-200 p-4 rounded-xl mb-6 text-amber-800 text-sm">
-                <b>Petunjuk Copy-Paste:</b><br><code id="paste-format" class="font-bold text-amber-600 mt-1 block"></code>
+            <h2 style="margin-bottom: 25px; color: var(--dark); font-weight: 800;">Konfirmasi Data Diri</h2>
+            <div style="text-align: left; margin-bottom: 30px; background: #F8FAFC; padding: 15px 20px; border-radius: 14px; border: 1px solid var(--gray-200);">
+                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--gray-200);">
+                    <span style="color: var(--gray-500); font-weight: 600; font-size: 0.85rem;">NAMA</span>
+                    <strong id="k-nama" style="color: var(--dark); text-transform: uppercase;"></strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--gray-200);">
+                    <span style="color: var(--gray-500); font-weight: 600; font-size: 0.85rem;">KELAS</span>
+                    <strong id="k-kelas" style="color: var(--dark);"></strong>
+                </div>
+                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                    <span style="color: var(--gray-500); font-weight: 600; font-size: 0.85rem;">NIS / NISN</span>
+                    <strong id="k-nis" style="color: var(--dark);"></strong>
+                </div>
             </div>
-            <input type="hidden" id="paste-jenis">
-            <textarea id="paste-input" class="form-input !h-48" placeholder="Paste (Ctrl+V) langsung di kotak ini..."></textarea>
-            <button class="btn-main mt-6" onclick="simpanDataPaste()"><i class="fas fa-save"></i> Simpan ke Database</button>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-outline" onclick="tutupModal('modal-konfirm')">Batal</button>
+                <button class="btn btn-primary" onclick="startUjian()">Mulai Ujian <i class="fas fa-play"></i></button>
+            </div>
         </div>
     </div>
 
-    <!-- Modal Generator AI -->
-    <div id="modal-ai" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[1000] hidden items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-3xl w-full max-w-2xl shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="font-extrabold text-xl text-purple-600"><i class="fas fa-robot mr-2"></i> Generator Soal AI</h2>
-                <button class="text-slate-400 hover:text-red-500 text-2xl" onclick="tutupModal('modal-ai')"><i class="fas fa-times"></i></button>
+    <!-- MODAL PASTE EXCEL -->
+    <div id="modal-paste" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2 id="m-title" style="margin-bottom: 15px; font-weight: 800;">Paste Data</h2>
+            <div style="background: #FEF3C7; padding: 15px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 20px; border: 1px solid #FCD34D;">
+                <b style="color: #D97706;">Format Excel:</b><br><code id="m-format" style="color: var(--dark); font-weight: 800; display: block; margin-top: 5px;"></code>
             </div>
-            <div class="bg-purple-50 border border-purple-200 p-4 rounded-xl mb-6 text-purple-800 text-sm">
-                <b>API Key Terhubung!</b> Upload PDF/Word materi Bapak, dan AI otomatis mengekstraknya menjadi Soal Pilihan Ganda.
+            <input type="hidden" id="m-type">
+            <textarea id="m-text" class="input-control" rows="8" placeholder="Paste (Ctrl+V) tabel dari Excel di sini..."></textarea>
+            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                <button class="btn btn-outline" onclick="tutupModal('modal-paste')">Batal</button>
+                <button class="btn btn-primary" onclick="simpanPaste()">Simpan Data</button>
             </div>
-            <div class="mb-6">
-                <label class="block font-bold text-slate-700 mb-2 text-sm">Upload File (PDF / Word / TXT)</label>
-                <input type="file" id="ai-file" class="form-input !py-3" accept=".pdf, .docx, .txt" onchange="bacaFileUntukAI(event)">
-            </div>
-            <div class="text-center font-bold text-slate-400 my-4">ATAU</div>
-            <div class="mb-6">
-                <label class="block font-bold text-slate-700 mb-2 text-sm">Paste Teks Materi / Soal Mentah</label>
-                <textarea id="ai-teks" class="form-input !h-32" placeholder="Paste materi mentahnya di sini..."></textarea>
-            </div>
-            <button class="btn-main" onclick="prosesAI()"><i class="fas fa-magic"></i> Generate & Simpan Otomatis</button>
         </div>
     </div>
 
+    <!-- MODAL AI -->
+    <div id="modal-ai" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="font-weight: 800;"><i class="fas fa-robot" style="color: var(--primary);"></i> AI Generator</h2>
+                <button class="btn btn-outline" style="border:none; padding:8px; width:auto;" onclick="tutupModal('modal-ai')"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="input-group">
+                <label>Upload File (PDF / DOCX)</label>
+                <input type="file" id="ai-file-input" class="input-control" accept=".pdf, .docx, .txt" onchange="bacaFileUpload(event)">
+            </div>
+            <div style="text-align: center; font-weight: 800; color: var(--gray-500); margin: 15px 0;">ATAU</div>
+            <div class="input-group">
+                <label>Paste Teks Materi</label>
+                <textarea id="ai-teks-mentah" class="input-control" rows="5" placeholder="Paste teks materi di sini..."></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="prosesGeneratorAI()"><i class="fas fa-magic"></i> Buat Soal Otomatis</button>
+        </div>
+    </div>
+
+    <!-- SCRIPT UTAMA & FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, doc, updateDoc, setDoc, deleteDoc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
         const app = initializeApp({
             apiKey: "AIzaSyDExMRbUfrN-R8mKVznYCVpng4K6F8iaSg", authDomain: "uh-pkn-kelas-9.firebaseapp.com",
@@ -526,317 +289,231 @@ SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P`;
         });
         const db = getFirestore(app);
 
-        let dbSiswa = [], dbSoal = [];
-        let sessionUser = null, sessionSoal = [], sessionIndex = 0, sessionJawaban = {};
-        
-        // PENTING: Kunci Memori LocalStorage Baru agar error lama di HP anak otomatis diabaikan
-        const MEMORY_VERSION = 'V3_Final_PKN_'; 
+        let users = [], questions = [], userNow = null;
+        let soalSiswa = [], idxSoal = 0, jawaban = {};
 
-        // AUTO-HEALING & SINKRONISASI DATABASE 
-        // Jika database kosong ATAU berisi error (undefined), otomatis timpa dengan LOCAL_USERS & LOCAL_QUESTIONS
-        onSnapshot(collection(db, "users"), (snap) => {
-            dbSiswa = []; snap.forEach(d => dbSiswa.push({ id: d.id, ...d.data() }));
-            
-            // Cek apakah data siswa kosong
-            if(dbSiswa.length === 0) {
-                const batch = writeBatch(db);
-                LOCAL_USERS.forEach(u => batch.set(doc(db, "users", u.id), u));
-                batch.commit();
-                dbSiswa = LOCAL_USERS;
-            }
-            if(!document.getElementById('admin-page').classList.contains('hidden')) { updateDashboardAdmin(); renderTabelRekap(); renderTabelSiswa(); }
-        });
-
-        onSnapshot(collection(db, "questions"), (snap) => {
-            dbSoal = []; snap.forEach(d => dbSoal.push({ id: d.id, ...d.data() }));
-            
-            // Cek apakah soal kosong ATAU cacat (undefined text) akibat error masa lalu
-            const isCorrupted = dbSoal.some(s => !s.soal || s.soal === "undefined" || !s.a);
-            
-            if(dbSoal.length === 0 || isCorrupted) {
-                // Hapus data cacat (jika ada) dan timpa dengan data murni
-                if(isCorrupted) dbSoal.forEach(s => deleteDoc(doc(db, "questions", s.id)));
-                const batch = writeBatch(db);
-                LOCAL_QUESTIONS.forEach(q => batch.set(doc(db, "questions", q.id), q));
-                batch.commit();
-                dbSoal = LOCAL_QUESTIONS;
-            }
-            if(!document.getElementById('admin-page').classList.contains('hidden')) { document.getElementById('stat-soal').innerText = dbSoal.length; renderTabelSoal(); }
-        });
-
-        // ==================== FUNGSI LOGIN SISWA & GURU ====================
-        window.gantiTab = (tab) => {
-            document.getElementById('tab-btn-siswa').className = tab === 'siswa' ? "flex-1 py-2 font-bold rounded-lg bg-white text-purple-600 shadow-sm transition text-sm" : "flex-1 py-2 font-bold rounded-lg text-slate-500 hover:text-slate-700 transition text-sm";
-            document.getElementById('tab-btn-guru').className = tab === 'guru' ? "flex-1 py-2 font-bold rounded-lg bg-white text-purple-600 shadow-sm transition text-sm" : "flex-1 py-2 font-bold rounded-lg text-slate-500 hover:text-slate-700 transition text-sm";
-            document.getElementById('form-siswa').classList.toggle('hidden', tab !== 'siswa');
-            document.getElementById('form-guru').classList.toggle('hidden', tab !== 'guru');
-        };
-
-        window.muatNamaSiswa = () => {
-            const kls = document.getElementById('sel-kelas').value;
-            const selNama = document.getElementById('sel-nama');
-            selNama.innerHTML = '<option value="">-- Pilih Nama --</option>';
-            if(kls) {
-                const dataDipakai = dbSiswa.length > 0 ? dbSiswa : LOCAL_USERS; // Fallback jika internet delay
-                dataDipakai.filter(s => s.kelas === kls).sort((a,b) => a.nama.localeCompare(b.nama)).forEach(s => {
-                    selNama.innerHTML += `<option value="${s.id}">${s.nama}</option>`;
-                });
-                selNama.disabled = false;
-            } else selNama.disabled = true;
-        };
-
-        window.verifikasiSiswa = () => {
-            const id = document.getElementById('sel-nama').value;
-            if(!id) return Swal.fire('Oops!', 'Silakan pilih nama Anda terlebih dahulu.', 'warning');
-            const dataDipakai = dbSiswa.length > 0 ? dbSiswa : LOCAL_USERS;
-            sessionUser = dataDipakai.find(s => s.id === id);
-            
-            if(sessionUser.status === 'selesai') return Swal.fire('Selesai', 'Anda telah menyelesaikan ujian ini.', 'info');
-
-            document.getElementById('konf-nama').innerText = sessionUser.nama;
-            document.getElementById('konf-kelas').innerText = sessionUser.kelas;
-            document.getElementById('konf-nis').innerText = sessionUser.nis;
-            document.getElementById('konf-nisn').innerText = sessionUser.nisn;
-            document.getElementById('konf-jk').innerText = sessionUser.jk === 'L' ? 'Laki-laki' : 'Perempuan';
-            document.getElementById('modal-konfirmasi').classList.remove('hidden');
-            document.getElementById('modal-konfirmasi').classList.add('flex');
-        };
-
-        window.tutupModal = (id) => {
-            document.getElementById(id).classList.add('hidden');
-            document.getElementById(id).classList.remove('flex');
-        };
-
-        // ==================== FUNGSI UJIAN (ANTI NYONTEK & ANTI RESET) ====================
-        window.mulaiMengerjakan = () => {
-            tutupModal('modal-konfirmasi');
-            document.getElementById('login-page').classList.remove('flex');
-            document.getElementById('login-page').classList.add('hidden');
-            document.getElementById('ujian-page').classList.remove('hidden');
-            
-            document.getElementById('info-nama').innerText = sessionUser.nama;
-            document.getElementById('info-kelas').innerText = `Kelas ${sessionUser.kelas} • NIS: ${sessionUser.nis}`;
-
-            // Cek Memori Lokal (Anti-Reset). Menggunakan KEY BARU agar error lama hilang!
-            const memori = localStorage.getItem(MEMORY_VERSION + sessionUser.id);
-            if (memori) {
-                const dataMemori = JSON.parse(memori);
-                // Validasi ketat memori: Pastikan tidak undefined!
-                if(dataMemori.soal && dataMemori.soal.length > 0 && dataMemori.soal[0].soal && dataMemori.soal[0].soal !== 'undefined') {
-                    sessionSoal = dataMemori.soal; sessionJawaban = dataMemori.jawaban; sessionIndex = dataMemori.index;
-                } else {
-                    localStorage.removeItem(MEMORY_VERSION + sessionUser.id); // Buang jika corrupt
-                }
-            } 
-            
-            if (!memori || sessionSoal.length === 0) {
-                // ACAK URUTAN SOAL, TAPI OPSI (A,B,C,D) TETAP DI TEMPATNYA!
-                const dataSoalDipakai = dbSoal.length > 0 ? dbSoal : LOCAL_QUESTIONS;
-                sessionSoal = [...dataSoalDipakai].sort(() => Math.random() - 0.5).map(q => ({
-                    id: q.id, soal: q.soal, jawabanKunci: q.jawaban,
-                    opsiTetap: [ {huruf: 'a', teks: q.a}, {huruf: 'b', teks: q.b}, {huruf: 'c', teks: q.c}, {huruf: 'd', teks: q.d} ]
-                }));
-                sessionJawaban = {}; sessionIndex = 0;
-            }
-            tampilkanSoalLayar(sessionIndex);
-        };
-
-        function simpanKeMemoriLokal() { localStorage.setItem(MEMORY_VERSION + sessionUser.id, JSON.stringify({ soal: sessionSoal, jawaban: sessionJawaban, index: sessionIndex })); }
-
-        window.tampilkanSoalLayar = (index) => {
-            sessionIndex = index; simpanKeMemoriLokal();
-            const q = sessionSoal[index];
-            document.getElementById('info-nomor').innerText = `${index + 1} / ${sessionSoal.length}`;
-            document.getElementById('teks-pertanyaan').innerText = q.soal;
-
-            const wadahOpsi = document.getElementById('area-opsi'); wadahOpsi.innerHTML = '';
-            q.opsiTetap.forEach((opsi) => {
-                if(!opsi.teks || opsi.teks.trim() === '-' || opsi.teks === 'undefined') return; // Skip untuk opsi kosong (Benar/Salah)
-                const div = document.createElement('div');
-                div.className = `option-card ${sessionJawaban[q.id] === opsi.huruf ? 'selected' : ''}`;
-                div.onclick = () => { sessionJawaban[q.id] = opsi.huruf; simpanKeMemoriLokal(); tampilkanSoalLayar(sessionIndex); };
-                div.innerHTML = `<div class="option-badge">${opsi.huruf.toUpperCase()}</div><div class="font-medium text-slate-700 text-sm md:text-base">${opsi.teks}</div>`;
-                wadahOpsi.appendChild(div);
-            });
-
-            // Logika Tombol Next/Prev/Kirim
-            document.getElementById('tombol-prev').disabled = (index === 0);
-            document.getElementById('tombol-next').classList.toggle('hidden', index === sessionSoal.length - 1);
-            document.getElementById('tombol-kirim').classList.toggle('hidden', index !== sessionSoal.length - 1);
-        };
-
-        window.pindahSoal = (arah) => { if (sessionIndex + arah >= 0 && sessionIndex + arah < sessionSoal.length) tampilkanSoalLayar(sessionIndex + arah); };
-
-        window.kumpulUjian = async () => {
-            const dijawab = Object.keys(sessionJawaban).length;
-            if(dijawab < sessionSoal.length) {
-                const tanya = await Swal.fire({ title: 'Ada yang terlewat!', text: `Baru dijawab ${dijawab} dari ${sessionSoal.length} soal. Yakin?`, icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Kirim' });
-                if(!tanya.isConfirmed) return;
-            } else if(!confirm('Kirim jawaban secara permanen?')) return;
-
-            Swal.fire({ title: 'Menghitung Nilai...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            let jumlahBenar = 0;
-            for(let idSoal in sessionJawaban) {
-                const soalAsli = sessionSoal.find(s => s.id === idSoal);
-                if(soalAsli && soalAsli.jawabanKunci === sessionJawaban[idSoal]) jumlahBenar++;
-            }
-            const nilaiAkhir = Math.round((jumlahBenar / sessionSoal.length) * 100) || 0;
-
+        // FITUR DOKTER: MENGHANCURKAN ERROR UNDEFINED & SOAL GANDA (100 SOAL)
+        async function hardResetDanSuntik() {
             try {
-                await updateDoc(doc(db, "users", sessionUser.id), { status: 'selesai', nilai: nilaiAkhir, jawaban: sessionJawaban });
-                localStorage.removeItem(MEMORY_VERSION + sessionUser.id);
-                Swal.fire('Ujian Selesai!', `Jawaban tersimpan.\nNilai Anda: ${nilaiAkhir}`, 'success').then(() => window.location.reload());
-            } catch(e) { Swal.fire('Gagal', 'Koneksi internet terputus. Coba lagi.', 'error'); }
-        };
-
-        // ==================== ADMIN GURU ====================
-        window.masukDashboardGuru = () => {
-            if(document.getElementById('pin-admin').value === '202099') {
-                document.getElementById('login-page').classList.remove('flex');
-                document.getElementById('login-page').classList.add('hidden');
-                document.getElementById('admin-page').classList.remove('hidden');
-                updateDashboardAdmin();
-            } else Swal.fire('Ditolak', 'PIN salah.', 'error');
-        };
-
-        window.bukaTabAdmin = (namaTab, elemen) => {
-            document.querySelectorAll('.tab-konten').forEach(t => t.classList.add('hidden'));
-            document.querySelectorAll('.sidebar-menu').forEach(m => m.classList.remove('active'));
-            document.getElementById(`tab-${namaTab}`).classList.remove('hidden');
-            elemen.classList.add('active');
-        };
-
-        function updateDashboardAdmin() {
-            document.getElementById('stat-siswa').innerText = dbSiswa.length;
-            document.getElementById('stat-selesai').innerText = dbSiswa.filter(u => u.status === 'selesai').length;
-            let dataKelas = {};
-            dbSiswa.forEach(s => {
-                if(!dataKelas[s.kelas]) dataKelas[s.kelas] = { total: 0, L: 0, P: 0, selesai: 0 };
-                dataKelas[s.kelas].total++;
-                if(s.jk === 'L') dataKelas[s.kelas].L++; else dataKelas[s.kelas].P++;
-                if(s.status === 'selesai') dataKelas[s.kelas].selesai++;
-            });
-            const tbody = document.querySelector('#tabel-statistik tbody'); tbody.innerHTML = '';
-            Object.keys(dataKelas).sort().forEach(kls => {
-                const d = dataKelas[kls];
-                tbody.innerHTML += `<tr><td class="font-bold text-purple-600">${kls}</td><td>${d.total}</td><td>${d.L}</td><td>${d.P}</td><td><span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-xs font-bold">${d.selesai}</span></td><td><span class="px-2 py-1 bg-amber-100 text-amber-700 rounded-lg text-xs font-bold">${d.total - d.selesai}</span></td></tr>`;
-            });
-        }
-
-        window.renderTabelRekap = () => {
-            const filter = document.getElementById('filter-rekap').value;
-            const dataFiltered = filter === 'ALL' ? dbSiswa : dbSiswa.filter(s => s.kelas === filter);
-            const tbody = document.querySelector('#tabel-rekap tbody'); tbody.innerHTML = '';
-            dataFiltered.sort((a,b) => a.nama.localeCompare(b.nama)).forEach(s => {
-                const status = s.status === 'selesai' ? '<span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded-md text-xs font-bold">Selesai</span>' : '<span class="px-2 py-1 bg-amber-100 text-amber-700 rounded-md text-xs font-bold">Belum</span>';
-                tbody.innerHTML += `<tr><td><strong class="text-slate-800">${s.nama}</strong></td><td>${s.kelas}</td><td>${s.nis}<br><span class="text-xs text-slate-400">${s.nisn}</span></td><td>${status}</td><td><strong class="text-purple-600 text-lg">${s.status === 'selesai' ? s.nilai : '-'}</strong></td></tr>`;
-            });
-        };
-
-        window.downloadExcel = () => {
-            const filter = document.getElementById('filter-rekap').value;
-            const dataFiltered = filter === 'ALL' ? dbSiswa : dbSiswa.filter(s => s.kelas === filter);
-            let csv = "Nama Lengkap,Kelas,NIS,NISN,Jenis Kelamin,Status,Nilai Akhir\n";
-            dataFiltered.sort((a,b) => a.nama.localeCompare(b.nama)).forEach(s => { csv += `"${s.nama}",${s.kelas},${s.nis},${s.nisn},${s.jk},${s.status},${s.status === 'selesai' ? s.nilai : ''}\n`; });
-            const link = document.createElement("a"); link.href = encodeURI("data:text/csv;charset=utf-8," + csv); link.download = `Rekap_Nilai_${filter}.csv`; link.click();
-        };
-
-        window.renderTabelSiswa = () => {
-            const filter = document.getElementById('filter-siswa').value;
-            const dataFiltered = filter === 'ALL' ? dbSiswa : dbSiswa.filter(s => s.kelas === filter);
-            const tbody = document.querySelector('#tabel-siswa tbody'); tbody.innerHTML = '';
-            dataFiltered.sort((a,b) => a.nama.localeCompare(b.nama)).forEach(s => {
-                const btnReset = s.status === 'selesai' ? `<button class="bg-amber-500 text-white p-2 rounded-md hover:bg-amber-600 mr-2" onclick="resetSiswa('${s.id}')" title="Reset Ujian"><i class="fas fa-undo"></i></button>` : '';
-                tbody.innerHTML += `<tr><td><strong class="text-slate-800">${s.nama}</strong></td><td>${s.kelas}</td><td>${s.nis}<br><span class="text-xs text-slate-400">${s.nisn}</span></td><td>${s.jk}</td><td>${s.status}</td><td class="whitespace-nowrap">${btnReset} <button class="bg-red-500 text-white p-2 rounded-md hover:bg-red-600" onclick="hapusDokumen('users','${s.id}')" title="Hapus Siswa"><i class="fas fa-trash"></i></button></td></tr>`;
-            });
-        };
-
-        window.resetSiswa = async (id) => { if(confirm('Hapus nilai siswa ini agar bisa mengulang?')) await updateDoc(doc(db, "users", id), { status: 'belum', nilai: 0, jawaban: {} }); };
-
-        window.renderTabelSoal = () => {
-            const tbody = document.querySelector('#tabel-soal tbody'); tbody.innerHTML = '';
-            dbSoal.forEach((q, i) => {
-                tbody.innerHTML += `<tr><td>${i+1}</td><td><div class="max-h-20 overflow-y-auto pr-2 text-sm">${q.soal}</div></td><td><strong class="text-emerald-500 uppercase">${q.jawaban}</strong></td><td class="whitespace-nowrap"><button class="bg-red-500 text-white p-2 rounded-md hover:bg-red-600" onclick="hapusDokumen('questions','${q.id}')"><i class="fas fa-trash"></i></button></td></tr>`;
-            });
-        };
-
-        window.hapusDokumen = async (koleksi, id) => { if(confirm('Yakin hapus permanen?')) await deleteDoc(doc(db, koleksi, id)); };
-
-        // ==================== PASTE EXCEL ====================
-        window.bukaModalPaste = (jenis) => {
-            document.getElementById('paste-jenis').value = jenis; document.getElementById('paste-input').value = '';
-            if(jenis === 'siswa') {
-                document.getElementById('paste-title').innerText = "Tambah Siswa Massal";
-                document.getElementById('paste-format').innerText = "Kolom 1: NAMA | 2: KELAS | 3: NIS | 4: NISN | 5: L/P";
-            } else {
-                document.getElementById('paste-title').innerText = "Tambah Soal Massal";
-                document.getElementById('paste-format').innerText = "Kolom 1: SOAL | 2: Opsi A | 3: Opsi B | 4: Opsi C | 5: Opsi D | 6: KUNCI (a/b/c/d)";
-            }
-            const modal = document.getElementById('modal-paste'); modal.classList.remove('hidden'); modal.classList.add('flex');
-        };
-
-        window.simpanDataPaste = async () => {
-            const jenis = document.getElementById('paste-jenis').value; const teks = document.getElementById('paste-input').value.trim();
-            if(!teks) return Swal.fire('Kosong', 'Paste data dulu', 'warning');
-            Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-            let berhasil = 0; const barisData = teks.split('\n');
-            const batch = writeBatch(db);
-            try {
-                if(jenis === 'siswa') {
-                    for(let baris of barisData) {
-                        if(!baris.trim()) continue;
-                        const k = baris.includes('\t') ? baris.split('\t') : baris.split('|');
-                        if(k.length >= 5) { batch.set(doc(db, "users", `siswa_${k[2].trim()}`), { nama: k[0].trim(), kelas: k[1].trim(), nis: k[2].trim(), nisn: k[3].trim(), jk: k[4].trim(), status: 'belum', nilai: 0, jawaban: {} }); berhasil++; }
-                    }
-                } else {
-                    for(let baris of barisData) {
-                        if(!baris.trim()) continue;
-                        const k = baris.includes('\t') ? baris.split('\t') : baris.split('|');
-                        if(k.length >= 6) { batch.set(doc(db, "questions", 'soal_' + Date.now() + Math.random()), { soal: k[0].trim(), a: k[1].trim(), b: k[2].trim(), c: k[3].trim(), d: k[4].trim(), jawaban: k[5].trim().toLowerCase() }); berhasil++; }
-                    }
-                }
-                await batch.commit();
-                tutupModal('modal-paste'); Swal.fire('Berhasil!', `${berhasil} Baris data tersimpan.`, 'success');
-            } catch(e) { Swal.fire('Error', 'Format kolom salah.', 'error'); }
-        };
-
-        // ==================== GENERATOR AI (PDF/WORD/TEXT) ====================
-        window.bukaModalAI = () => {
-            document.getElementById('ai-teks').value = ''; 
-            const modal = document.getElementById('modal-ai'); modal.classList.remove('hidden'); modal.classList.add('flex');
-        };
-
-        window.bacaFileUntukAI = async (e) => {
-            const file = e.target.files[0]; if(!file) return; document.getElementById('ai-teks').value = "⏳ Mengekstrak teks dari dokumen...";
-            try {
-                if(file.name.endsWith('.txt')) document.getElementById('ai-teks').value = await file.text();
-                else if(file.name.endsWith('.docx')) { const buf = await file.arrayBuffer(); const res = await mammoth.extractRawText({arrayBuffer: buf}); document.getElementById('ai-teks').value = res.value; }
-                else if(file.name.endsWith('.pdf')) { const buf = await file.arrayBuffer(); const pdf = await pdfjsLib.getDocument({data: buf}).promise; let txtFull = ""; for(let i=1; i<=pdf.numPages; i++) { const page = await pdf.getPage(i); const content = await page.getTextContent(); txtFull += content.items.map(t => t.str).join(" ") + "\n"; } document.getElementById('ai-teks').value = txtFull; }
-            } catch(err) { document.getElementById('ai-teks').value = ""; Swal.fire('Gagal', 'File tidak terbaca.', 'error'); }
-        };
-
-        window.prosesAI = async () => {
-            const API_KEY_JAYADI = "AIzaSyBQ6KInIm35AvTUs6S32pQza5Q1Kae2sCI";
-            const teksMateri = document.getElementById('ai-teks').value.trim();
-            if(!teksMateri) return Swal.fire('Kosong', 'Masukkan materi!', 'warning');
-            Swal.fire({ title: 'AI Meracik Soal...', text: 'Tunggu sebentar, mesin sedang berpikir...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-            const instruksi = `Buatkan soal pilihan ganda dari teks ini:\n"${teksMateri}"\nATURAN MUTLAK:\n1. HANYA KELUARKAN JSON ARRAY murni.\n[{"soal":"Tanya?","a":"OpsiA","b":"OpsiB","c":"OpsiC","d":"OpsiD","jawaban":"a"}]`;
-            try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY_JAYADI}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: instruksi }] }], generationConfig: { temperature: 0.2 } }) });
-                if(!response.ok) throw new Error("Gagal Koneksi API");
-                const data = await response.json();
-                let hasilTeksAI = data.candidates[0].content.parts[0].text;
-                const arraySoalJSON = JSON.parse(hasilTeksAI.substring(hasilTeksAI.indexOf('['), hasilTeksAI.lastIndexOf(']') + 1));
+                const qSnap = await getDocs(collection(db, "questions"));
+                let butuhReset = false;
                 
-                const batch = writeBatch(db);
-                let jumlahSukses = 0;
-                for(let item of arraySoalJSON) {
-                    if(item.soal && item.a && item.jawaban) { batch.set(doc(db, "questions", 'soal_ai_' + Date.now() + Math.random()), item); jumlahSukses++; }
+                // Cek apakah ada lebih dari 50 soal (menumpuk) atau ada yang undefined
+                if (qSnap.size !== 50) butuhReset = true;
+                else {
+                    qSnap.forEach(d => { if(!d.data().soal || d.data().soal.includes('undefined')) butuhReset = true; });
                 }
-                await batch.commit();
-                tutupModal('modal-ai'); Swal.fire('Sempurna!', `${jumlahSukses} Soal AI berhasil ditambahkan.`, 'success');
-            } catch (err) { Swal.fire('Error AI', 'Teks terlalu panjang atau format jawaban AI meleset. Coba potong teks menjadi lebih sedikit.', 'error'); }
+
+                if(butuhReset) {
+                    document.getElementById('loading-overlay').classList.remove('hidden');
+                    
+                    // 1. Bersihkan sampah soal lama
+                    const batchDelete = writeBatch(db);
+                    qSnap.forEach(d => batchDelete.delete(d.ref));
+                    await batchDelete.commit();
+
+                    // 2. Suntik ulang tepat 50 soal murni
+                    const batchSoal = writeBatch(db);
+                    const strSoal = "Analisis hubungan antara Pancasila dan Pembukaan UUD NRI Tahun 1945: (1) Pancasila berkedudukan di atas konstitusi sebagai norma dasar. (2) Pembukaan UUD 1945 dapat diubah sewaktu-waktu. (3) Pembukaan UUD 1945 memuat rumusan Pancasila.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b^Karakteristik hubungan Pancasila dengan Bhinneka Tunggal Ika: (1) Sila ketiga meletakkan dasar kebangsaan. (2) Keberagaman harus diseragamkan. (3) Pancasila menjamin hak yang setara bagi setiap warga.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b^Implementasi semangat Pancasila dalam kehidupan bernegara: (1) Mengutamakan musyawarah mufakat. (2) Memperlakukan orang lain secara adil. (3) Memaksakan kehendak kelompok mayoritas.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a^Analisis pandangan para ahli mengenai konsep hak dan kewajiban: (1) Notonegoro menyatakan hak adalah kekuasaan menerima. (2) John Salmond mengelompokkan hak kekebalan. (3) Kewajiban warga negara bersifat opsional.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a^Pengaturan hak dan kewajiban warga negara dalam UUD 1945: (1) Hak atas pekerjaan diatur Pasal 27 ayat 2. (2) Hak berserikat diatur Pasal 28E. (3) Warga negara dibebaskan dari kewajiban hukum.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a^Peran lembaga penegak hukum dalam sistem peradilan di Indonesia: (1) Polri memelihara keamanan. (2) Kejaksaan melaksanakan penuntutan perkara pidana. (3) Hakim bertindak sebagai penasihat hukum terdakwa.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a^Hakikat kemerdekaan berpendapat sebagai hak asasi manusia: (1) Tolok ukur negara demokrasi. (2) Dapat dilaksanakan sebebas-bebasnya tanpa batas. (3) Harus diimbangi kewajiban menghormati hak orang lain.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b^Ketentuan hukum penyampaian pendapat di muka umum (UU No 9/1998): (1) Dilarang di istana kepresidenan dan tempat ibadah. (2) Diwujudkan melalui unjuk rasa atau pawai. (3) Diizinkan malam hari tanpa batasan waktu.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a^Prinsip keterbukaan informasi publik (UU No 14/2008): (1) Menjamin hak warga mengetahui kebijakan publik. (2) Mendorong partisipasi aktif masyarakat. (3) Menutupi dokumen negara dari pengawasan.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a^Karakteristik tradisi dan kearifan lokal di Indonesia: (1) Tradisi diwariskan turun-temurun. (2) Kearifan lokal memuat budi pekerti luhur. (3) Tradisi bersifat statis mutlak dan tidak beradaptasi.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a^Analisis nilai filosofis kearifan lokal nusantara: (1) Tri Hita Karana mengajarkan keharmonisan. (2) Ajining diri saka lathi menekankan pentingnya etika. (3) Lojor teu meunang dipotong mendorong eksploitasi hutan.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a^Ruang lingkup objek pemajuan kebudayaan (UU No 5/2017): (1) Tradisi lisan dan upacara adat. (2) Permainan rakyat dan olahraga tradisional. (3) Industri manufaktur mesin berat.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a^Analisis tantangan demografi Indonesia (Sensus 2020): (1) Bonus demografi ditandai dominasi usia produktif. (2) Sebaran penduduk merata di pulau terluar. (3) Peningkatan kualitas SDM sangat krusial.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|b^Wujud cita-cita bangsa dan sistem pertahanan NKRI: (1) Membentuk masyarakat adil makmur. (2) Menerapkan Sishankamrata. (3) Mengisolasi diri dari kerja sama internasional.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a^Peran aktif peserta didik menjaga keutuhan wilayah NKRI: (1) Belajar tekun. (2) Menjaga kerukunan dan menghindari intoleransi. (3) Melakukan tindakan anarkis di ruang publik.|Jika pernyataan (1) dan (2) benar|Jika pernyataan (1) dan (3) benar|Jika pernyataan (2) dan (3) benar|Jika pernyataan (1), (2), dan (3) benar|a^Pendapat yang menyatakan hubungan Pancasila dan UUD 1945 ibarat roh dan jasad dikemukakan oleh...|Prof. Dr. Notonegoro|Jimly Asshiddiqie|Yudi Latif|Moh. Hatta|a^Alasan utama Pembukaan UUD 1945 tidak boleh diubah oleh MPR adalah karena memuat...|Aturan peralihan sistem|Rumusan dasar negara dan tujuan NKRI|Rincian pasal penyelenggaraan negara|Jadwal pelaksanaan pemilu|b^Menurut Prof. Dr. Notonegoro, hak diartikan sebagai...|Kepentingan yang dilindungi hukum|Beban memberikan sesuatu|Kekuasaan menerima sesuatu yang semestinya|Izin mutlak dari penguasa|c^Pasal UUD 1945 yang tegas menjamin kebebasan memeluk agama dan beribadat adalah...|Pasal 27 ayat (1)|Pasal 28D ayat (1)|Pasal 29 ayat (2)|Pasal 31 ayat (1)|c^Perilaku keseimbangan antara hak dan kewajiban di sekolah adalah...|Menuntut fasilitas tanpa merawat|Mendapat pelajaran & menaati tata tertib|Meminta guru mengulang tanpa perhatikan|Mengabaikan kebersihan demi nilai|b^Lembaga peradilan di bawah MA untuk mengadili perkara perdata dan pidana umum adalah...|Peradilan TUN|Peradilan Agama|Peradilan Militer|Peradilan Umum|d^Berdasarkan UU No 2 Tahun 2002, tugas utama Polri adalah...|Menguji UU terhadap UUD|Memelihara keamanan & ketertiban hukum|Menjatuhkan vonis persidangan|Melaksanakan penuntutan perkara|b^Undang-undang yang khusus mengatur kemerdekaan menyampaikan pendapat di muka umum adalah...|UU No 9 Tahun 1998|UU No 39 Tahun 1999|UU No 14 Tahun 2008|UU No 5 Tahun 2017|a^Lokasi yang dilarang mutlak untuk dijadikan tempat unjuk rasa adalah...|Alun-alun dan jalan protokol|Istana kepresidenan dan tempat ibadah|Depan gedung DPRD|Lapangan terbuka umum|b^Aplikasi resmi pemerintah untuk layanan pengaduan online masyarakat adalah...|PeduliLindungi|JKN Mobile|LAPOR!|JDIH Nasional|c^Abercrombie mendefinisikan tradisi sebagai...|Keputusan politik parlemen|Kebiasaan diwariskan antargenerasi|Aturan tertulis bersanksi|Perilaku adopsi budaya asing|b^Kearifan lokal Bali tentang keharmonisan manusia, Tuhan, dan alam disebut...|Tri Hita Karana|Sad Rasa|Tat Twam Asi|Tri Kaya Parisudha|a^Pesan utama filosofi Baduy 'Gunung teu meunang dilebur' adalah...|Membangun kawasan industri pegunungan|Kewajiban menjaga kelestarian alam|Larangan mukim di dataran rendah|Memanfaatkan hutan sebebasnya|b^Undang-undang tentang Pemajuan Kebudayaan adalah...|UU No 11 Tahun 2008|UU No 9 Tahun 1998|UU No 5 Tahun 2017|UU No 14 Tahun 2008|c^Kondisi struktur penduduk didominasi kelompok usia produktif disebut...|Urbanisasi penduduk|Bonus demografi|Transisi demografi|Kepadatan agraris|b^Wujud cita-cita nasional dalam Pembukaan UUD 1945 tercantum pada...|Alinea pertama|Alinea kedua|Alinea ketiga|Alinea keempat|b^Sistem pertahanan keamanan yang bersifat semesta dikenal dengan...|Hansip|Sishankamrata|Wajib militer|Bela negara aktif|b^Pasal 28F UUD 1945 memberikan jaminan perlindungan untuk...|Memilih pekerjaan layak|Berkomunikasi & memperoleh informasi|Memeluk agama|Mendapat pengajaran dasar|b^Peran pers nasional di Indonesia diatur dalam...|UU No 40 Tahun 1999 tentang Pers|UU No 39 Tahun 1999 tentang HAM|UU No 14 Tahun 2008 tentang KIP|UU No 9 Tahun 1998|a^Komitmen pelajar dalam menjaga NKRI diwujudkan melalui sikap...|Membentuk kelompok eksklusif|Menaati tata tertib & toleransi|Aksi protes anarkis|Mengabaikan upacara bendera|b^Hubungan Pancasila dan UUD 1945 ibarat roh dan jasad yang tak terpisahkan.|Benar|Salah|-|-|a^Pembukaan UUD 1945 dapat diamendemen sewaktu-waktu oleh MPR.|Benar|Salah|-|-|b^Menurut Notonegoro, kewajiban adalah beban memberikan sesuatu secara mutlak.|Benar|Salah|-|-|a^HAM di Indonesia bersifat mutlak tanpa batas dan bebas tanpa peduli hak orang lain.|Benar|Salah|-|-|b^Peradilan militer mengadili tindak pidana yang dilakukan oleh militer.|Benar|Salah|-|-|a^Demonstrasi diperbolehkan di lingkungan istana kepresidenan pada malam hari.|Benar|Salah|-|-|b^Keterbukaan informasi publik diatur melalui UU No 14 Tahun 2008.|Benar|Salah|-|-|a^Tradisi budaya lokal bersifat statis dan tidak berguna bagi masyarakat modern.|Benar|Salah|-|-|b^Satu Tungku Tiga Batu adalah wujud kearifan lokal kerukunan di Fakfak.|Benar|Salah|-|-|a^Sensus 2020: sebagian besar penduduk Indonesia terkonsentrasi di luar Pulau Jawa.|Benar|Salah|-|-|b^Bonus demografi memberi keuntungan jika SDM didukung pendidikan dan kesehatan.|Benar|Salah|-|-|a^Pasal 33 UUD 1945: bumi, air, kekayaan alam dikuasai negara untuk kemakmuran rakyat.|Benar|Salah|-|-|a^Bullying di sekolah adalah bentuk pelanggaran hak asasi manusia.|Benar|Salah|-|-|a^Kebebasan pendapat tidak memerlukan batasan moral karena dijamin undang-undang.|Benar|Salah|-|-|b^Peran menjaga NKRI bagi siswa dimulai dari disiplin dan menghormati teman.|Benar|Salah|-|-|a";
+                    strSoal.split('^').forEach((s, i) => { const [soal, a, b, c, d, ans] = s.split('|'); batchSoal.set(doc(db, "questions", 'soal_pkn_'+(i+1)), {soal, a, b, c, d, jawaban:ans}); });
+                    await batchSoal.commit();
+                }
+
+                // 3. Cek Siswa (Pastikan tepat 173 sesuai PDF)
+                const uSnap = await getDocs(collection(db, "users"));
+                if(uSnap.size !== 173) {
+                    document.getElementById('loading-overlay').classList.remove('hidden');
+                    const batchDelete = writeBatch(db); uSnap.forEach(d => batchDelete.delete(d.ref)); await batchDelete.commit();
+
+                    const batchSiswa = writeBatch(db);
+                    const strSiswa = "ABIDZAR AL GHIFARI LUBIS|9.1|242507001|0112250701|L^AISHA RIZKYA ZHAFIRA|9.1|242507185|0118468729|P^ALDIAN FAIZ ABIMANYU|9.1|242507049|0115521932|L^AN NISA AULIA RAHMAH|9.1|242507051|03113035206|P^ASSYIPA ALDAWIYAH|9.1|242507140|3126598859|P^ATARA NAWAWINA ALAYA|9.1|242507006|3115132886|P^DANISH ALDRIC KANDELA|9.1|242507053|0129682086|L^ELVINA RAMADHANI|9.1|242507011|0128031712|P^FAKHRI AL YASIN|9.1|242507144|0125950149|L^HAIKAL YUSUF MUTAQIN|9.1|242507146|0126738383|L^HELMAWATI NISPI|9.1|242507148|0127732474|P^KALILA AZZAHRA AGSYA|9.1|242507150|0123215234|P^KARIN PUTRI RAHMANIAR|9.1|242507151|0123810952|P^MEDINA RAYANI PUTRI|9.1|242507154|0111262830|P^MUHAMAD FIKRI HAIKAL|9.1|242507067|3115858704|L^MUHAMAD KURNIAWAN|9.1|242507110|3128561717|L^MUHAMAD RISKI|9.1|242507163|0119272535|L^MUHAMAD RIZKY ALFARIZI|9.1|242507156|0114707555|L^MUHAMAD YAHYA SEPTIAN|9.1|242507023|3114407011|L^MUHAMMAD AMMAR AZZIKRA|9.1|242507026|0121453887|L^MUHAMMAD AZZAM ZAIDDAN|9.1|242507113|0127804343|L^MUHAMMAD FADIL ALFARIZKY|9.1|242507066|0125048100|L^MUHAMMAD IMAM RIYADHUSSOLIHIN|9.1|242507029|0121991684|L^MUHAMMAD NICKY PRATAMA|9.1|242507074|0112208538|L^MULYANA BADAR MUHTAR|9.1|242507167|0126632131|L^NAJLAA KIRANA PUTRI|9.1|242507116|0126757694|P^NARENDRA DARVESH PRADITYA|9.1|242507117|0129767780|L^NAZWA ZAKIYAH|9.1|242507031|3122953563|P^NOVITA DWI LESTARI|9.1|242507032|3128551310|P^RAFA FAEYZA ADITYA|9.1|242507123|0124575918|L^RAFI IMADUL BILAD|9.1|242507081|0118347648|L^RIDHONINO SETIAWAN|9.1|242507174|0115176085|L^RIYAN AZZARI DALIMUNTE|9.1|242507126|0124959392|L^SIFA RAMADANI|9.1|242507129|0114585043|P^SILVIA HIDAYAT|9.1|242507130|0115912357|P^SITI SILVIAWATI|9.1|242507086|3120214186|P^SITI WINDI AZAHIRA|9.1|242507087|0116017127|P^SITI ZAHIRA|9.1|242507088|0129243631|P^SYLA RAHMAΝΙΑ|9.1|242507186|0122849032|P^VIOLA ZULFIANI|9.1|242507089|0117682754|P^VISKA ARIANI|9.1|242507090|3125102794|P^WILDAN NURULLOH|9.1|242507046|3112799899|L^ZIDAN ALGIFARI SURYAMAN|9.1|242507179|0112922469|L^AFRINA RAFANIA RHAMDANI|9.2|242507093|0123145389|P^AL ZAHIRA SRI WIJAYA|9.2|242507094|0112458312|P^ALFAN ANDRIAN|9.2|242507050|3110372642|L^ARSYAVIN WIDAN SAPUTRA|9.2|242507005|3114044196|L^ARYA NAILUL KHALIL|9.2|242507139|0119108501|L^AURORA MIKHAYLA RAMADANTI|9.2|242507052|3126814449|P^AZZAHRA WIDYASIH PUTRI|9.2|242507141|0121057775|P^BUNGA KEYSHA DARMAWAN|9.2|242507008|3128932716|P^DENDY ALFAREZ PUTRA WIDODO|9.2|242507054|0124462929|L^EGI|9.2|242507010|3114633046|L^FAHMI PUTRA RIFA'I|9.2|242507056|3111616100|L^FAIRUZ FUADI SAPUTRA|9.2|242507101|3114479502|L^FAJAR ADHITAMA|9.2|242507102|3125296816|L^FARASKA SURYA FADILAH|9.2|242507145|0127713764|L^FARSHA FAIZI SAPUTRA|9.2|242507057|0113281236|L^HASBI ALGANI|9.2|242507147|0117447040|L^IBRAHIM DZAKI CHANDRA|9.2|242507104|0111135296|L^INTAN SYIFA MUFADHILAH|9.2|242507149|0129554291|P^IRVAN MAULANA|9.2|242507060|0116127084|L^JERRY AHMAD AL-FARIZZI|9.2|242507016|0121692888|L^KALILA RIFDA|9.2|242507017|0126563139|P^KHANZA CHAERUNNISA|9.2|242507063|3122278981|P^MUHAMAD ALVIN MULYADI|9.2|242507073|0127635435|L^MUHAMAD DHARIN DIMYATI|9.2|242507021|0117756964|L^MUHAMAD RAFI FAHRUROHMAN|9.2|242507111|3115697782|L^MUHAMMAD AZZMI KHAIRAN|9.2|242507114|0114059284|L^MUHAMMAD ENO KURNIAWAN|9.2|242507159|3127311018|L^MUHAMMAD FAHRY FIQRIANI|9.2|242507161|0122039029|L^MUHAMMAD IBNU SABIL|9.2|242507028|3129677731|L^MUHAMMAD RENALDY SYAHRILLAH|9.2|242507076|0121473107|L^MUHAMMAD RIFYAN|9.2|242507162|0119702922|L^NAJWATUL LATIFAH|9.2|242507187|0102357258|P^NAWA AURA WAHYUDI|9.2|242507119|3117784761|P^NUGIH PRATAMA|9.2|242507078|0118972393|L^NUR SHAFA KAMILA|9.2|242507080|0115974381|P^PUTRI CAHYA YULIA|9.2|242507169|0116845427|P^RAFIF NAUFAL FADHILAH|9.2|242507170|0127658437|L^ROFI ALKHAYIS PUTRA YOLANDA|9.2|242507127|3125609025|L^SHEREN AZKIA CALISTA|9.2|242507085|0127368315|P^SITI QISWAH|9.2|242507041|0113065360|P^ULFAH HAKIMAH AKBAR|9.2|242507044|0129472451|P^YASMIN ADZKIA|9.2|242507131|3115175343|P^YUNITA PERMATA SARI|9.2|242507133|0113300370|P^ZAHRAH ZAAFARANI|9.2|242507092|0127178677|P^ACHDAN YUSUF KRISTIANTO|9.3|242507002|3118256582|L^ADELIA ALYA PUTRI|9.3|242507003|0128183889|P^AFRAM MAHAWIRA|9.3|242507047|0128502377|L^ALFIAN SYAHPUTRA|9.3|242507095|3120024158|L^ALIKA KHOIRUNNISA|9.3|242507138|0116206407|P^BALQIS UFAIRAH|9.3|242507007|0123010248|P^CALLISTA NEYSA SAFARI|9.3|242507009|0121170697|P^DHENA ZAHRA RAMADHANI|9.3|242507098|0128640046|P^FAHRI NURHAKIM|9.3|242507100|0116919283|L^FATIMAH RAHMA|9.3|242507013|0129629537|P^FIKRI SURYA PRATAMA RAMADHAN|9.3|242507014|0117318247|L^GEMA ARVI RAMADHAN|9.3|242507015|0111856130|L^HILMA AYUNINDIA PUTRI|9.3|242507103|0125846934|P^KENZA ALGIYASA RAMADHAN|9.3|252608188|0114001833|L^LAURA KIRANA SYIFAN|9.3|242507064|0114668414|P^M. RAMLAN|9.3|242507107|0107534944|L^MAURA SILVIANA DEVI|9.3|242507153|0129560342|P^MUHAMAD HASBI AL-HADORI|9.3|242507069|3118528446|L^MUHAMAD RAMA HAIKAL ANDRIAN|9.3|242507155|3122869484|L^MUHAMAD SYAGHILUL KHAIR|9.3|242507157|3128263561|L^MUHAMMAD AGHA ALDZAKWAN|9.3|242507071|3127683602|L^MUHAMMAD ALIF AHDAN|9.3|242507072|0118702008|L^MUHAMMAD GALEN HAMIZAN FAIQ|9.3|242507027|3120581901|L^MUHAMMAD MAHAMERU|9.3|242507030|0115155912|L^MUHAMMAD RAFI AL ZAKI|9.3|242507075|0125695290|L^MUHAMMAD SALMAN ALPARIZZI|9.3|242507164|0113012488|L^NUR AKBAR|9.3|242507079|0114829364|L^PRADIPTA DAMAR ATMAJA|9.3|242507121|0124241649|L^RAFA ALDIAN SIREGAR|9.3|242507034|0125010329|L^RAHMA FITRIANI|9.3|242507035|0128054159|P^RAISSA RAWNIE RIANTA|9.3|242507082|0125692386|P^RAVAEL ARIFIAN|9.3|242507083|3127004840|L^REYHANI KURNIA RAMADHANI|9.3|242507172|0127614774|P^SABRINA SOFIA FIRDAUS|9.3|242507128|3123791401|P^SASKIA SHAFARANI|9.3|242507040|31108930891|P^SHAFA RIZKIKA RAMADHANI|9.3|242507084|3118689729|P^TSANI LATIFA|9.3|242507043|3119726769|P^WAHYU RIFTIANSYAH CAHYO PRAYOG|9.3|242507091|0121650332|L^YASMIN NABILA RAMADHANI|9.3|242507132|0116646191|P^ZAIN GIBRAN|9.3|242507134|0122321920|L^ZARA ALIFAH NOVIANTI|9.3|242507135|0115864404|P^ZASKIA OKTAVIANI|9.3|242507136|0117852452|P^ZEIN ABDULLAH SOPYAN|9.3|242507178|3120378578|L^ADISTYA SAHIRA NASUTION|9.4|242507137|0114272306|P^AHTAR MAULANA SANJAYA|9.4|242507048|3113568980|L^ANANDA CHIARA CHANA LUCITA HAR|9.4|242507004|3113858725|P^ANDHIKA MAULANA RIZKY|9.4|242507096|3129608907|L^ANNALISA PUTRI ANGGRAENI|9.4|242507184|0118448564|P^DESHINTA MAHARANI|9.4|242507055|0119756570|P^DHIA AYU SYARAFANA|9.4|242507142|0128579453|P^DINDA RIZKY LESTARI|9.4|242507099|0114364305|P^FAHMI NURUL DZIHNI|9.4|242507012|0111449123|L^FAJAR RAMADHAN|9.4|242507143|0107745175|L^IKRIMA AZZAHRA|9.4|242507058|3122354991|P^INDRIYANA|9.4|242507059|0126291785|P^JOE HANDY VICKY ATMAJA|9.4|242507061|0144020622|L^KENZIE EKO SADUBI|9.4|242507018|0116692650|L^KHADIZAH PUTRI FAUZIAH|9.4|242507062|0114934071|P^MAULANA ABDUL HADI|9.4|242507152|0111138804|L^MUHAMAD ARYA PRATAMA|9.4|242507019|0126737439|L^MUHAMAD DANU PERMAΝΑ|9.4|242507020|0124559999|L^MUHAMAD GISMA APRIATNA|9.4|242507068|0128155135|L^MUHAMAD ILHAM FIQRIANSYAH|9.4|242507070|3122395422|L^MUHAMAD RIFAT SULAEMAN|9.4|242507077|0126156847|L^MUHAMAD YUSUF GHAZALI SUTISNA|9.4|242507024|0118598035|L^MUHAMMAD ABIAN PRATAMA PUTRA|9.4|242507025|0129777548|L^MUHAMMAD ANWARUDIN|9.4|242507112|3129727489|L^MUHAMMAD ARKA SAPUTRA|9.4|242507065|0123775509|L^MUHAMMAD AZKA ADYARIZKY|9.4|242507158|3114586617|L^MUHAMMAD FACHRI TIRTAYASA|9.4|242507160|3128358398|L^MUHAMMAD SYATHIR|9.4|242507182|0121665902|L^MUHAMMAD TIBRIZIK MUKODAM|9.4|242507165|0127611686|L^MUHAMMAD VICKY AKBAR|9.4|242507166|0123762074|L^NUFFAH JASMINE HAURA KHANSA|9.4|242507033|3118668179|P^NURHILMA NAFILA|9.4|242507168|3125724996|P^OCTA NUR'AENI|9.4|242507120|0112620301|P^PUTRI AYUDIA INKAN|9.4|242507122|0128792685|P^RAIF AL YASIR|9.4|242507036|0128822909|L^RAISA ALKAUTSAR|9.4|242507037|3124118938|P^RAYHAN HERMANSYAH|9.4|242507124|0114866515|L^REZKY AJI SAPUTRA|9.4|242507173|0116362683|L^SAEPUDIN|9.4|242507038|3125354904|L^SALWA ALFINA HUSNIYAH|9.4|242507039|0121847853|P^SITI AYRA|9.4|242507176|3127820485|P^SITI AZZAHRA BATUBARA|9.4|242507177|0115727627|P^SITI SALWA KHAMALIYAH|9.4|242507042|3121489131|P";
+                    strSiswa.split('^').forEach(s => { const [nama, kelas, nis, nisn, jk] = s.split('|'); batchSiswa.set(doc(db, "users", 'siswa_'+nis), {nama, kelas, nis, nisn, jk, status: 'belum', nilai: 0, jawaban: {}}); });
+                    await batchSiswa.commit();
+                    
+                    document.getElementById('loading-overlay').classList.add('hidden');
+                    window.location.reload(); // Refresh setelah repair
+                }
+            } catch(e) { console.log("Gagal Hard Reset:", e); }
+        }
+        
+        window.addEventListener('load', hardResetDanSuntik);
+
+        // LISTENER DB (Menangkap 50 soal murni)
+        onSnapshot(collection(db, "users"), (snapshot) => {
+            users = []; snapshot.forEach(d => { if(d.data().nama && !d.data().nama.includes('undefined')) users.push({ id: d.id, ...d.data() }); });
+            if(!document.getElementById('admin-page').classList.contains('hidden')) { updateDash(); renderNilai(); renderSiswa(); }
+        });
+
+        onSnapshot(collection(db, "questions"), (snapshot) => {
+            questions = []; snapshot.forEach(d => { if(d.data().soal && !d.data().soal.includes('undefined')) questions.push({ id: d.id, ...d.data() }); });
+            if(!document.getElementById('admin-page').classList.contains('hidden')) { document.getElementById('s-soal').innerText = questions.length; renderSoal(); }
+        });
+
+        // ==========================
+        // LOGIN & KONFIRMASI SISWA
+        // ==========================
+        window.switchTab = (t) => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('form-siswa').classList.add('hidden'); document.getElementById('form-guru').classList.add('hidden');
+            document.getElementById(t === 'siswa' ? 'form-siswa' : 'form-guru').classList.remove('hidden');
+            document.querySelectorAll('.tab-btn')[t === 'siswa' ? 0 : 1].classList.add('active');
+        };
+        window.loadNama = () => {
+            const k = document.getElementById('kelas-select').value;
+            const s = document.getElementById('nama-select'); s.innerHTML = '<option value="">-- Pilih Nama Lengkap --</option>';
+            if(k) { users.filter(u => u.kelas === k).sort((a,b) => a.nama.localeCompare(b.nama)).forEach(u => { s.innerHTML += `<option value="${u.id}">${u.nama}</option>`; }); s.disabled = false; } else s.disabled = true;
+        };
+        window.cekSiswa = () => {
+            const id = document.getElementById('nama-select').value; if(!id) return Swal.fire('Tunggu!', 'Pilih nama Anda terlebih dahulu.', 'warning');
+            userNow = users.find(u => u.id === id);
+            if(userNow.status === 'selesai') return Swal.fire('Selesai', 'Anda sudah mengumpulkan ujian ini.', 'info');
+            document.getElementById('k-nama').innerText = userNow.nama; document.getElementById('k-kelas').innerText = userNow.kelas; document.getElementById('k-nis').innerText = `${userNow.nis} / ${userNow.nisn}`;
+            document.getElementById('modal-konfirm').classList.remove('hidden');
+        };
+        window.tutupModal = (id) => document.getElementById(id).classList.add('hidden');
+
+        // ==========================
+        // LOGIKA UJIAN HP (NO GRID, ACAK SOAL - JAWABAN TETAP, KUNCI MEMORI BARU)
+        // ==========================
+        window.startUjian = () => {
+            if(questions.length < 10) return Swal.fire('Tunggu!', 'Sistem sedang memuat soal. Coba lagi dalam 3 detik.', 'warning');
+            document.getElementById('modal-konfirm').classList.add('hidden'); document.getElementById('login-page').classList.add('hidden'); document.getElementById('ujian-page').classList.remove('hidden');
+            document.getElementById('u-nama').innerText = userNow.nama; document.getElementById('u-kelas').innerText = `Kelas ${userNow.kelas} • NIS: ${userNow.nis}`;
+            
+            // Kunci Memori Baru: Memaksa HP melupakan soal undefined yang lama
+            const sesiKey = 'ujian_bersih_100persen_' + userNow.id; 
+            const sesi = localStorage.getItem(sesiKey);
+            
+            if(sesi) { 
+                const p = JSON.parse(sesi); soalSiswa = p.s; jawaban = p.j; idxSoal = p.i; 
+            } else {
+                // ACAK SOAL UNTUK ANAK, TAPI POSISI JAWABAN (A,B,C,D) TETAP TIDAK DIACAK
+                soalSiswa = questions.sort(()=>Math.random()-0.5).map(q => ({
+                    ...q, opsi: [{k:'a',t:q.a}, {k:'b',t:q.b}, {k:'c',t:q.c}, {k:'d',t:q.d}] // JAWABAN TETAP PERMANEN
+                }));
+                jawaban = {}; idxSoal = 0; sSesi();
+            }
+            
+            document.getElementById('total-soal').innerText = soalSiswa.length;
+            tampilSoal(idxSoal);
+        };
+        
+        const sSesi = () => localStorage.setItem('ujian_bersih_100persen_' + userNow.id, JSON.stringify({s: soalSiswa, j: jawaban, i: idxSoal}));
+        
+        window.tampilSoal = (i) => {
+            idxSoal = i; sSesi(); const q = soalSiswa[i];
+            document.getElementById('nomor-tampil').innerText = (i + 1); 
+            document.getElementById('teks-soal').innerText = q.soal;
+            
+            const list = document.getElementById('opsi-list'); list.innerHTML = '';
+            q.opsi.forEach((o, n) => {
+                if(!o.t || o.t === "-" || o.t.includes('undefined')) return; // Abaikan jika opsi rusak/kosong
+                const d = document.createElement('div'); d.className = `opsi-item ${jawaban[q.id] === o.k ? 'selected' : ''}`;
+                d.onclick = () => { jawaban[q.id] = o.k; sSesi(); tampilSoal(i); };
+                d.innerHTML = `<div class="opsi-label">${['A','B','C','D'][n]}</div><div class="opsi-text">${o.t}</div>`; list.appendChild(d);
+            });
+            
+            document.getElementById('btn-prev').style.display = i === 0 ? 'none' : 'flex';
+            document.getElementById('btn-next').style.display = i === soalSiswa.length - 1 ? 'none' : 'flex';
+            document.getElementById('btn-kirim').classList.toggle('hidden', i !== soalSiswa.length - 1);
+        };
+        
+        window.navigasi = (d) => tampilSoal(idxSoal + d);
+        
+        window.kirimUjian = async () => {
+            if(!confirm('Kumpulkan ujian sekarang? Pastikan semua sudah diisi.')) return;
+            Swal.fire({ title: 'Menyimpan Jawaban...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            let benar = 0; for(let k in jawaban) { const a = questions.find(x => x.id === k); if(a && a.jawaban === jawaban[k]) benar++; }
+            const nilai = Math.round((benar / soalSiswa.length) * 100) || 0;
+            await updateDoc(doc(db, "users", userNow.id), { status: 'selesai', nilai: nilai, jawaban: jawaban });
+            localStorage.removeItem('ujian_bersih_100persen_' + userNow.id); // hapus memori ujian
+            Swal.fire('Berhasil!', 'Jawaban terkirim. Nilai Anda: ' + nilai, 'success').then(() => window.location.reload());
+        };
+
+        // ==========================
+        // MENU ADMIN (GURU)
+        // ==========================
+        window.loginGuru = () => { if(document.getElementById('pin-guru').value === '202099') { document.getElementById('login-page').classList.add('hidden'); document.getElementById('admin-page').classList.remove('hidden'); updateDash(); } else Swal.fire('Error', 'PIN Salah', 'error'); };
+        window.bukaMenu = (m, el) => { document.querySelectorAll('.admin-menu').forEach(x => x.classList.add('hidden')); document.querySelectorAll('.menu-item').forEach(x => x.classList.remove('active')); document.getElementById('menu-'+m).classList.remove('hidden'); el.classList.add('active'); };
+        
+        function updateDash() {
+            let totalSiswa = users.length, selesai = users.filter(u => u.status === 'selesai').length;
+            document.getElementById('s-siswa').innerText = totalSiswa; document.getElementById('s-selesai').innerText = selesai;
+            let kls = {}; users.forEach(u => { if(!kls[u.kelas]) kls[u.kelas] = {t:0,l:0,p:0,s:0}; kls[u.kelas].t++; if(u.jk==='L') kls[u.kelas].l++; else kls[u.kelas].p++; if(u.status==='selesai') kls[u.kelas].s++; });
+            const tb = document.querySelector('#tbl-statistik tbody'); tb.innerHTML = '';
+            Object.keys(kls).sort().forEach(k => { const s = kls[k]; tb.innerHTML += `<tr><td style="color:var(--primary); font-weight:800;">${k}</td><td>${s.t}</td><td>${s.l}</td><td>${s.p}</td><td><span class="badge badge-success">${s.s}</span></td><td><span class="badge badge-warning">${s.t-s.s}</span></td></tr>`; });
+        }
+        
+        window.renderNilai = () => {
+            const f = document.getElementById('f-nilai').value; const list = f === 'ALL' ? users : users.filter(u => u.kelas === f);
+            const tb = document.querySelector('#tbl-nilai tbody'); tb.innerHTML = '';
+            list.sort((a,b) => a.nama.localeCompare(b.nama)).forEach(u => tb.innerHTML += `<tr><td style="font-weight:700;">${u.nama}</td><td>${u.kelas}</td><td>${u.nis}</td><td>${u.status==='selesai'?'<span class="badge badge-success">Selesai</span>':'<span class="badge badge-warning">Belum</span>'}</td><td style="font-size:1.1rem; font-weight:800; color:var(--primary);">${u.status==='selesai'?u.nilai:'-'}</td></tr>`);
+        };
+        
+        window.renderSiswa = () => {
+            const f = document.getElementById('f-siswa').value; const list = f === 'ALL' ? users : users.filter(u => u.kelas === f);
+            const tb = document.querySelector('#tbl-siswa tbody'); tb.innerHTML = '';
+            list.sort((a,b) => a.nama.localeCompare(b.nama)).forEach(u => tb.innerHTML += `<tr><td style="font-weight:700;">${u.nama}</td><td>${u.kelas}</td><td>${u.nis}</td><td>${u.nisn||'-'}</td><td>${u.jk}</td><td>${u.status}</td><td>${u.status==='selesai'?`<button class="btn btn-outline" style="padding:8px 12px; margin-right:5px; border-color:var(--secondary); color:var(--secondary);" onclick="rst('${u.id}')" title="Reset Ujian"><i class="fas fa-undo"></i></button>`:''}<button class="btn btn-danger" onclick="hps('users','${u.id}')" title="Hapus"><i class="fas fa-trash"></i></button></td></tr>`);
+        };
+        
+        window.renderSoal = () => {
+            const tb = document.querySelector('#tbl-soal tbody'); tb.innerHTML = '';
+            questions.forEach((q, i) => tb.innerHTML += `<tr><td style="font-weight:800;">${i+1}</td><td>${q.soal}</td><td style="color:var(--secondary);font-weight:800;text-transform:uppercase;">${q.jawaban}</td><td><button class="btn btn-danger" onclick="hps('questions','${q.id}')"><i class="fas fa-trash"></i></button></td></tr>`);
+        };
+        
+        window.downloadExcel = () => {
+            const f = document.getElementById('f-nilai').value; const list = f === 'ALL' ? users : users.filter(u => u.kelas === f);
+            let c = "Nama Lengkap,Kelas,NIS,NISN,L/P,Status,Nilai Akhir\n"; list.sort((a,b) => a.nama.localeCompare(b.nama)).forEach(u => c += `${u.nama},${u.kelas},${u.nis},${u.nisn||'-'},${u.jk},${u.status},${u.status==='selesai'?u.nilai:''}\n`);
+            const l = document.createElement("a"); l.href = encodeURI("data:text/csv;charset=utf-8," + c); l.download = `Nilai_PKN_${f}.csv`; l.click();
+        };
+        
+        window.rst = async (id) => { if(confirm('Reset ujian siswa ini?')) await updateDoc(doc(db,"users",id),{status:'belum',nilai:0,jawaban:{}}); };
+        window.hps = async (k, id) => { if(confirm('Hapus data ini?')) await deleteDoc(doc(db,k,id)); };
+
+        // ==========================
+        // PASTE MANUAL & AI
+        // ==========================
+        window.bukaModalPaste = (t) => {
+            document.getElementById('m-type').value = t; document.getElementById('m-text').value = '';
+            document.getElementById('m-title').innerText = t === 'siswa' ? "Paste Data Siswa" : "Paste Data Soal";
+            document.getElementById('m-format').innerText = t === 'siswa' ? "Nama Lengkap | Kelas | NIS | NISN | L/P" : "Pertanyaan | Opsi A | Opsi B | Opsi C | Opsi D | Kunci";
+            document.getElementById('modal-paste').classList.remove('hidden');
+        };
+        window.simpanPaste = async () => {
+            const t = document.getElementById('m-type').value; const txt = document.getElementById('m-text').value.trim();
+            if(!txt) return alert("Kotak masih kosong!"); Swal.fire({ title: 'Menyimpan...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            const lines = txt.split('\n'); let b = 0;
+            try {
+                if(t === 'siswa') {
+                    for(let l of lines) { if(!l.trim()) continue; const c = l.includes('|') ? l.split('|') : l.split('\t'); if(c.length>=4) { await setDoc(doc(db,"users",'siswa_'+c[2].trim()),{nama:c[0].trim(),kelas:c[1].trim(),nis:c[2].trim(),nisn:(c[3]||''),jk:(c[4]||c[3]).trim(),status:'belum',nilai:0,jawaban:{}}); b++; } }
+                } else {
+                    for(let l of lines) { if(!l.trim()) continue; const c = l.includes('|') ? l.split('|') : l.split('\t'); if(c.length>=6) { await setDoc(doc(db,"questions",'soal_manual_'+Date.now()+Math.random()),{soal:c[0].trim(),a:c[1].trim(),b:c[2].trim(),c:c[3].trim(),d:c[4].trim(),jawaban:c[5].trim().toLowerCase()}); b++; } }
+                }
+                document.getElementById('modal-paste').classList.add('hidden'); Swal.fire('Berhasil', `${b} Data Tersimpan`, 'success');
+            } catch(e) { Swal.fire('Error', 'Format kurang tepat.', 'error'); }
+        };
+
+        window.bukaModalAI = () => { document.getElementById('ai-teks-mentah').value = ''; document.getElementById('modal-ai').classList.remove('hidden'); };
+        window.bacaFileUpload = async (e) => {
+            const f = e.target.files[0]; if(!f) return; document.getElementById('ai-teks-mentah').value = "Mengekstrak teks...";
+            try {
+                if(f.name.endsWith('.txt')) document.getElementById('ai-teks-mentah').value = await f.text();
+                else if(f.name.endsWith('.docx')) { const buf = await f.arrayBuffer(); const res = await mammoth.extractRawText({arrayBuffer: buf}); document.getElementById('ai-teks-mentah').value = res.value; }
+                else if(f.name.endsWith('.pdf')) { const buf = await f.arrayBuffer(); const pdf = await pdfjsLib.getDocument({data: buf}).promise; let txt = ""; for(let i=1; i<=pdf.numPages; i++){ const page = await pdf.getPage(i); const c = await page.getTextContent(); txt += c.items.map(x=>x.str).join(" ")+"\\n"; } document.getElementById('ai-teks-mentah').value = txt; }
+            } catch(err) { Swal.fire('Error', 'Gagal membaca file', 'error'); document.getElementById('ai-teks-mentah').value = ""; }
+        };
+        window.prosesGeneratorAI = async () => {
+            const apiKey = "AIzaSyBQ6KInIm35AvTUs6S32pQza5Q1Kae2sCI"; const teks = document.getElementById('ai-teks-mentah').value.trim();
+            if(!teks) return Swal.fire('Error', 'Teks kosong!', 'error');
+            Swal.fire({ title: 'AI Sedang Meracik...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            const p = `Buat soal pilihan ganda dari materi ini:\n\n${teks}\n\nATURAN MUTLAK:\n1. Format WAJIB murni JSON Array: [{"soal":"Tanya?","a":"OpsiA","b":"OpsiB","c":"OpsiC","d":"OpsiD","jawaban":"a"}]`;
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({contents:[{parts:[{text:p}]}], generationConfig:{temperature:0.1}}) });
+                if(!res.ok) throw new Error(); const data = await res.json();
+                let rTxt = data.candidates[0].content.parts[0].text; const arr = JSON.parse(rTxt.substring(rTxt.indexOf('['), rTxt.lastIndexOf(']')+1));
+                let b = 0; for(let item of arr) { if(item.soal && item.a && item.jawaban) { await setDoc(doc(db,"questions",'soal_ai_'+Date.now()+Math.random()), item); b++; } }
+                document.getElementById('modal-ai').classList.add('hidden'); Swal.fire('Selesai', `${b} Soal AI tersimpan.`, 'success');
+            } catch(e) { Swal.fire('Error AI', 'Teks terlalu panjang/Format salah.', 'error'); }
         };
     </script>
 </body>
